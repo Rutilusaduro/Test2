@@ -10,6 +10,8 @@ import { createCombatState, getCombatRewards } from "./gameData/combat.js";
 import { pickEncounter } from "./gameData/enemies.js";
 import { awardCombatXp } from "./gameData/leveling.js";
 import { initSpellSlots } from "./gameData/spellSlots.js";
+import { ensureQuestState } from "./gameData/questEngine.js";
+import { recordCombatEndForQuests } from "./hooks/questHooks.js";
 import "./textEngine/scenes/index.js";
 
 export default function App() {
@@ -28,6 +30,7 @@ export default function App() {
     if (g) {
       if (!g.player.spellSlots) initSpellSlots(g.player);
       if (!g.player.sizeCap) g.player.sizeCap = 5;
+      ensureQuestState(g);
       setGame(g);
       setScreen("world");
     }
@@ -59,6 +62,10 @@ export default function App() {
       const { levelUps } = awardCombatXp(next.player, combat);
       if (levelUps.length) {
         next.lastLevelUpMessage = levelUps.map((lu) => `Level ${lu.level}! ${lu.flavor}`).join("\n");
+      }
+      const quest = recordCombatEndForQuests(next, combat);
+      if (quest.questMessages) {
+        next.lastQuestMessage = quest.questMessages;
       }
       next.combat = null;
       saveGame(next);

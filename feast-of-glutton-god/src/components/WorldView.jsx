@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { getRegion } from "../gameData/regions.js";
 import { getNpcsInRegion } from "../gameData/npcs.js";
 import { getNpcState, applyNpcState } from "../gameData/player.js";
@@ -8,7 +8,10 @@ import { getCorruptionTier } from "../gameData/corruption.js";
 import { getXpProgress } from "../gameData/leveling.js";
 import { longRest } from "../gameData/leveling.js";
 import { getPlayerDerivedStats } from "../gameData/player.js";
+import { getUnlockedConnections } from "../gameData/questEngine.js";
+import { recordRegionVisitForQuests } from "../hooks/questHooks.js";
 import NpcModal from "./NpcModal.jsx";
+import QuestLog from "./QuestLog.jsx";
 
 export default function WorldView({ game, onUpdate, onEncounter, onSave, onDebugContext }) {
   const [npcModal, setNpcModal] = useState(null);
@@ -19,8 +22,24 @@ export default function WorldView({ game, onUpdate, onEncounter, onSave, onDebug
   const derived = getPlayerDerivedStats(player);
 
   const travel = (regionId) => {
-    onUpdate((g) => ({ ...g, region: regionId }));
+    onUpdate((g) => {
+      const next = { ...g, region: regionId };
+      const quest = recordRegionVisitForQuests(next, regionId);
+      if (quest.questMessages) next.lastQuestMessage = quest.questMessages;
+      return next;
+    });
   };
+
+  useEffect(() => {
+    onUpdate((g) => {
+      const quest = recordRegionVisitForQuests(g, g.region);
+      if (quest.questMessages) {
+        return { ...g, lastQuestMessage: quest.questMessages };
+      }
+      return g;
+    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- fire once on mount for visit objectives
+  }, []);
 
   const openNpc = (npc) => {
     const state = getNpcState(game, npc);
@@ -76,7 +95,7 @@ export default function WorldView({ game, onUpdate, onEncounter, onSave, onDebug
       <div className="panel">
         <h2>Travel</h2>
         <div className="btn-grid">
-          {region.connections.map((id) => {
+          {getUnlockedConnections(game, game.region).map((id) => {
             const r = getRegion(id);
             return (
               <button key={id} onClick={() => travel(id)}>Go to {r.name}</button>
@@ -106,6 +125,8 @@ export default function WorldView({ game, onUpdate, onEncounter, onSave, onDebug
           </div>
         )}
       </div>
+
+      <QuestLog game={game} regionId={game.region} onUpdate={onUpdate} />
 
       <div className="panel">
         <h2>Actions</h2>
@@ -140,6 +161,7 @@ export default function WorldView({ game, onUpdate, onEncounter, onSave, onDebug
           game={game}
           onClose={() => setNpcModal(null)}
           onUpdate={handleNpcUpdate}
+          onGameRefresh={() => onUpdate((g) => ({ ...g }))}
           onDebugContext={onDebugContext}
         />
       )}

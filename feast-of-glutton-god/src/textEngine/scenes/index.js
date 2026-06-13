@@ -8,6 +8,7 @@ import './combatText.js';
 import './checks/index.js';
 import './growthEvent/index.js';
 import './growth/index.js';
+import './quests/index.js';
 
 export { renderObserve, POSES } from './npc/observe.js';
 export { renderFeed, FEED_TEMPLATE } from './npc/feed.js';

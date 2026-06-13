@@ -15,6 +15,21 @@ import { getCorruptionTier } from '../gameData/corruption.js';
 import { getStage } from '../gameData/stages.js';
 import { spendAP } from '../gameData/player.js';
 import { checkSeduce, formatCheckSummary, toTextContext, DC } from '../gameData/skillChecks.js';
+import { recordNpcInteractionForQuests } from './questHooks.js';
+
+function withQuestProgress(game, npc, interaction, meta, result) {
+  const quest = recordNpcInteractionForQuests(game, {
+    npcId: npc.id,
+    interaction,
+    npc: result.npc ?? npc,
+    meta,
+  });
+  if (quest.questMessages) {
+    result.text = (result.text || '') + (quest.questMessages ? `\n\n---\n${quest.questMessages}` : '');
+  }
+  result.questNotes = quest;
+  return result;
+}
 
 let sessionHistory = null;
 
@@ -36,13 +51,13 @@ export function doObserve(npc, player, game) {
   const pose = poses[Math.floor(Math.random() * poses.length)];
   const text = renderObserve(npc, player, { pose, location: game.region, history: getTextHistory(game) });
   addCorruption(npc, 1);
-  return { text, npc };
+  return withQuestProgress(game, npc, 'observe', null, { text, npc });
 }
 
 export function doTalk(npc, player, game) {
   const text = renderTalk(npc, player, { location: game.region, history: getTextHistory(game) });
   addRelationship(npc, 3);
-  return { text, npc };
+  return withQuestProgress(game, npc, 'talk', null, { text, npc });
 }
 
 export function doFlirt(npc, player, game) {
@@ -86,12 +101,12 @@ export function doFlirt(npc, player, game) {
       ? '\n\n✦ A charming fumble — you blush, and she finds it endearing.'
       : '';
 
-  return {
+  return withQuestProgress(game, updatedNpc, 'flirt', null, {
     text: `${summary}\n\n${text}${failNote}${critNote}`,
     npc: updatedNpc,
     success: check.success,
     check,
-  };
+  });
 }
 
 export function doFeed(npc, player, game, feedType = 'hand') {
@@ -107,7 +122,9 @@ export function doFeed(npc, player, game, feedType = 'hand') {
     gainLbs: 10,
     week: game.day,
   });
-  return { text: text + '\n\n' + growthText, npc, growth };
+  return withQuestProgress(game, npc, 'feed', { feedType }, {
+    text: text + '\n\n' + growthText, npc, growth,
+  });
 }
 
 export function doBless(npc, player, game, blessType = 'minor') {
@@ -130,7 +147,9 @@ export function doBless(npc, player, game, blessType = 'minor') {
     endStage: growth.endStage,
     week: game.day,
   });
-  return { text: text + '\n\n' + growthText, npc, growth, ok: true };
+  return withQuestProgress(game, npc, 'bless', { blessType }, {
+    text: text + '\n\n' + growthText, npc, growth, ok: true,
+  });
 }
 
 export function doFeast(npc, player, game) {
@@ -147,7 +166,9 @@ export function doFeast(npc, player, game) {
     week: game.day,
   });
   game.day += 1;
-  return { text: text + '\n\n' + growthText, npc, growth, ok: true };
+  return withQuestProgress(game, npc, 'feast', null, {
+    text: text + '\n\n' + growthText, npc, growth, ok: true,
+  });
 }
 
 export function getInteractionMenu(npc, player) {
@@ -180,7 +201,9 @@ export function doSpecial(npc, player, game) {
   addCorruption(npc, 8);
   addRelationship(npc, 5);
   const growthText = renderGrowthScene(npc, { growthMethod: 'blessing', startStage, endStage: growth.endStage, week: game.day });
-  return { text: (lines[player.classId] || lines.cleric) + '\n\n' + growthText, npc, growth };
+  return withQuestProgress(game, npc, 'special', null, {
+    text: (lines[player.classId] || lines.cleric) + '\n\n' + growthText, npc, growth,
+  });
 }
 
 export function doIntimate(npc, player, game) {
@@ -189,16 +212,18 @@ export function doIntimate(npc, player, game) {
   addCorruption(npc, 5);
   addRelationship(npc, 3);
   const growthText = renderGrowthScene(npc, { growthMethod: 'blessing', startStage, endStage: growth.endStage, week: game.day });
-  return {
+  return withQuestProgress(game, npc, 'intimate', null, {
     text: `Intimacy with ${npc.name} — warmth, feeding, worship, growth during lovemaking.\n\n${growthText}`,
     npc, growth,
-  };
+  });
 }
 
 export function doCorrupt(npc, player, game) {
   if (!spendAP(game, 10)) return { text: 'Not enough AP.', npc, ok: false };
   addCorruption(npc, 15);
-  return { text: `You whisper Gorgara's gospel into ${npc.name}'s ear until resistance crumbles into hungry devotion.`, npc, ok: true };
+  return withQuestProgress(game, npc, 'corrupt', null, {
+    text: `You whisper Gorgara's gospel into ${npc.name}'s ear until resistance crumbles into hungry devotion.`, npc, ok: true,
+  });
 }
 
 export function doRecruit(npc, player, game) {
@@ -207,7 +232,9 @@ export function doRecruit(npc, player, game) {
   if (exists) return { text: `${npc.name} is already in your party.`, npc, ok: false };
   const companion = { ...npc, id: npc.companionId, recruited: true, isCompanion: true };
   game.party.push(companion);
-  return { text: `${npc.name} joins your feast-bound pilgrimage!`, npc: companion, ok: true };
+  return withQuestProgress(game, npc, 'recruit', null, {
+    text: `${npc.name} joins your feast-bound pilgrimage!`, npc: companion, ok: true,
+  });
 }
 
 export function renderCombatNarration(unit, interaction) {
