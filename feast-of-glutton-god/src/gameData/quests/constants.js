@@ -23,6 +23,10 @@ export const OBJECTIVE_TYPE = {
   NPC_STAGE_MIN: 'npc_stage_min',
   COMBAT_VICTORY: 'combat_victory',
   FLAG_SET: 'flag_set',
+  /** Cumulative: N distinct NPCs gained minStagesGained since quest start. */
+  NPC_GROWTH_QUOTA: 'npc_growth_quota',
+  /** Any feast interaction in a region (communal abundance). */
+  COMMUNAL_FEAST: 'communal_feast',
 };
 
 /** Approach hints for UI — not mechanically enforced. */
@@ -38,4 +42,12 @@ export const QUEST_APPROACH = {
 export const QUEST_SCORE = {
   ABUNDANCE: 'abundanceScore',
   CONVERSION: 'conversionScore',
+  DOMINANCE: 'dominanceScore',
+  MERCY: 'mercyScore',
+};
+
+/** NPC id aliases for companion ↔ world npc matching in objectives. */
+export const QUEST_NPC_ALIASES = {
+  elara: ['elara', 'elara_inn'],
+  lyra: ['lyra', 'rival_lyra'],
 };

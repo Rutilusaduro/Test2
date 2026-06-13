@@ -15,7 +15,7 @@ import { getCorruptionTier } from '../gameData/corruption.js';
 import { getStage } from '../gameData/stages.js';
 import { spendAP } from '../gameData/player.js';
 import { checkSeduce, formatCheckSummary, toTextContext, DC } from '../gameData/skillChecks.js';
-import { recordNpcInteractionForQuests } from './questHooks.js';
+import { recordNpcInteractionForQuests, recordNpcGrowthForQuests } from './questHooks.js';
 
 function withQuestProgress(game, npc, interaction, meta, result) {
   const quest = recordNpcInteractionForQuests(game, {
@@ -24,8 +24,22 @@ function withQuestProgress(game, npc, interaction, meta, result) {
     npc: result.npc ?? npc,
     meta,
   });
-  if (quest.questMessages) {
-    result.text = (result.text || '') + (quest.questMessages ? `\n\n---\n${quest.questMessages}` : '');
+  let questMessages = quest.questMessages || '';
+  if (result.growth) {
+    const growthQuest = recordNpcGrowthForQuests(game, {
+      npcId: (result.npc ?? npc).id,
+      startStage: result.growth.startStage,
+      endStage: result.growth.endStage,
+      stagesGained: result.growth.stagesJumped,
+    });
+    if (growthQuest.questMessages) {
+      questMessages = questMessages
+        ? `${questMessages}\n\n${growthQuest.questMessages}`
+        : growthQuest.questMessages;
+    }
+  }
+  if (questMessages) {
+    result.text = (result.text || '') + `\n\n---\n${questMessages}`;
   }
   result.questNotes = quest;
   return result;

@@ -109,7 +109,7 @@ export function pickEncounter(regionId) {
     market_square: ["rival_adventurer", "gluttonous_goblin"],
     fertile_heartlands: ["vinebound_dryad", "harvest_harpy"],
     gorgara_cradle: ["temple_guardian", "purity_inquisitor"],
-    ancient_temple: ["temple_guardian", "famine_hag"],
+    ancient_temple: ["temple_guardian", "purity_inquisitor", "famine_hag"],
   };
   const pool = pools[regionId] || ["harvest_harpy"];
   const id = pool[Math.floor(Math.random() * pool.length)];

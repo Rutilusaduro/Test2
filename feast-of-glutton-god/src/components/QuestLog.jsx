@@ -7,6 +7,7 @@ import {
   getObjectiveProgressText,
   getCurrentStage,
 } from '../gameData/questEngine.js';
+import { getQuestDefinition } from '../gameData/quests/registry.js';
 import {
   getQuestDescription,
   getQuestStageDescription,
@@ -43,11 +44,12 @@ export default function QuestLog({ game, regionId, onUpdate }) {
       background: 'var(--bg-card)',
       borderRadius: '4px',
     }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline' }}>
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', flexWrap: 'wrap', gap: '0.25rem' }}>
         <strong style={{ color: isMain ? 'var(--gold-bright)' : 'var(--rose)' }}>
           {isMain ? '★ ' : ''}{entry.def.title}
         </strong>
         <span style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
+          {isMain && entry.def.actLabel ? `${entry.def.actLabel} · ` : ''}
           {entry.def.tags?.map((t) => TAG_LABELS[t] || t).join(' · ')}
         </span>
       </div>
@@ -131,9 +133,10 @@ export default function QuestLog({ game, regionId, onUpdate }) {
         <details style={{ marginTop: '1rem' }}>
           <summary style={{ cursor: 'pointer', color: 'var(--text-dim)' }}>Completed ({completed.length})</summary>
           <ul style={{ marginTop: '0.5rem', paddingLeft: '1.25rem', color: 'var(--text-dim)', fontSize: '0.9rem' }}>
-            {completed.map((id) => (
-              <li key={id}>{id.replace(/_/g, ' ')}</li>
-            ))}
+            {completed.map((id) => {
+              const def = getQuestDefinition(id);
+              return <li key={id}>{def?.title ?? id.replace(/_/g, ' ')}</li>;
+            })}
           </ul>
         </details>
       )}

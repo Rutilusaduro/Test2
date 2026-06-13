@@ -2,14 +2,14 @@
  * Quest engine — unified tracking, advancement, rewards for main & side quests.
  */
 import { getQuestDefinition, getAllQuests } from './quests/registry.js';
-import { QUEST_TYPE, OBJECTIVE_TYPE, QUEST_SCORE } from './quests/constants.js';
+import { QUEST_TYPE, OBJECTIVE_TYPE, QUEST_SCORE, QUEST_NPC_ALIASES } from './quests/constants.js';
 import { getTier } from './relationships.js';
 import { getCorruptionTier } from './corruption.js';
 import { getStage, advanceStage } from './stages.js';
 import { addAbundancePoints } from './player.js';
 import { addExperience, XP_SOURCES } from './leveling.js';
 import { getNpcState, applyNpcState } from './player.js';
-import { findNpc } from './npcs.js';
+import { findNpc, WORLD_NPCS, createNpc } from './npcs.js';
 import { getRegion } from './regions.js';
 import { renderGrowthProse } from '../textEngine/scenes/growth/index.js';
 import { renderQuestText } from '../textEngine/scenes/quests/index.js';
@@ -20,7 +20,22 @@ const DEFAULT_UNLOCKED_REGIONS = [
   'fertile_heartlands',
 ];
 
-/** @typedef {import('./quests/constants.js').QUEST_TYPE} QuestType */
+const PASSIVE_OBJECTIVE_TYPES = [
+  OBJECTIVE_TYPE.NPC_RELATIONSHIP_MIN,
+  OBJECTIVE_TYPE.NPC_CORRUPTION_MIN,
+  OBJECTIVE_TYPE.NPC_STAGE_MIN,
+  OBJECTIVE_TYPE.PLAYER_STAGE_MIN,
+  OBJECTIVE_TYPE.VISIT_REGION,
+  OBJECTIVE_TYPE.FLAG_SET,
+  OBJECTIVE_TYPE.NPC_GROWTH_QUOTA,
+];
+
+const SCORE_FIELD_MAP = {
+  [QUEST_SCORE.ABUNDANCE]: 'abundanceScore',
+  [QUEST_SCORE.CONVERSION]: 'conversionScore',
+  [QUEST_SCORE.DOMINANCE]: 'dominanceScore',
+  [QUEST_SCORE.MERCY]: 'mercyScore',
+};
 
 export function ensureQuestState(game) {
   if (!game.quests) {
@@ -34,10 +49,49 @@ export function ensureQuestState(game) {
   if (!game.player.storyFlags) {
     game.player.storyFlags = {};
   }
+  if (!game.worldFlags.worldAuras) {
+    game.worldFlags.worldAuras = {};
+  }
   return game;
 }
 
-function createActiveQuest(questDef) {
+function resolveNpcAliases(npcId) {
+  if (!npcId) return [];
+  if (QUEST_NPC_ALIASES[npcId]) return QUEST_NPC_ALIASES[npcId];
+  for (const aliases of Object.values(QUEST_NPC_ALIASES)) {
+    if (aliases.includes(npcId)) return aliases;
+  }
+  return [npcId];
+}
+
+function npcIdsMatch(questNpcId, eventNpcId) {
+  if (!questNpcId || !eventNpcId) return false;
+  const a = new Set(resolveNpcAliases(questNpcId));
+  return resolveNpcAliases(eventNpcId).some((id) => a.has(id));
+}
+
+function snapshotGrowthBaselines(game) {
+  const baselines = {};
+  for (const template of WORLD_NPCS) {
+    const npc = createNpc(template);
+    const merged = getNpcState(game, npc);
+    baselines[template.id] = getStage(merged.lbs).id;
+  }
+  for (const companion of game.party ?? []) {
+    baselines[companion.id] = getStage(companion.lbs).id;
+  }
+  return baselines;
+}
+
+function getNpcForObjective(game, npcId) {
+  for (const id of resolveNpcAliases(npcId)) {
+    const npc = findNpc(id, game);
+    if (npc) return getNpcState(game, npc);
+  }
+  return null;
+}
+
+function createActiveQuest(questDef, game) {
   const objectives = {};
   for (const stage of questDef.stages) {
     for (const obj of stage.objectives) {
@@ -49,6 +103,10 @@ function createActiveQuest(questDef) {
     objectives,
     abundanceScore: 0,
     conversionScore: 0,
+    dominanceScore: 0,
+    mercyScore: 0,
+    growthBaselines: snapshotGrowthBaselines(game),
+    growthQualified: [],
     startedDay: null,
     endingId: null,
   };
@@ -57,8 +115,6 @@ function createActiveQuest(questDef) {
 function hasFlag(game, flag) {
   if (game.worldFlags?.[flag]) return true;
   if (game.player?.storyFlags?.[flag]) return true;
-  const qFlags = Object.values(game.quests?.active ?? {}).flatMap(() => []);
-  void qFlags;
   for (const q of Object.values(game.quests?.active ?? {})) {
     if (q.flags?.[flag]) return true;
   }
@@ -133,7 +189,7 @@ export function startQuest(game, questId) {
   if (!check.ok) return { ok: false, message: check.reason, game };
 
   const def = getQuestDefinition(questId);
-  const instance = createActiveQuest(def);
+  const instance = createActiveQuest(def, game);
   instance.startedDay = game.day;
   game.quests.active[questId] = instance;
 
@@ -173,26 +229,58 @@ export function getCurrentStage(questDef, instance) {
   return questDef.stages[instance.stageIndex] ?? null;
 }
 
-function objectiveTargetMet(game, obj) {
-  const count = obj.count ?? 1;
+function getGrowthQuotaTarget(obj) {
+  return obj.npcCount ?? obj.count ?? 4;
+}
 
+function getNpcBaseline(instance, npcId) {
+  for (const id of resolveNpcAliases(npcId)) {
+    if (instance.growthBaselines?.[id] != null) return { id, stage: instance.growthBaselines[id] };
+  }
+  return { id: npcId, stage: null };
+}
+
+function refreshGrowthQuota(game, instance, obj) {
+  const minGain = obj.minStagesGained ?? 2;
+  const target = getGrowthQuotaTarget(obj);
+  const qualified = [];
+
+  const candidates = new Set([
+    ...Object.keys(instance.growthBaselines ?? {}),
+    ...(game.party ?? []).map((c) => c.id),
+  ]);
+
+  for (const npcId of candidates) {
+    const merged = getNpcForObjective(game, npcId);
+    if (!merged) continue;
+    const { id: trackId, stage: baseline } = getNpcBaseline(instance, npcId);
+    if (baseline == null) continue;
+    const current = getStage(merged.lbs).id;
+    if (current - baseline >= minGain) qualified.push(trackId);
+  }
+
+  instance.growthQualified = [...new Set(qualified)];
+  const rec = instance.objectives[obj.id];
+  rec.progress = instance.growthQualified.length;
+  rec.completed = rec.progress >= target;
+  return rec.completed;
+}
+
+function objectiveTargetMet(game, obj, instance = null) {
   switch (obj.type) {
     case OBJECTIVE_TYPE.NPC_RELATIONSHIP_MIN: {
-      const npc = findNpc(obj.npcId, game);
-      if (!npc) return false;
-      const merged = getNpcState(game, npc);
+      const merged = getNpcForObjective(game, obj.npcId);
+      if (!merged) return false;
       return getTier(merged.relationship || 0).id >= (obj.tier ?? 1);
     }
     case OBJECTIVE_TYPE.NPC_CORRUPTION_MIN: {
-      const npc = findNpc(obj.npcId, game);
-      if (!npc) return false;
-      const merged = getNpcState(game, npc);
+      const merged = getNpcForObjective(game, obj.npcId);
+      if (!merged) return false;
       return getCorruptionTier(merged.corruption || 0).id >= (obj.tier ?? 1);
     }
     case OBJECTIVE_TYPE.NPC_STAGE_MIN: {
-      const npc = findNpc(obj.npcId, game);
-      if (!npc) return false;
-      const merged = getNpcState(game, npc);
+      const merged = getNpcForObjective(game, obj.npcId);
+      if (!merged) return false;
       return getStage(merged.lbs).id >= (obj.stage ?? 1);
     }
     case OBJECTIVE_TYPE.PLAYER_STAGE_MIN:
@@ -201,50 +289,33 @@ function objectiveTargetMet(game, obj) {
       return game.region === obj.regionId;
     case OBJECTIVE_TYPE.FLAG_SET:
       return hasFlag(game, obj.flag) || getPlayerFlag(game, obj.flag);
+    case OBJECTIVE_TYPE.NPC_GROWTH_QUOTA:
+      return instance ? refreshGrowthQuota(game, instance, obj) : false;
     default:
       return false;
   }
 }
 
-function isObjectiveComplete(instance, obj) {
+function isObjectiveComplete(game, instance, obj) {
   const rec = instance.objectives[obj.id];
   if (!rec) return false;
   if (rec.completed) return true;
-  const count = obj.count ?? 1;
-  if ([
-    OBJECTIVE_TYPE.NPC_RELATIONSHIP_MIN,
-    OBJECTIVE_TYPE.NPC_CORRUPTION_MIN,
-    OBJECTIVE_TYPE.NPC_STAGE_MIN,
-    OBJECTIVE_TYPE.PLAYER_STAGE_MIN,
-    OBJECTIVE_TYPE.VISIT_REGION,
-    OBJECTIVE_TYPE.FLAG_SET,
-  ].includes(obj.type)) {
-    return rec.progress >= count;
+  if (PASSIVE_OBJECTIVE_TYPES.includes(obj.type)) {
+    return objectiveTargetMet(game, obj, instance);
   }
+  const count = obj.count ?? 1;
   return rec.progress >= count;
 }
 
 function stageObjectivesMet(game, stage, instance) {
   const required = stage.objectives.filter((o) => !o.optional);
-  return required.every((obj) => {
-    if ([
-      OBJECTIVE_TYPE.NPC_RELATIONSHIP_MIN,
-      OBJECTIVE_TYPE.NPC_CORRUPTION_MIN,
-      OBJECTIVE_TYPE.NPC_STAGE_MIN,
-      OBJECTIVE_TYPE.PLAYER_STAGE_MIN,
-      OBJECTIVE_TYPE.VISIT_REGION,
-      OBJECTIVE_TYPE.FLAG_SET,
-    ].includes(obj.type)) {
-      return objectiveTargetMet(game, obj);
-    }
-    return isObjectiveComplete(instance, obj);
-  });
+  return required.every((obj) => isObjectiveComplete(game, instance, obj));
 }
 
 function applyScores(instance, scoreMap = {}) {
   for (const [key, val] of Object.entries(scoreMap)) {
-    if (key === QUEST_SCORE.ABUNDANCE) instance.abundanceScore += val;
-    if (key === QUEST_SCORE.CONVERSION) instance.conversionScore += val;
+    const field = SCORE_FIELD_MAP[key] ?? key;
+    instance[field] = (instance[field] ?? 0) + val;
   }
 }
 
@@ -283,7 +354,46 @@ function applyRewardBundle(game, bundle = {}) {
   for (const qid of bundle.unlockQuests ?? []) {
     game.worldFlags[`quest_unlock_${qid}`] = true;
   }
+  if (bundle.playerSizeCapBonus) {
+    game.player.sizeCap = (game.player.sizeCap || 5) + bundle.playerSizeCapBonus;
+    messages.push(`Maximum size stage increased by ${bundle.playerSizeCapBonus}`);
+  }
+  if (bundle.worldAura) {
+    const aura = typeof bundle.worldAura === 'string'
+      ? { regionId: bundle.worldAura, name: 'Aura of Plenty' }
+      : bundle.worldAura;
+    game.worldFlags.worldAuras[aura.regionId] = aura;
+    messages.push(`${aura.name || 'Aura of Plenty'} settles over ${aura.regionId.replace(/_/g, ' ')}`);
+  }
+  if (bundle.recruitCompanionNpcId) {
+    const template = findNpc(bundle.recruitCompanionNpcId, game);
+    const companionId = template?.companionId || bundle.recruitCompanionNpcId;
+    const exists = (game.party ?? []).find((c) => c.id === companionId);
+    if (!exists && template) {
+      const companion = {
+        ...getNpcState(game, template),
+        id: companionId,
+        recruited: true,
+        isCompanion: true,
+      };
+      game.party = game.party || [];
+      game.party.push(companion);
+      messages.push(`${companion.name} joins your pilgrimage!`);
+    } else if (!exists) {
+      game.player.storyFlags[`companion_unlock_${companionId}`] = true;
+      messages.push(`Companion recruitment unlocked: ${companionId}`);
+    }
+  }
+  for (const cid of bundle.unlockCompanionIds ?? []) {
+    game.player.storyFlags[`companion_unlock_${cid}`] = true;
+    messages.push(`Companion available: ${cid.replace(/_/g, ' ')}`);
+  }
   return messages;
+}
+
+function getScoreValue(instance, scoreKey) {
+  const field = SCORE_FIELD_MAP[scoreKey] ?? scoreKey;
+  return instance[field] ?? 0;
 }
 
 function pickEnding(questDef, instance) {
@@ -291,10 +401,7 @@ function pickEnding(questDef, instance) {
     const mins = ending.condition?.minScores ?? {};
     let ok = true;
     for (const [scoreKey, min] of Object.entries(mins)) {
-      const val = scoreKey === QUEST_SCORE.ABUNDANCE
-        ? instance.abundanceScore
-        : instance.conversionScore;
-      if (val < min) ok = false;
+      if (getScoreValue(instance, scoreKey) < min) ok = false;
     }
     if (ok) return ending;
   }
@@ -303,7 +410,9 @@ function pickEnding(questDef, instance) {
 
 function runGrowthTrigger(game, player, growthSpec, npc) {
   if (!growthSpec) return '';
-  const targetNpc = growthSpec.npcId ? getNpcState(game, findNpc(growthSpec.npcId, game) || npc) : npc;
+  const targetNpc = growthSpec.npcId
+    ? getNpcForObjective(game, growthSpec.npcId)
+    : npc;
   if (!targetNpc) return '';
   const startStage = getStage(targetNpc.lbs).id;
   const stages = growthSpec.stages ?? 1;
@@ -316,6 +425,27 @@ function runGrowthTrigger(game, player, growthSpec, npc) {
     stagesJumped: stages,
     growthPerspective: growthSpec.target === 'player' ? 'self' : 'target',
   });
+}
+
+function objectiveLabel(obj) {
+  return obj.label || obj.id.replace(/_/g, ' ');
+}
+
+function recordGrowthQuotaProgress(game, instance, obj, event) {
+  const minGain = obj.minStagesGained ?? 2;
+  const { id: trackId, stage: baseline } = getNpcBaseline(instance, event.npcId);
+  if (baseline == null) return false;
+
+  const gained = event.endStage - baseline;
+  if (gained >= minGain && !instance.growthQualified.includes(trackId)) {
+    instance.growthQualified.push(trackId);
+  }
+
+  const rec = instance.objectives[obj.id];
+  const target = getGrowthQuotaTarget(obj);
+  rec.progress = instance.growthQualified.length;
+  rec.completed = rec.progress >= target;
+  return rec.completed;
 }
 
 /**
@@ -334,40 +464,44 @@ export function notifyQuestEvent(game, event = {}) {
     const stage = getCurrentStage(def, instance);
     if (!stage) continue;
 
-    let stageChanged = false;
-
     for (const obj of stage.objectives) {
-      if (isObjectiveComplete(instance, obj) && ![
-        OBJECTIVE_TYPE.NPC_RELATIONSHIP_MIN,
-        OBJECTIVE_TYPE.NPC_CORRUPTION_MIN,
-        OBJECTIVE_TYPE.NPC_STAGE_MIN,
-      ].includes(obj.type)) continue;
+      if (isObjectiveComplete(game, instance, obj)) continue;
 
       let matched = false;
 
       if (obj.type === OBJECTIVE_TYPE.NPC_INTERACTION) {
         matched = event.type === 'npc_interaction'
-          && event.npcId === obj.npcId
+          && npcIdsMatch(obj.npcId, event.npcId)
           && event.interaction === obj.interaction
           && (!obj.interactionMeta || matchMeta(obj.interactionMeta, event.meta));
       } else if (obj.type === OBJECTIVE_TYPE.VISIT_REGION) {
         matched = event.type === 'visit_region' && event.regionId === obj.regionId;
       } else if (obj.type === OBJECTIVE_TYPE.COMBAT_VICTORY) {
         matched = event.type === 'combat_end'
-          && (!obj.victoryType || event.victoryType === obj.victoryType);
-      } else if (obj.type === OBJECTIVE_TYPE.NPC_RELATIONSHIP_MIN
-        || obj.type === OBJECTIVE_TYPE.NPC_CORRUPTION_MIN
-        || obj.type === OBJECTIVE_TYPE.NPC_STAGE_MIN
-        || obj.type === OBJECTIVE_TYPE.PLAYER_STAGE_MIN
-        || obj.type === OBJECTIVE_TYPE.FLAG_SET) {
-        if (objectiveTargetMet(game, obj)) {
+          && (!obj.victoryType || event.victoryType === obj.victoryType)
+          && (!obj.enemyId || (event.defeatedEnemyIds ?? []).includes(obj.enemyId));
+      } else if (obj.type === OBJECTIVE_TYPE.COMMUNAL_FEAST) {
+        matched = event.type === 'npc_interaction'
+          && event.interaction === 'feast'
+          && (!obj.regionId || event.regionId === obj.regionId || game.region === obj.regionId);
+      } else if (obj.type === OBJECTIVE_TYPE.NPC_GROWTH_QUOTA) {
+        if (event.type === 'npc_growth') {
+          recordGrowthQuotaProgress(game, instance, obj, event);
+          matched = instance.objectives[obj.id].completed;
+        }
+      } else if (PASSIVE_OBJECTIVE_TYPES.includes(obj.type) && obj.type !== OBJECTIVE_TYPE.NPC_GROWTH_QUOTA) {
+        if (objectiveTargetMet(game, obj, instance)) {
           instance.objectives[obj.id].progress = obj.count ?? 1;
           instance.objectives[obj.id].completed = true;
           matched = true;
         }
       }
 
-      if (matched && obj.type === OBJECTIVE_TYPE.NPC_INTERACTION) {
+      if (matched && [
+        OBJECTIVE_TYPE.NPC_INTERACTION,
+        OBJECTIVE_TYPE.COMBAT_VICTORY,
+        OBJECTIVE_TYPE.COMMUNAL_FEAST,
+      ].includes(obj.type)) {
         const rec = instance.objectives[obj.id];
         rec.progress += 1;
         if (rec.progress >= (obj.count ?? 1)) rec.completed = true;
@@ -376,25 +510,31 @@ export function notifyQuestEvent(game, event = {}) {
           const snippet = runGrowthTrigger(game, game.player, obj.growth, event.npc);
           if (snippet) growthSnippets.push(snippet);
         }
-        lines.push(`Quest progress: ${def.title} — ${obj.id.replace(/_/g, ' ')}`);
+        lines.push(`Quest progress: ${def.title} — ${objectiveLabel(obj)}`);
+      } else if (matched && obj.type === OBJECTIVE_TYPE.NPC_GROWTH_QUOTA) {
+        applyScores(instance, obj.score);
+        lines.push(`Quest progress: ${def.title} — ${objectiveLabel(obj)} (${instance.growthQualified.length}/${getGrowthQuotaTarget(obj)})`);
       }
     }
 
-  // Re-check passive objectives
     for (const obj of stage.objectives) {
-      if ([
-        OBJECTIVE_TYPE.NPC_RELATIONSHIP_MIN,
-        OBJECTIVE_TYPE.NPC_CORRUPTION_MIN,
-        OBJECTIVE_TYPE.NPC_STAGE_MIN,
-        OBJECTIVE_TYPE.PLAYER_STAGE_MIN,
-        OBJECTIVE_TYPE.VISIT_REGION,
-        OBJECTIVE_TYPE.FLAG_SET,
-      ].includes(obj.type) && objectiveTargetMet(game, obj)) {
+      if (obj.type === OBJECTIVE_TYPE.NPC_GROWTH_QUOTA) {
+        const rec = instance.objectives[obj.id];
+        const wasComplete = rec.completed;
+        refreshGrowthQuota(game, instance, obj);
+        if (!wasComplete && rec.completed) {
+          applyScores(instance, obj.score);
+          lines.push(`Quest progress: ${def.title} — ${objectiveLabel(obj)} (${instance.growthQualified.length}/${getGrowthQuotaTarget(obj)})`);
+        }
+        continue;
+      }
+      if (PASSIVE_OBJECTIVE_TYPES.includes(obj.type) && objectiveTargetMet(game, obj, instance)) {
         const rec = instance.objectives[obj.id];
         if (!rec.completed) {
           rec.progress = obj.count ?? 1;
           rec.completed = true;
           applyScores(instance, obj.score);
+          lines.push(`Quest progress: ${def.title} — ${objectiveLabel(obj)}`);
         }
       }
     }
@@ -403,10 +543,7 @@ export function notifyQuestEvent(game, event = {}) {
       const stageResult = advanceQuestStage(game, questId);
       if (stageResult.message) lines.push(stageResult.message);
       if (stageResult.completed) lines.push(stageResult.completionMessage);
-      stageChanged = true;
     }
-
-    void stageChanged;
   }
 
   return { lines, growthSnippets };
@@ -476,17 +613,15 @@ export function getObjectiveProgressText(game, questId) {
   if (!stage) return '';
 
   return stage.objectives.map((obj) => {
-    const rec = instance.objectives[obj.id];
-    const done = isObjectiveComplete(instance, obj)
-      || ([
-        OBJECTIVE_TYPE.NPC_RELATIONSHIP_MIN,
-        OBJECTIVE_TYPE.NPC_CORRUPTION_MIN,
-        OBJECTIVE_TYPE.NPC_STAGE_MIN,
-      ].includes(obj.type) && objectiveTargetMet(game, obj));
-    const prog = rec?.progress ?? 0;
-    const need = obj.count ?? 1;
+    const done = isObjectiveComplete(game, instance, obj);
+    const prog = obj.type === OBJECTIVE_TYPE.NPC_GROWTH_QUOTA
+      ? (instance.growthQualified?.length ?? instance.objectives[obj.id]?.progress ?? 0)
+      : (instance.objectives[obj.id]?.progress ?? 0);
+    const need = obj.type === OBJECTIVE_TYPE.NPC_GROWTH_QUOTA
+      ? getGrowthQuotaTarget(obj)
+      : (obj.count ?? 1);
     const opt = obj.optional ? ' (optional)' : '';
-    return `${done ? '✓' : '○'} ${obj.id.replace(/_/g, ' ')} ${prog}/${need}${opt}`;
+    return `${done ? '✓' : '○'} ${objectiveLabel(obj)} ${prog}/${need}${opt}`;
   }).join('\n');
 }
 

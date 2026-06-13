@@ -10,102 +10,232 @@ function registerQuestCopy(key, lines) {
   ]);
 }
 
-// ─── Main: The Everfull Awakening ─────────────────────────────────────────────
+// ─── Main: The First Feast of Gorgara ─────────────────────────────────────────
 
-registerQuestCopy('quest.main.awakening.title', ['The Everfull Awakening']);
-registerQuestCopy('quest.main.awakening.desc', [
-  'Gorgara stirs beneath the heartlands. Sister Maribel hears the goddess in the wheat — help her spread the gospel of glorious abundance.',
-  'A sacred hunger awakens in Fertile Heartlands. The world will grow softer, fuller, and more divine.',
-]);
-
-registerQuestCopy('quest.main.awakening.stage.hear.desc', [
-  'Speak with Sister Maribel at the harvest shrine. Learn what the Everfull demands of her chosen.',
-]);
-registerQuestCopy('quest.main.awakening.stage.hear.complete', [
-  'Maribel\'s voice trembles with holy hunger. The call of Gorgara rings in your bones — beautiful, inevitable, hungry.',
+registerQuestCopy('quest.main.first_feast.title', ['The First Feast of Gorgara']);
+registerQuestCopy('quest.main.first_feast.desc', [
+  'Harvest\'s Hearth has grown stagnant and repressed — bellies pinched, laughter muted. Awaken Gorgara\'s first major node by befriending the town\'s influential women, hosting a communal feast, and softening its stern noblewoman.',
+  'Spread abundance until the entire settlement visibly flourishes. Growth, feeding, blessing, and conversion are all paths to glory.',
 ]);
 
-registerQuestCopy('quest.main.awakening.stage.spread.desc', [
-  'Bless Maribel with abundance. Feed Grikka\'s feast-queen greed. Win the sister\'s trust until friendship blooms.',
+registerQuestCopy('quest.main.first_feast.stage.stirring.desc', [
+  'Speak with Elara Warmbelly at the inn. The town\'s warmth has gone thin — someone must remind it how good fullness feels.',
 ]);
-registerQuestCopy('quest.main.awakening.stage.spread.complete', [
-  'The heartlands ripple with new softness — wheat heavy, bellies heavier, laughter warmer. The gospel takes root.',
-]);
-
-registerQuestCopy('quest.main.awakening.stage.cradle.desc', [
-  'Journey to Gorgara\'s Cradle when the path opens. Offer Maribel a major blessing to awaken the sacred grotto.',
-]);
-registerQuestCopy('quest.main.awakening.stage.cradle.complete', [
-  'Golden light pulses from the cradle. The goddess breathes — and the world inhales with her, ready to swell.',
+registerQuestCopy('quest.main.first_feast.stage.stirring.complete', [
+  'Elara\'s eyes glisten with hope and hunger. The hearth stirs — Gorgara\'s influence prickles at the edges of every loaf and every waistline.',
 ]);
 
-registerQuestCopy('quest.main.awakening.ending.abundant', [
-  'Abundance cascades across the land. Fields fatten, folk blush, and Gorgara\'s smile warms every horizon. You are her beloved herald.',
+registerQuestCopy('quest.main.first_feast.stage.circle.desc', [
+  'Win the trust of three influential women: Elara the innkeeper, Grikka the feast-queen, and Sylvie the baker. Friendship or conversion — abundance accepts both.',
 ]);
-registerQuestCopy('quest.main.awakening.ending.converted', [
-  'Hearts convert faster than waistlines — yet both swell together. The cradle awakens to a chorus of hungry, happy devotion.',
-]);
-registerQuestCopy('quest.main.awakening.complete.default', [
-  'The first act of the Everfull\'s awakening is complete. Greater feasts await — and greater sizes.',
+registerQuestCopy('quest.main.first_feast.stage.circle.complete', [
+  'The town\'s circle bends toward you. Laughter returns to kitchens and market stalls alike — softer, fuller, hungrier.',
 ]);
 
-// ─── Side: Flour and Fullness ────────────────────────────────────────────────
-
-registerQuestCopy('quest.side.sylvie.title', ['Flour and Fullness']);
-registerQuestCopy('quest.side.sylvie.desc', [
-  'Sylvie, the shy baker\'s daughter, sneaks tastes of her own pastries. Help her admit she wants more — of food, of softness, of you.',
+registerQuestCopy('quest.main.first_feast.stage.feast.desc', [
+  'Host a grand communal feast and help at least four townsfolk advance two size stages through feeding, blessing, intimacy, or combat conversion.',
+]);
+registerQuestCopy('quest.main.first_feast.stage.feast.complete', [
+  'Tables groan. Bellies bloom. The settlement sighs in collective satisfaction — a living testament to Gorgara\'s gospel.',
 ]);
 
-registerQuestCopy('quest.side.sylvie.stage.shy.desc', [
-  'Talk with Sylvie among the ovens. Flirt gently until flour-dusted cheeks flush with something sweeter than shame.',
+registerQuestCopy('quest.main.first_feast.stage.crown.desc', [
+  'Lady Vesperia still clings to austerity and poise. Break her resistance through feeding, flattery, and glorious growth until authority kneels to abundance.',
 ]);
-registerQuestCopy('quest.side.sylvie.stage.shy.complete', [
+registerQuestCopy('quest.main.first_feast.stage.crown.complete', [
+  'The noblewoman\'s corset surrenders. Vesperia blushes, moans, and smiles — stern no longer, splendidly soft.',
+]);
+
+registerQuestCopy('quest.main.first_feast.ending.abundant', [
+  'An Aura of Plenty settles over Harvest\'s Hearth. Wheat fattens, folk glow, and Gorgara\'s first feast echoes through the land. Your own limits swell in answer.',
+]);
+registerQuestCopy('quest.main.first_feast.ending.converted', [
+  'Hearts convert faster than waistlines — yet both swell together. The town\'s authority bends, and a new region opens to your pilgrimage.',
+]);
+registerQuestCopy('quest.main.first_feast.complete.default', [
+  'The First Feast of Gorgara is complete. The town will never be repressed again — and neither will you.',
+]);
+
+// ─── Main: The Overflowing Temple ────────────────────────────────────────────
+
+registerQuestCopy('quest.main.overflowing_temple.title', ['The Overflowing Temple']);
+registerQuestCopy('quest.main.overflowing_temple.desc', [
+  'An ancient temple of restraint and denial resists Gorgara\'s awakening. Transform it into a sanctuary of indulgence — convert the priestess circle, bloom the halls with ritual abundance, and face ascetic warriors who would stop you.',
+]);
+
+registerQuestCopy('quest.main.overflowing_temple.stage.approach.desc', [
+  'Sister Maribel knows the temple\'s fanatics. Learn their weaknesses, then reach the crumbling ruins where denial still holds power.',
+]);
+registerQuestCopy('quest.main.overflowing_temple.stage.approach.complete', [
+  'Marble halls loom ahead, inscribed with fasting rites. You carry sweeter scripture in your hands and your hips.',
+]);
+
+registerQuestCopy('quest.main.overflowing_temple.stage.circle.desc', [
+  'Convert Maribel and Rootmother Ash through personal growth encounters. Win the high priestess\'s devoted trust.',
+]);
+registerQuestCopy('quest.main.overflowing_temple.stage.circle.complete', [
+  'The inner circle softens. Vows of denial melt into moans of pleasure — holy hunger replaces hollow restraint.',
+]);
+
+registerQuestCopy('quest.main.overflowing_temple.stage.ritual.desc', [
+  'Hold a feast within the temple and help Maribel bloom to plump abundance. Let the sanctuary swell with visible, divine indulgence.',
+]);
+registerQuestCopy('quest.main.overflowing_temple.stage.ritual.complete', [
+  'The temple blooms — vines heavy with fruit, halls warm with steam and sighs. Abundance consecrates every stone.',
+]);
+
+registerQuestCopy('quest.main.overflowing_temple.stage.warriors.desc', [
+  'Ascetic guardians rush to stop the ritual. Defeat or convert them — Growth Damage and conventional valor both serve Gorgara.',
+]);
+registerQuestCopy('quest.main.overflowing_temple.stage.warriors.complete', [
+  'Armor clatters. The last ascetic kneels — converted or conquered — and the sanctuary is yours to fill.',
+]);
+
+registerQuestCopy('quest.main.overflowing_temple.ending.mercy', [
+  'You transform the temple with loving mercy. It becomes a sanctuary where indulgence is worship, and new clerical and warlock gifts flow to the faithful.',
+]);
+registerQuestCopy('quest.main.overflowing_temple.ending.dominance', [
+  'You claim the temple through glorious dominance. Its halls belong to appetite now — and so do powerful new spells for Cleric and Warlock.',
+]);
+registerQuestCopy('quest.main.overflowing_temple.complete.default', [
+  'The Overflowing Temple stands transformed. Denial is memory; abundance is eternal.',
+]);
+
+// ─── Side: The Baker's Indulgence ────────────────────────────────────────────
+
+registerQuestCopy('quest.side.baker.title', ["The Baker's Indulgence"]);
+registerQuestCopy('quest.side.baker.desc', [
+  'Sylvie denies her own desires between shifts at the oven. Help her bake — and devour — increasingly decadent creations until she embraces how good indulgence feels.',
+]);
+
+registerQuestCopy('quest.side.baker.stage.cravings.desc', [
+  'Spend time with Sylvie. Talk, flirt, and let her admit the cravings she hides behind flour-dusted modesty.',
+]);
+registerQuestCopy('quest.side.baker.stage.cravings.complete', [
   'Sylvie giggles through a mouthful of proofing dough. Shyness melts like butter — appetite remains.',
 ]);
 
-registerQuestCopy('quest.side.sylvie.stage.sweet.desc', [
-  'Feed Sylvie until the bakery smells like desire. Win her trust as her uniform grows snug.',
+registerQuestCopy('quest.side.baker.stage.decadent.desc', [
+  'Feed her pastries rich enough to shame a noblewoman. Guide her through at least two size stages of joyful swelling.',
 ]);
-registerQuestCopy('quest.side.sylvie.stage.sweet.complete', [
+registerQuestCopy('quest.side.baker.stage.decadent.complete', [
   'She licks frosting from her fingers without apology. The ovens are warm; Sylvie is warmer.',
 ]);
 
-registerQuestCopy('quest.side.sylvie.stage.oven.desc', [
-  'Share intimacy among rising bread. Help Sylvie cross into chubby honesty — beautiful, wanted, full.',
+registerQuestCopy('quest.side.baker.stage.release.desc', [
+  'Resolve her internal conflict in intimacy and mutual growth. Leave her happier, fuller, and unashamed.',
 ]);
-registerQuestCopy('quest.side.sylvie.stage.oven.complete', [
-  'Steam, sugar, and sighs. Sylvie swells in your arms like perfect dough — soft, golden, yours.',
+registerQuestCopy('quest.side.baker.stage.release.complete', [
+  'Steam, sugar, and sighs. Sylvie swells in your arms like perfect dough — soft, golden, radiant.',
 ]);
 
-registerQuestCopy('quest.side.sylvie.ending.romance', [
-  'Romance rises with her dough. Sylvie chooses abundance openly — and chooses you between every feast.',
+registerQuestCopy('quest.side.baker.ending.romance', [
+  'Romance rises with her dough. Sylvie chooses abundance openly — and may choose you between every feast.',
 ]);
-registerQuestCopy('quest.side.sylvie.complete.default', [
+registerQuestCopy('quest.side.baker.complete.default', [
   'Sylvie\'s shy hunger becomes celebration. The market smells sweeter when she smiles, rounder and radiant.',
 ]);
 
-// ─── Side: The Noble Mask ────────────────────────────────────────────────────
+// ─── Side: The Duel of Curves ────────────────────────────────────────────────
 
-registerQuestCopy('quest.side.vesperia.title', ['The Noble Mask']);
-registerQuestCopy('quest.side.vesperia.desc', [
-  'Lady Vesperia sneers at your gospel — yet watches your hips when she thinks you don\'t notice. Crack the mask.',
-]);
-
-registerQuestCopy('quest.side.vesperia.stage.haughty.desc', [
-  'Engage Vesperia in conversation. Whisper Gorgara\'s truth until poise falters.',
-]);
-registerQuestCopy('quest.side.vesperia.stage.haughty.complete', [
-  'A noble blush betrays her. The mask slips — hunger peers through, curious and furious.',
+registerQuestCopy('quest.side.duel.title', ['The Duel of Curves']);
+registerQuestCopy('quest.side.duel.desc', [
+  'Lyra Swiftblade believes leanness is strength. Accept her duel — defeat her traditionally or overwhelm her with Growth Damage until she discovers how powerful softness can be.',
 ]);
 
-registerQuestCopy('quest.side.vesperia.stage.cracked.desc', [
-  'Feed Vesperia until haughtiness melts. Nurture curiosity into eager, jiggling enthusiasm.',
+registerQuestCopy('quest.side.duel.stage.challenge.desc', [
+  'Trade words with the proud warrior. Study her athletic frame — soon to learn the virtues of curve.',
 ]);
-registerQuestCopy('quest.side.vesperia.stage.cracked.complete', [
+registerQuestCopy('quest.side.duel.stage.challenge.complete', [
+  'Lyra\'s jaw sets. The duel is inevitable — and you can already imagine how she\'ll look when it ends.',
+]);
+
+registerQuestCopy('quest.side.duel.stage.duel.desc', [
+  'Fight Lyra in the market square. Win through steel or swelling — Growth Damage is a valid sermon.',
+]);
+registerQuestCopy('quest.side.duel.stage.duel.complete', [
+  'Lyra pants, stunned — lean lines yielding to new softness. Victory tastes like cream and conquest.',
+]);
+
+registerQuestCopy('quest.side.duel.stage.after.desc', [
+  'Help her process — and enjoy — her new size. Feed her until pride becomes pleasure.',
+]);
+registerQuestCopy('quest.side.duel.stage.after.complete', [
+  'Lyra flexes a softer arm and laughs in disbelief. Strength remains — it simply jiggles now.',
+]);
+
+registerQuestCopy('quest.side.duel.ending.lover', [
+  'Respect and desire intertwine. Lyra becomes lover or devoted ally — either way, she trains in your shadow, softer every week.',
+]);
+registerQuestCopy('quest.side.duel.ending.rival', [
+  'Lyra respects the power that reshaped her. A worthy rival — and a splendid sight in sparring gear straining at the seams.',
+]);
+registerQuestCopy('quest.side.duel.complete.default', [
+  'The Duel of Curves concludes. The training grounds welcome a warrior who finally understands abundance.',
+]);
+
+// ─── Side: A Night of Shared Abundance ───────────────────────────────────────
+
+registerQuestCopy('quest.side.night.title', ['A Night of Shared Abundance']);
+registerQuestCopy('quest.side.night.desc', [
+  'Elara has been quietly struggling with desire and body image. She asks for a private evening focused purely on indulgence and mutual growth.',
+]);
+
+registerQuestCopy('quest.side.night.stage.invite.desc', [
+  'Deepen trust with your companion innkeeper. Accept her vulnerable invitation.',
+]);
+registerQuestCopy('quest.side.night.stage.invite.complete', [
+  'Elara\'s voice drops to a whisper. Tonight, she wants only fullness and honesty — with you.',
+]);
+
+registerQuestCopy('quest.side.night.stage.evening.desc', [
+  'Share a private feast. Feed each other until the kitchen steam mirrors your rising heat.',
+]);
+registerQuestCopy('quest.side.night.stage.evening.complete', [
+  'Plates empty. Bellies round. Elara sighs against your shoulder — content, curious, craving more.',
+]);
+
+registerQuestCopy('quest.side.night.stage.mutual.desc', [
+  'Intimacy and mutual growth. Help her reach a new size stage comfortably, joyfully, together.',
+]);
+registerQuestCopy('quest.side.night.stage.mutual.complete', [
+  'Candlelight on new curves. Elara\'s laughter is low and lush — a bond deepened in pleasure.',
+]);
+
+registerQuestCopy('quest.side.night.complete.default', [
+  'A Night of Shared Abundance lingers in memory and waistlines alike. Elara glows — and so do you.',
+]);
+
+// ─── Side: The Reluctant Noblewoman ──────────────────────────────────────────
+
+registerQuestCopy('quest.side.noblewoman.title', ['The Reluctant Noblewoman']);
+registerQuestCopy('quest.side.noblewoman.desc', [
+  'Lady Vesperia sneers at common indulgence — yet watches your hips when she thinks you don\'t notice. Change her mind, and her figure, through escalating encounters.',
+]);
+
+registerQuestCopy('quest.side.noblewoman.stage.gates.desc', [
+  'Gain access through charm and flattery. Crack the mask of haughty poise.',
+]);
+registerQuestCopy('quest.side.noblewoman.stage.gates.complete', [
+  'A noble blush betrays her. The gates of the estate open — hunger peers through, curious and furious.',
+]);
+
+registerQuestCopy('quest.side.noblewoman.stage.escalate.desc', [
+  'Feed Vesperia in secret. Whisper gospel past her pride until curiosity becomes craving.',
+]);
+registerQuestCopy('quest.side.noblewoman.stage.escalate.complete', [
   'Vesperia moans behind a handkerchief and does not wipe the crumbs away. Conversion tastes like cake.',
 ]);
-registerQuestCopy('quest.side.vesperia.complete.default', [
-  'The noblewoman kneels to abundance — gracefully, greedily, gloriously. The square will gossip; she will glow.',
+
+registerQuestCopy('quest.side.noblewoman.stage.transform.desc', [
+  'Bless her with decadent abundance. Guide a dramatic, pleasurable transformation worthy of gossip and glory.',
+]);
+registerQuestCopy('quest.side.noblewoman.stage.transform.complete', [
+  'The noblewoman kneels to abundance — gracefully, greedily, gloriously. Silk strains; poise surrenders.',
+]);
+
+registerQuestCopy('quest.side.noblewoman.complete.default', [
+  'Vesperia becomes a softer ally with political reach. The square will gossip; she will glow.',
 ]);
 
 // ─── Generic quest beats ─────────────────────────────────────────────────────

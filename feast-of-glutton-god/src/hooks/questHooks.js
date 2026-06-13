@@ -20,9 +20,22 @@ export function recordNpcInteractionForQuests(game, { npcId, interaction, npc, m
     interaction,
     npc,
     meta,
+    regionId: game.region,
   });
   const questMessages = formatQuestMessages(lines, growthSnippets);
   return { lines, growthSnippets, questMessages };
+}
+
+export function recordNpcGrowthForQuests(game, { npcId, startStage, endStage, stagesGained }) {
+  ensureQuestState(game);
+  const { lines, growthSnippets } = notifyQuestEvent(game, {
+    type: 'npc_growth',
+    npcId,
+    startStage,
+    endStage,
+    stagesGained: stagesGained ?? Math.max(0, endStage - startStage),
+  });
+  return { questMessages: formatQuestMessages(lines, growthSnippets), lines, growthSnippets };
 }
 
 export function recordRegionVisitForQuests(game, regionId) {
@@ -37,10 +50,14 @@ export function recordRegionVisitForQuests(game, regionId) {
 export function recordCombatEndForQuests(game, combat) {
   ensureQuestState(game);
   const victoryType = combat.victory === 'converted' ? 'converted' : 'win';
+  const defeatedEnemyIds = (combat.enemies ?? [])
+    .map((e) => e.id)
+    .filter(Boolean);
   const { lines, growthSnippets } = notifyQuestEvent(game, {
     type: 'combat_end',
     victoryType,
     regionId: game.region,
+    defeatedEnemyIds,
   });
   return { questMessages: formatQuestMessages(lines, growthSnippets) };
 }
