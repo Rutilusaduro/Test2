@@ -70,5 +70,5 @@ export function renderFeed(npc, player, opts = {}) {
     seed: opts.seed,
     history: opts.history,
   });
-  return render(FEED_TEMPLATE, ctx);
+  return render(FEED_TEMPLATE, ctx, { trace: opts.trace });
 }

@@ -48,5 +48,5 @@ export function renderTalk(npc, player, opts = {}) {
     seed: opts.seed,
     history: opts.history,
   });
-  return render(TALK_TEMPLATE, ctx);
+  return render(TALK_TEMPLATE, ctx, { trace: opts.trace });
 }

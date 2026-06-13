@@ -2,11 +2,18 @@ import { getClass } from "./classes.js";
 import { getStage } from "./stages.js";
 import { getSpellsForClass } from "./spells.js";
 import { createCompanionData, COMPANIONS } from "./companions.js";
+import { initSpellSlots } from "./spellSlots.js";
+import { getMaxAbundancePoints, hpPerLevel, getArmorClass } from "./stats.js";
+import { getSizeCapForLevel } from "./leveling.js";
+import { CLASS_SKILL_PROFICIENCIES } from "./skills.js";
 
 export function createPlayer(name, classId) {
   const cls = getClass(classId);
-  const stats = cls.stats;
-  return {
+  const stats = { ...cls.stats };
+  const level = 1;
+  const maxHp = (cls.hitDie || 8) + Math.floor((stats.con - 10) / 2) + 10;
+
+  const player = {
     id: "player",
     name: name || "Chosen of Gorgara",
     classId: cls.id,
@@ -17,19 +24,25 @@ export function createPlayer(name, classId) {
     relationship: 0,
     bodyType: "hourglass",
     archetype: "chosen",
-    hp: stats.hp + 10,
-    maxHp: stats.hp + 10,
-    mp: stats.mp,
-    maxMp: stats.mp,
+    hp: maxHp,
+    maxHp,
     stats,
+    proficientSaves: cls.proficientSaves || [],
+    skillProficiencies: CLASS_SKILL_PROFICIENCIES[cls.id] || [],
     ap: 20,
     xp: 0,
-    level: 1,
+    level,
+    sizeCap: getSizeCapForLevel(level),
     gender: "she",
     pronouns: "she",
     storyFlags: {},
     spells: getSpellsForClass(cls.id),
+    levelUpsPending: [],
   };
+
+  initSpellSlots(player);
+  player.ap = Math.min(player.ap, getMaxAbundancePoints(player));
+  return player;
 }
 
 export function createNewGame(name, classId) {
@@ -45,13 +58,22 @@ export function createNewGame(name, classId) {
     endingsSeen: [],
     newGamePlus: false,
     combat: null,
+    lastLevelUpMessage: null,
   };
 }
 
 export function syncPlayerFromCombat(game, combat) {
   const p = combat.allies.find((a) => a.isPlayer);
   if (p) {
-    game.player = { ...game.player, lbs: p.lbs, hp: p.hp, maxHp: p.maxHp, mp: p.mp, corruption: p.corruption };
+    game.player = {
+      ...game.player,
+      lbs: p.lbs,
+      hp: p.hp,
+      maxHp: p.maxHp,
+      corruption: p.corruption,
+      spellSlots: p.spellSlots,
+      ap: p.ap,
+    };
   }
   game.party = combat.allies
     .filter((a) => !a.isPlayer)
@@ -64,7 +86,8 @@ export function getPlayerStage(player) {
 }
 
 export function addAbundancePoints(game, amount) {
-  game.player.ap = (game.player.ap || 0) + amount;
+  const max = getMaxAbundancePoints(game.player);
+  game.player.ap = Math.min(max, (game.player.ap || 0) + amount);
   return game;
 }
 
@@ -83,4 +106,12 @@ export function applyNpcState(game, npcId, updates) {
 export function getNpcState(game, npc) {
   const saved = game.npcStates?.[npc.id] || {};
   return { ...npc, ...saved };
+}
+
+export function getPlayerDerivedStats(player) {
+  return {
+    ac: getArmorClass(player),
+    stage: getStage(player.lbs),
+    maxAp: getMaxAbundancePoints(player),
+  };
 }

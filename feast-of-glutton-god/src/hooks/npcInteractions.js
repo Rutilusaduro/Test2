@@ -14,6 +14,7 @@ import { getTier } from '../gameData/relationships.js';
 import { getCorruptionTier } from '../gameData/corruption.js';
 import { getStage } from '../gameData/stages.js';
 import { spendAP } from '../gameData/player.js';
+import { checkSeduce, formatCheckSummary, toTextContext, DC } from '../gameData/skillChecks.js';
 
 let sessionHistory = null;
 
@@ -45,14 +46,52 @@ export function doTalk(npc, player, game) {
 }
 
 export function doFlirt(npc, player, game) {
-  const cha = player.stats?.cha || 14;
-  const success = Math.random() * 20 + cha >= 12;
-  const text = renderFlirt(npc, player, { history: getTextHistory(game) });
-  if (success) {
-    addRelationship(npc, 5);
-    addCorruption(npc, 3);
+  const relBonus = (npc.relationship || 0) >= 40 ? 2 : 0;
+  const check = checkSeduce(player, DC.medium, {
+    bonuses: relBonus
+      ? [{ type: 'circumstantial', label: 'Warm rapport', value: relBonus, source: 'relationship' }]
+      : [],
+    applyCriticalEffects: true,
+    target: npc,
+  });
+
+  const updatedNpc = check.target ?? npc;
+  if (check.entity?.lbs != null && check.entity.id === 'player') {
+    game.player = { ...game.player, ...check.entity };
   }
-  return { text: success ? text : text + '\n\nShe smiles shyly but isn\'t quite ready for more.', npc, success };
+
+  const textContext = toTextContext(check);
+  const text = renderFlirt(updatedNpc, player, {
+    history: getTextHistory(game),
+    globals: textContext,
+    checkResult: check.outcomeKey,
+    checkCritical: check.critical,
+  });
+
+  if (check.success) {
+    addRelationship(updatedNpc, check.critical === 'success' ? 8 : 5);
+    addCorruption(updatedNpc, check.critical === 'success' ? 5 : 3);
+  } else if (check.critical === 'failure') {
+    addRelationship(updatedNpc, 1);
+  }
+
+  const summary = formatCheckSummary(check);
+  const failNote =
+    check.success || check.critical === 'failure'
+      ? ''
+      : '\n\nShe smiles shyly but isn\'t quite ready for more.';
+  const critNote = check.critical === 'success'
+    ? '\n\n★ Critical success — desire and softness bloom between you.'
+    : check.critical === 'failure'
+      ? '\n\n✦ A charming fumble — you blush, and she finds it endearing.'
+      : '';
+
+  return {
+    text: `${summary}\n\n${text}${failNote}${critNote}`,
+    npc: updatedNpc,
+    success: check.success,
+    check,
+  };
 }
 
 export function doFeed(npc, player, game, feedType = 'hand') {

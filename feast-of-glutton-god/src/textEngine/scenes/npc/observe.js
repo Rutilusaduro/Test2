@@ -71,7 +71,7 @@ export function renderObserve(npc, player, opts = {}) {
     seed: opts.seed,
     history: opts.history,
   });
-  return render('{npc.observe.pose}', ctx);
+  return render('{npc.observe.pose}', ctx, { trace: opts.trace });
 }
 
 export { POSES };
