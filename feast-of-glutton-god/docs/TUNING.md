@@ -53,12 +53,15 @@ Check NEW content against this list too, not just fixes. When a fix generalizes,
 6. **Big-scale references outside stage 7+** — the industrial scale exists only for girls who broke the analog one.
 7. **Tone-loaded generics in shared pools** — any fragment with tier-specific psychology gets a corruption gate, full stop.
 8. **Stale-context dialogue**: greetings referencing things not in the scene ("not the paperwork"), pre-weigh lines that only make sense post-weigh ("Same time next week"). Place lines in the beat where their content is true.
-9. **Stage-name label crossings** — `"Colossal: reinforced chairs…"` / `"Heavy — chairs complain…"`. Crossings describe the lived threshold (furniture, doorways, movement), not a stage title plus flavor text.
-10. **"I have become the X" dialogue** — banned narrator/character tic in growth crossings and reactions. Show the role metaphorically or cut it.
-11. **Malformed malfunction ticks** — malf clauses must be complete clauses after the em dash (not noun fragments like "a messy overfeed {name}"); malfunction beats use `; {sensation|cap}` so the second half is a proper sentence. Device-specific failure modes only — feeders overfeed, stims overrun pulses, chambers spike fields.
-12. **"Week's device work" / bland surprise gain** — no "she feels the week's device work", no generic "takes the gain faster than she expected"; sensations name what changed on the body.
 
-## Fix mechanics quick-reference
+### Feast of the Glutton God — additions (from Dialogue Lab batches)
+
+9. **Name echo in multi-beat scenes** — `{subject.name}` on the first subject mention in a scene; `{subject.first}` in later beats of the same render (e.g. feast climax). Never repeat the full name in the closing beat.
+10. **Never `{join}` two FULL SENTENCE pools** — `join` glues with `, ` / `and`; after `smooth()` this becomes `. And A …` when both pools end/start sentences. Use separate skeleton slots (`{npc.observe.body} {npc.observe.clothing}`) instead.
+11. **`word.movement` is VERB PHRASE shape** — only after `{subject.name}` (`Mira waddles`). For `stands before you, …` use `word.standingMovement` (PARTICIPLE CLAUSE). Never comma-splice a finite verb onto "stands".
+12. **Body vs clothing slot separation** — `npc.observe.body` describes flesh and silhouette; `npc.observe.clothing` owns garments. Body beats must not mention outfits, seams, or fabric when the clothing slot follows in the same skeleton.
+13. **Vague garment metaphors** — avoid lines like "sits closer than last month" without a body referent; say what changed (`hugs new softness at the middle`, `pulls across the hips`).
+14. **Agreement** — use `{they}/{their}/{They}` and `{verb:lemma}`; never hard-code `she/her` in new pool content.
 
 - **Gate**: add `when` keys to the offending variant (split a variant if only some texts need the gate).
 - **Relocate**: move a line to the beat where it belongs (greeting → post-weigh reply), rewording for the new position.

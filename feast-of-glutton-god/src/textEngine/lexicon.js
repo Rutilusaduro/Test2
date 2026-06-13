@@ -20,7 +20,7 @@ export const SIZE_WORDS = {
   chubby:   ["chubby", "thickening", "padded", "rounded", "pleasantly plump", "soft in the middle", "noticeably fuller"],
   plump:    ["plump", "thick", "heavyset", "well-padded", "substantially soft", "carrying extra weight", "full-figured"],
   heavy:    ["heavy", "broad", "ponderous", "weighty", "substantial", "dense with softness", "carrying real mass"],
-  fat:      ["fat", "very fat", "rolling", "waddling", "abundant", "overflowing at the seams", "generously proportioned"],
+  fat:      ["fat", "very fat", "rolling", "abundant", "overflowing at the seams", "generously proportioned", "lush with softness"],
   veryFat:  ["very fat", "vast", "immense", "overflowing", "enormous", "barely contained", "spilling past every edge"],
   enormous: ["enormous", "staggering", "room-filling", "mountainous", "colossal in scale", "immense by any measure", "overwhelmingly large"],
   colossal: ["monumental", "barely mobile", "overwhelming", "spreadingly vast", "architectural in scale", "immobile with mass", "beyond ordinary furniture"],
@@ -200,7 +200,24 @@ export const MOVEMENT_WORDS = {
   leviathan: ["barely shifts", "settles rather than walks", "exists more than arrives", "moves like geography rearranging", "arrives by accumulation not stride"],
 };
 
-// ── clothing fit — season × stage ─────────────────────────────
+// Participial / adjective-complement phrases for "stands before you, …"
+// Shape: PARTICIPLE CLAUSE (lowercase, no period) — NOT bare verb phrases (those are word.movement).
+export const STANDING_MOVEMENT_WORDS = {
+  slight:   ["poised and light on {their} feet", "still and slender", "easy in {their} posture"],
+  slim:     ["relaxed and unhurried", "balanced and natural", "light in {their} stance"],
+  soft:     ["settling into a softer sway", "carrying new curves with easy grace", "shifting with a gentle bounce"],
+  chubby:   ["rounded and comfortable in {their} stance", "shifting with thighs that nearly brush", "carrying new weight with easy rhythm"],
+  plump:    ["settled and deliberately soft", "rocking slightly as {they} find {their} balance", "wide and unapologetic in {their} posture"],
+  heavy:    ["waddling slightly in place", "rocking {their} weight from side to side", "breathing audibly as {they} hold still"],
+  fat:      ["waddling gently in place", "rocking side to side with each shift of weight", "laboring pleasantly even to stand still"],
+  veryFat:  ["waddling slowly even at rest", "settling {their} mass before {they} speak", "shifting with great deliberation"],
+  enormous: ["lumbering even in stillness", "ponderous even at rest", "holding still like weather about to move"],
+  colossal: ["shuffling {their} weight in small careful shifts", "barely shifting, vast and warm", "repositioning rather than merely standing"],
+  blob:     ["settling more than standing", "rippling softly even at rest", "a slow tide of flesh at pause"],
+  leviathan:["barely shifting", "warm and impossibly still", "existing as warmth more than posture"],
+};
+
+// ─── clothing fit — season × stage ─────────────────────────────
 
 const seasonRow = (slight, slim, soft, chubby, plump, heavy, fat, veryFat, enormous, colossal, blob, leviathan) =>
   ({ slight, slim, soft, chubby, plump, heavy, fat, veryFat, enormous, colossal, blob, leviathan: leviathan || blob });
@@ -209,11 +226,11 @@ export const CLOTHING_FIT = {
   fall: seasonRow(
     ["a light jacket hanging loose on {their} angular frame", "clothes hanging off a slight frame", "layers with room to spare"],
     ["a jacket hanging loosely", "fall layers falling straight on a slim frame", "clothes still easy on {them}"],
-    ["a cardigan that sits a little closer than last month", "a sweater beginning to hug new softness", "fabric settling closer at the middle"],
-    ["a cardigan straining at the buttons", "clothes noticeably tighter across bust and belly", "waistbands working harder than they used to"],
-    ["a sweater filled out completely, stretched soft at the seams", "shirts riding up at the hem", "a plump figure testing every seam"],
-    ["layers that have given up disguising anything", "a coat worn open over a heavy middle", "fabric pulled drum-tight"],
-    ["clothes at war with {their} body", "buttons under permanent strain", "layers that stopped pretending to fit"],
+    ["A light cardigan hugs new softness at her middle.", "Her sweater is beginning to cling at the waist.", "Fabric settles closer across her hips and belly."],
+    ["A cardigan strains gently at the buttons.", "Her clothes are noticeably tighter across bust and belly.", "Waistbands are working harder than they used to."],
+    ["Her sweater is filled out completely, stretched soft at the seams.", "Shirts ride up at the hem.", "A plump figure tests every seam."],
+    ["Her layers have given up disguising anything.", "A coat worn open over a heavy middle.", "Fabric pulled drum-tight."],
+    ["Her clothes are at war with her body.", "Buttons under permanent strain.", "Layers that stopped pretending to fit."],
     ["garments remade once and outgrown again", "custom sizing still losing the fight", "fabric surrendering at every edge"],
     ["a custom wrap of fabric more tarp than outfit", "clothing more suggestion than coverage", "panels joined where buttons used to be"],
     ["fabric panels joined by hope", "draped layers over mass no rack was built for", "clothes in name only"],
@@ -305,6 +322,8 @@ function byBucket(dict) {
 registerModule("word.size", [{ when: {}, text: byBucket(SIZE_WORDS) }]);
 
 registerModule("word.movement", [{ when: {}, text: byBucket(MOVEMENT_WORDS) }]);
+
+registerModule("word.standingMovement", [{ when: {}, text: byBucket(STANDING_MOVEMENT_WORDS) }]);
 
 registerModule("word.body", [{
   when: {},

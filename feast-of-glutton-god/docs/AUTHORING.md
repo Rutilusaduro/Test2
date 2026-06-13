@@ -1,6 +1,10 @@
 # Text Engine Authoring Guide
 
+> **Feast of the Glutton God:** All narrative text edits must follow this file and `docs/TUNING.md` (flag-batch loop + Style Ledger). Canonical exemplar scenes in this repo: `src/textEngine/scenes/npc/` and `src/textEngine/scenes/growthEvent/`.
+>
 > **Audience: you, the LLM (or human) about to write game prose.** Read this whole file before writing or editing ANY narrative text. The engine reference is `docs/modular-text-system.md`; this file is the content contract. The canonical exemplar files to copy are `src/textEngine/scenes/weighIn/` and `src/textEngine/scenes/talkEncourage.js`.
+>
+> Companions: `MIGRATION.md` (process for converting legacy prose into this form) · `TUNING.md` (the flag-batch editing loop + the **Style Ledger** of banned constructions — new prose must respect the ledger too).
 
 ## 0. Prime directive
 
@@ -76,7 +80,8 @@ All keys combine (AND within a variant; value arrays are OR). Unlisted keys are 
 | Key | Values |
 |---|---|
 | `stage` / `stageMin`+`stageMax` | 0 Slight · 1 Slim · 2 Soft · 3 Chubby · 4 Plump · 5 Heavy · 6 Fat · 7 Very Fat · 8 Enormous · 9 Colossal · 10 Blob · 11 Leviathan. Bands used by weigh-in content: light ≤2, rounded 3-5, heavy 6-8, vast 9+ |
-| `corruption` | 0 Hesitant · 1 Conflicted · 2 Broken In |
+| `attitude` / `attitudeMin`+`attitudeMax` | **the portable "how they feel about gaining" axis** — 0 reluctant · 1 ambivalent · 2 eager (· 3 devoted). **New content should key on `attitude`.** |
+| `corruption` | legacy alias of `attitude` (same tier): 0 Hesitant · 1 Conflicted · 2 Broken In. Existing scenes keep using it. |
 | `relationship` | 0 Acquaintance · 1 Close · 2 Intimate · 3 Devoted |
 | `mood` | happy, focused, excited, content, tired, stressed, warm, observant, cheerful, bemused, curious, nervous (new moods may appear — ALWAYS provide a wildcard) |
 | `bodyType` | pear, apple, hourglass, athletic, straight, rotund, voluptuous, mom_bod, fertility_goddess, topHeavy (+ `default` row convention in lexicon) |
@@ -92,6 +97,19 @@ All keys combine (AND within a variant; value arrays are OR). Unlisted keys are 
 | `bigScale` | true when the industrial scale is in play (say "display", not "dial") |
 | `skill` | one skillEffects flag name, truthy check |
 | `relSize` / `refStage` | vs `ctx.ref`: much_smaller, smaller, similar, larger, much_larger |
+| `startStageMin/Max` · `endStageMin/Max` · `endStage` | growth-event stage span (from `globals.startStage`/`endStage`); `endStage` is an exact match for the per-stage crossing lexicon |
+| `stagesJumpedMin` | growth-event: number of stages crossed in one event |
+| `causeType` | growth-event cause: device_use, device_malfunction, weekly_tick, digest_stageup, feature |
+| `featureId` | growth-event feature source: stream, compound, cultivator, contest |
+| `growthMethod` | device growthProfile method: feed, bloat, infuse, serum, radiation, gas, sculpt, stimulate, limit_break |
+| `growthIntensity` | gradual, steady, rapid, violent (device-risk register lives here) |
+| `sensation` | pressure, fullness, warmth, pleasure, stretch |
+| `locale` | growth-event setting: lab, dorm, stream_setup, dining_hall, kitchen, office, campus |
+| `outfitHint` | growth-event garment override: casual, revealing, branded, contest (overrides archetype garment) |
+| `isPermanent` / `limitRemoved` | growth-event: gain is permanent / the student's growth ceiling was removed |
+| `saidBefore` / `notYet` | scene-memory predicates — a tag (or array) that has / hasn't been marked this scene. Pair with `priority` to hard-gate callback vs cold-intro fragments. See §7. |
+
+> Selector keys are linted: `npm run text:lint` flags any `when:` key that isn't a registered dimension, a `<dim>Min/<dim>Max` range, an engine-structural key, or a declared global — so typos like `coruption` are caught. Free-form `ctx.globals` keys are declared in `dimensions/gameSelectors.js` via `registerSelectors(...)`.
 
 ### Student roster + voice cheat-sheet
 
@@ -118,10 +136,11 @@ All keys combine (AND within a variant; value arrays are OR). Unlisted keys are 
 
 ## 4. Per-girl persona conventions
 
-- Persona variants live in a dedicated `personas.js` next to the scene (see `scenes/weighIn/personas.js`), registered into the SAME slot keys via `registerModuleVariants` — they extend the shared pool, they don't replace it.
-- Key on `studentId` (+ `corruption`, + wide `stageMin/stageMax` ranges so several lines co-pool) and set `weight: 4` so the girl's own voice dominates without silencing shared fragments.
+- Persona variants live in a dedicated `personas.js` next to the scene (see `scenes/weighIn/personas.js`), registered into the SAME slot keys — they extend the shared pool, they don't replace it. Prefer **`definePersona`** (see `PERSONAS.md`) over hand-written `registerModuleVariants` for new casts.
+- Key on `characterId` (the portable alias of `studentId`) + `attitude` + wide `stageMin/stageMax` ranges so several lines co-pool, and set `weight: 4` so the character's own voice dominates without silencing shared fragments.
 - **Dialogue is sacred:** when migrating handwritten lines, keep quoted speech verbatim — the voice lives in the quotes. Narration around quotes may be genericized.
-- Aim for ≥2 dialogue beats per girl per corruption tier in any slot that carries personality.
+- Aim for ≥2 dialogue beats per character per attitude tier in any slot that carries personality.
+- **The full how-to for authoring a cast is `PERSONAS.md`.**
 
 ## 5. Authoring a new scene (checklist)
 
@@ -142,3 +161,15 @@ All keys combine (AND within a variant; value arrays are OR). Unlisted keys are 
 - **Re-registering a key** — overwrites silently in prod (dev warns). Check the namespace before naming.
 - **Paraphrasing mined dialogue** — kills the character voice that playtesters already know.
 - **`gameHelpers.rnd` vs `pick`** — `rnd(a,b)` is an int range, `pick(arr)` picks from an array. Never mix.
+- **Anything in the TUNING.md Style Ledger** — banned constructions discovered through live tuning ("Statement. That is X.", knowing-narrator winks, gain-excuse lines below stage 2, double-described phenomena, pace/verb contradictions…). The ledger grows; check it before writing.
+
+## 7. Engine runtime features
+
+These are properties of the resolver you author *against*. All are opt-in via `createContext`.
+
+- **Pronouns & agreement** — never hard-code "she/her". Use `{they} {them} {their} {theirs} {themself}` (+ capitalized `{They}…`), `{verb:lemma}` ("strains"/"strain"), and `{plural:noun}`. They agree with `subject.pronouns` (`'she'|'he'|'they'|'it'` or a custom pack), or plural when `ctx.group` has >1. Default pack is `she`, so existing single-cast content is unaffected. Set the default with `setDefaultPronoun(key)`.
+- **Seeded / reproducible renders** — `createContext({ seed })` (number or string) makes a *fresh* context render deterministically (saves, replays, tests). A reused context keeps advancing, so repeated renders still vary.
+- **Anti-repetition** — `createContext({ history })` (pass `true` for a fresh buffer, or a shared `Map` across a session) biases away from lines just shown. Intra-render dedup is automatic (a pool used twice in one sentence won't echo itself). It's soft, so small pools still emit.
+- **Scene memory (cohesion)** — `createContext({ scene })` (pass `true` or a shared `Set` across a render sequence). A beat marks tags via the module opt `{ marks: 'belly' }` once it emits; fragments gate on `when:{ saidBefore: 'belly' }` (callback) or `when:{ notYet: 'belly' }` (cold intro). Pair memory-keyed variants with `priority: 1` to hard-gate them over the wildcard.
+- **Dimensions are registered, not hard-coded** — the selector model lives in `dimensions/weightGain.js` (`registerDimensions`). The engine core imports nothing from `../gameData`. Any registered dimension automatically gets `<name>Min/<name>Max` range selectors. A different game ships its own pack; see `index.js` for the core/domain boundary and `PERSONAS.md` for authoring a cast.
+- **Tooling** — `node scripts/scaffoldScene.mjs <key>` stubs a new scene; `engine.d.ts` gives editor autocomplete; `node scripts/textEngineSmoke.mjs` and `node scripts/exportProof.mjs` assert the runtime guarantees above.

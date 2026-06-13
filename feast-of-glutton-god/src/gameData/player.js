@@ -59,6 +59,11 @@ export function createNewGame(name, classId) {
     newGamePlus: false,
     combat: null,
     lastLevelUpMessage: null,
+    quests: { active: {}, completed: [], failed: [] },
+    worldFlags: {
+      regions_unlocked: ['harvest_hearth', 'market_square', 'fertile_heartlands'],
+    },
+    lastQuestMessage: null,
   };
 }
 

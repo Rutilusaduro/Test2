@@ -9,7 +9,7 @@ import { getCorruptionTier } from "../gameData/corruption.js";
 
 import { addBugNote, captureGameContext } from "../hooks/bugLog.js";
 
-export default function NpcModal({ npc, player, game, onClose, onUpdate, onDebugContext }) {
+export default function NpcModal({ npc, player, game, onClose, onUpdate, onGameRefresh, onDebugContext }) {
   const [text, setText] = useState("");
   const [submenu, setSubmenu] = useState(null);
 
@@ -20,6 +20,7 @@ export default function NpcModal({ npc, player, game, onClose, onUpdate, onDebug
 
   const apply = (result, interaction) => {
     if (result.npc) onUpdate(result.npc);
+    if (result.questNotes) onGameRefresh?.();
     setText(result.text || "");
     setSubmenu(null);
     onDebugContext?.({
