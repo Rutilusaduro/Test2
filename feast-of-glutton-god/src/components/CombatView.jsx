@@ -2,22 +2,26 @@ import { useState } from "react";
 import { getStage, getTileSize } from "../gameData/stages.js";
 import {
   getReachableTiles, moveUnit, attackUnit, castSpell, feedTarget,
-  enemyAiTurn, checkVictory, checkConversion, convertEnemy,
+  advanceTurn, checkVictory, checkConversion, convertEnemy, getTurnSummary,
+  getActiveUnit, isPlayerTurn,
 } from "../gameData/combat.js";
 import { getSpellsForClass } from "../gameData/spells.js";
+import { hasSpellSlot } from "../gameData/spellSlots.js";
 import { renderCombatNarration } from "../hooks/npcInteractions.js";
 import { renderGrowthScene } from "../textEngine/scenes/growthEvent/index.js";
-
 import { addBugNote, captureGameContext } from "../hooks/bugLog.js";
 
 export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebugContext }) {
-  const [selectedUnit, setSelectedUnit] = useState(combat.allies[0]);
+  const player = combat.allies.find((a) => a.isPlayer) || game.player;
   const [mode, setMode] = useState("move");
   const [growthText, setGrowthText] = useState("");
   const [reachable, setReachable] = useState([]);
+  const [overflowCast, setOverflowCast] = useState(false);
 
+  const selectedUnit = getActiveUnit(combat) || combat.allies[0];
+  const turnSummary = getTurnSummary(combat);
   const spells = getSpellsForClass(game.player.classId);
-  const size = selectedUnit ? getTileSize(getStage(selectedUnit.lbs).id) : 1;
+  const slots = player.spellSlots?.current || [];
 
   const reportCombat = (extra = {}) => {
     onDebugContext?.({
@@ -53,14 +57,23 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebu
     if (selectedUnit) setReachable(getReachableTiles(combat, selectedUnit));
   };
 
-  const handleCellClick = (x, y) => {
-    if (combat.victory) return;
-    const c = { ...combat, allies: [...combat.allies], enemies: [...combat.enemies], log: [...combat.log] };
+  const cloneCombat = () => ({
+    ...combat,
+    allies: combat.allies.map((a) => ({ ...a })),
+    enemies: combat.enemies.map((e) => ({ ...e })),
+    log: [...combat.log],
+    turnState: { ...combat.turnState, economy: { ...combat.turnState.economy } },
+  });
 
-    if (mode === "move" && selectedUnit) {
+  const handleCellClick = (x, y) => {
+    if (combat.victory || !isPlayerTurn(combat)) return;
+    const c = cloneCombat();
+    const active = getActiveUnit(c);
+
+    if (mode === "move" && active) {
       const can = reachable.find((t) => t.x === x && t.y === y);
       if (can) {
-        moveUnit(c, selectedUnit, x, y);
+        moveUnit(c, active, x, y);
         setReachable([]);
         setMode("action");
         update(c);
@@ -73,12 +86,11 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebu
         const s = getTileSize(getStage(e.lbs).id);
         return e.hp > 0 && x >= e.x && x < e.x + s && y >= e.y && y < e.y + s;
       });
-      if (target && selectedUnit) {
-        attackUnit(c, selectedUnit, target);
-        c.log.push(renderCombatNarration(selectedUnit, "attack"));
+      if (target && active) {
+        attackUnit(c, active, target);
+        c.log.push(renderCombatNarration(active, "attack"));
         if (target.hp <= 0) c.log.push(`${target.name} falls!`);
         checkVictory(c);
-        if (!c.victory) enemyAiTurn(c);
         update(c);
       }
       return;
@@ -89,8 +101,8 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebu
         const s = getTileSize(getStage(e.lbs).id);
         return e.hp > 0 && !e.converted && x >= e.x && x < e.x + s && y >= e.y && y < e.y + s;
       });
-      if (target && selectedUnit) {
-        feedTarget(c, selectedUnit, target, 1);
+      if (target && active) {
+        feedTarget(c, active, target, 1);
         const gt = renderGrowthScene(target, {
           growthMethod: "feed", startStage: getStage(target.lbs).id - 1,
           endStage: getStage(target.lbs).id, week: game.day,
@@ -99,17 +111,17 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebu
         c.log.push(renderCombatNarration(target, "feed"));
         if (checkConversion(target)) convertEnemy(c, target);
         checkVictory(c);
-        if (!c.victory) enemyAiTurn(c);
         update(c);
       }
     }
   };
 
   const cast = (spell) => {
-    const c = { ...combat, allies: [...combat.allies], enemies: [...combat.enemies], log: [...combat.log] };
+    if (!isPlayerTurn(combat)) return;
+    const c = cloneCombat();
     const caster = c.allies.find((a) => a.isPlayer) || c.allies[0];
-    const target = c.enemies.find((e) => e.hp > 0) || c.allies[1];
-    castSpell(c, caster, spell, target);
+    const target = c.enemies.find((e) => e.hp > 0 && !e.converted) || c.allies[1];
+    castSpell(c, caster, spell, target, { overflow: overflowCast && spell.overflow });
     if (c.lastGrowth) {
       const gt = renderGrowthScene(c.lastGrowth.unit, {
         growthMethod: "blessing",
@@ -121,14 +133,21 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebu
       c.log.push(renderCombatNarration(c.lastGrowth.unit, "growth"));
     }
     checkVictory(c);
-    if (!c.victory) enemyAiTurn(c);
     update(c);
   };
 
-  const endTurn = () => {
-    const c = { ...combat, allies: [...combat.allies], enemies: [...combat.enemies], log: [...combat.log] };
-    enemyAiTurn(c);
+  const finishTurn = () => {
+    const c = cloneCombat();
+    advanceTurn(c);
+    setReachable([]);
+    setMode("move");
     update(c);
+  };
+
+  const slotLabel = (lvl) => {
+    const n = slots[lvl - 1] ?? 0;
+    const max = player.spellSlots?.max?.[lvl - 1] ?? 0;
+    return max > 0 ? `${lvl}: ${n}/${max}` : null;
   };
 
   const renderCell = (x, y) => {
@@ -168,8 +187,13 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebu
   return (
     <div className="app">
       <div className="header">
-        <h1>Combat — Turn {combat.turn + 1}</h1>
-        <p className="subtitle">Grow. Feed. Convert. Conquer.</p>
+        <h1>Round {turnSummary?.round ?? combat.turn} — {turnSummary?.active ?? "…"}</h1>
+        <p className="subtitle">
+          {isPlayerTurn(combat) ? "Your turn" : "Enemy turn"} ·
+          Move {turnSummary?.movement ?? 0}/{turnSummary?.movementMax ?? 0} ·
+          Action {turnSummary?.action ? "ready" : "spent"} ·
+          Bonus {turnSummary?.bonus ? "ready" : "spent"}
+        </p>
       </div>
 
       {combat.victory && (
@@ -177,6 +201,14 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebu
           <h2>{combat.victory === "lose" ? "Defeat…" : "Victory!"}</h2>
         </div>
       )}
+
+      <div className="stats-bar">
+        <span className="stat">Lv <strong>{player.level}</strong></span>
+        {[1, 2, 3, 4, 5].map((l) => slotLabel(l)).filter(Boolean).map((s, i) => (
+          <span key={i} className="stat">Slots <strong>{s}</strong></span>
+        ))}
+        <span className="stat">AP <strong>{player.ap}</strong></span>
+      </div>
 
       <div className="combat-grid" style={{ gridTemplateColumns: `repeat(${combat.gridSize}, 36px)` }}>
         {grid}
@@ -193,33 +225,39 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebu
       <div className="panel">
         <h2>Actions</h2>
         <div className="btn-grid">
-          <button onClick={selectMove}>Move</button>
-          <button onClick={() => { setMode("attack"); setReachable([]); }}>Attack</button>
-          <button onClick={() => { setMode("feed"); setReachable([]); }}>Feed Enemy</button>
-          <button onClick={endTurn}>End Turn</button>
-          <button onClick={quickLogBug} style={{ background: "rgba(139,90,16,0.5)" }}>Log bug</button>
+          <button onClick={selectMove} disabled={!isPlayerTurn(combat)}>Move</button>
+          <button onClick={() => { setMode("attack"); setReachable([]); }} disabled={!isPlayerTurn(combat)}>Attack</button>
+          <button onClick={() => { setMode("feed"); setReachable([]); }} disabled={!isPlayerTurn(combat)}>Feed</button>
+          <button onClick={finishTurn} disabled={!isPlayerTurn(combat)}>End Turn</button>
+          <button onClick={quickLogBug}>Log bug</button>
         </div>
       </div>
 
       <div className="panel">
         <h2>Spells</h2>
+        <label style={{ fontSize: "0.85rem", display: "block", marginBottom: "0.5rem" }}>
+          <input type="checkbox" checked={overflowCast} onChange={(e) => setOverflowCast(e.target.checked)} />
+          {" "}Overflow cast (extra slot/AP, more growth)
+        </label>
         <div className="btn-grid">
-          {spells.map((s) => (
-            <button key={s.id} onClick={() => cast(s)} disabled={game.player.mp < (s.mp || 0)}>
-              {s.name} ({s.mp || 0} MP)
-            </button>
-          ))}
+          {spells.map((s) => {
+            const canCast = s.slotLevel === 0 || hasSpellSlot(player, s.slotLevel) || (s.apCost && player.ap >= s.apCost);
+            return (
+              <button key={s.id} onClick={() => cast(s)} disabled={!isPlayerTurn(combat) || !canCast}>
+                {s.name} {s.slotLevel ? `(L${s.slotLevel})` : "(cantrip)"}
+                {s.apCost ? ` / ${s.apCost} AP` : ""}
+              </button>
+            );
+          })}
         </div>
       </div>
 
-      {growthText && (
-        <div className="panel prose">{growthText}</div>
-      )}
+      {growthText && <div className="panel prose">{growthText}</div>}
 
       <div className="panel">
         <h2>Battle Log</h2>
         <div className="log">
-          {combat.log.slice(-12).map((line, i) => <p key={i}>{line}</p>)}
+          {combat.log.slice(-14).map((line, i) => <p key={i}>{line}</p>)}
         </div>
       </div>
     </div>

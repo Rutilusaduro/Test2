@@ -5,6 +5,9 @@ import { getNpcState, applyNpcState } from "../gameData/player.js";
 import { getStage } from "../gameData/stages.js";
 import { getTier } from "../gameData/relationships.js";
 import { getCorruptionTier } from "../gameData/corruption.js";
+import { getXpProgress } from "../gameData/leveling.js";
+import { longRest } from "../gameData/leveling.js";
+import { getPlayerDerivedStats } from "../gameData/player.js";
 import NpcModal from "./NpcModal.jsx";
 
 export default function WorldView({ game, onUpdate, onEncounter, onSave, onDebugContext }) {
@@ -12,6 +15,8 @@ export default function WorldView({ game, onUpdate, onEncounter, onSave, onDebug
   const region = getRegion(game.region);
   const player = game.player;
   const stage = getStage(player.lbs);
+  const xp = getXpProgress(player);
+  const derived = getPlayerDerivedStats(player);
 
   const travel = (regionId) => {
     onUpdate((g) => ({ ...g, region: regionId }));
@@ -49,12 +54,19 @@ export default function WorldView({ game, onUpdate, onEncounter, onSave, onDebug
 
       <div className="stats-bar">
         <span className="stat"><strong>{player.name}</strong> — {player.subclass}</span>
+        <span className="stat">Lv <strong>{player.level}</strong> ({Math.round(xp.pct)}% to next)</span>
         <span className="stat">Stage: <strong>{stage.label}</strong> ({Math.round(player.lbs)} lbs)</span>
-        <span className="stat">AP: <strong>{player.ap}</strong></span>
+        <span className="stat">AC <strong>{derived.ac}</strong></span>
+        <span className="stat">AP: <strong>{player.ap}</strong>/{derived.maxAp}</span>
         <span className="stat">HP: <strong>{player.hp}/{player.maxHp}</strong></span>
-        <span className="stat">MP: <strong>{player.mp}/{player.maxMp}</strong></span>
         <span className="stat">Party: <strong>{game.party.length}</strong></span>
       </div>
+
+      {game.lastLevelUpMessage && (
+        <div className="panel prose" style={{ borderColor: "var(--gold)" }}>
+          {game.lastLevelUpMessage}
+        </div>
+      )}
 
       <div className="panel">
         <h2>{region.name}</h2>
@@ -99,8 +111,11 @@ export default function WorldView({ game, onUpdate, onEncounter, onSave, onDebug
         <h2>Actions</h2>
         <div className="btn-grid">
           <button onClick={onEncounter}>Seek Encounter</button>
-          <button onClick={() => onUpdate((g) => ({ ...g, day: g.day + 1, player: { ...g.player, ap: g.player.ap + 5 } }))}>
-            Rest & Feast (+5 AP)
+          <button onClick={() => onUpdate((g) => {
+            longRest(g.player);
+            return { ...g, day: g.day + 1, lastLevelUpMessage: null };
+          })}>
+            Rest & Feast (long rest — restore HP & spell slots)
           </button>
           <button onClick={onSave}>Save Game</button>
         </div>

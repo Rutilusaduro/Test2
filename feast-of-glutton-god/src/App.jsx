@@ -8,6 +8,8 @@ import { createNewGame, addAbundancePoints, syncPlayerFromCombat } from "./gameD
 import { saveGame, loadGame } from "./gameData/save.js";
 import { createCombatState, getCombatRewards } from "./gameData/combat.js";
 import { pickEncounter } from "./gameData/enemies.js";
+import { awardCombatXp } from "./gameData/leveling.js";
+import { initSpellSlots } from "./gameData/spellSlots.js";
 import "./textEngine/scenes/index.js";
 
 export default function App() {
@@ -24,6 +26,8 @@ export default function App() {
   const continueGame = useCallback(() => {
     const g = loadGame();
     if (g) {
+      if (!g.player.spellSlots) initSpellSlots(g.player);
+      if (!g.player.sizeCap) g.player.sizeCap = 5;
       setGame(g);
       setScreen("world");
     }
@@ -52,7 +56,10 @@ export default function App() {
       let next = syncPlayerFromCombat(prev, combat);
       const rewards = getCombatRewards(combat);
       next = addAbundancePoints(next, rewards.ap);
-      next.player.xp = (next.player.xp || 0) + rewards.xp;
+      const { levelUps } = awardCombatXp(next.player, combat);
+      if (levelUps.length) {
+        next.lastLevelUpMessage = levelUps.map((lu) => `Level ${lu.level}! ${lu.flavor}`).join("\n");
+      }
       next.combat = null;
       saveGame(next);
       return next;
