@@ -87,6 +87,22 @@ export function evaluateSizeRollModifiers(skillId, stageId) {
   return { advantage, disadvantage };
 }
 
+/** Map crit/fumble results to text engine pool keys. */
+export function resolveCheckTextKey({ critical, skillId, stat, critEffects, outcomeKey }) {
+  if (critEffects?.textKey) return critEffects.textKey;
+  if (critical === 'success') {
+    if (skillId) return `check.crit.${skillId}`;
+    if (stat) return `check.crit.${stat}`;
+    return 'check.crit.default';
+  }
+  if (critical === 'failure') {
+    if (skillId) return `check.fumble.${skillId}`;
+    if (stat) return `check.fumble.${stat}`;
+    return 'check.fumble.default';
+  }
+  return `check.${outcomeKey}.${skillId ?? stat ?? 'generic'}`;
+}
+
 /**
  * Build modifier breakdown. Same BONUS_TYPE stacks additively unless tagged noStack.
  */
@@ -283,7 +299,13 @@ export function resolveSkillCheck(entity, options = {}) {
     margin: total - dc,
 
     critEffects,
-    textKey: critEffects?.textKey ?? `check.${outcomeKey}.${skillId ?? 'generic'}`,
+    textKey: resolveCheckTextKey({
+      critical,
+      skillId,
+      stat: modifiers.stat,
+      critEffects,
+      outcomeKey,
+    }),
     description: skill?.desc ?? null,
   };
 }
