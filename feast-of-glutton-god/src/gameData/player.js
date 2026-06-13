@@ -5,6 +5,7 @@ import { createCompanionData, COMPANIONS } from "./companions.js";
 import { initSpellSlots } from "./spellSlots.js";
 import { getMaxAbundancePoints, hpPerLevel, getArmorClass } from "./stats.js";
 import { getSizeCapForLevel } from "./leveling.js";
+import { CLASS_SKILL_PROFICIENCIES } from "./skills.js";
 
 export function createPlayer(name, classId) {
   const cls = getClass(classId);
@@ -27,6 +28,7 @@ export function createPlayer(name, classId) {
     maxHp,
     stats,
     proficientSaves: cls.proficientSaves || [],
+    skillProficiencies: CLASS_SKILL_PROFICIENCIES[cls.id] || [],
     ap: 20,
     xp: 0,
     level,

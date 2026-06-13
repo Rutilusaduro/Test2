@@ -9,6 +9,12 @@
  * Cha: Bard/Warlock casting, social, conversion
  */
 import { getStage } from "./stages.js";
+import {
+  resolveAbilityCheck,
+  resolveSavingThrow as resolveSave,
+  resolveContestedCheck,
+  formatCheckSummary,
+} from "./skillChecks.js";
 
 export const STAT_KEYS = ["str", "dex", "con", "int", "wis", "cha"];
 
@@ -110,32 +116,57 @@ export function hpPerLevel(character, hitDie = 8) {
   return Math.max(1, hitDie + con + sizeHp);
 }
 
-/** Skill / save check — returns { roll, mod, total, dc, success } */
+/** Skill / save check — delegates to skill check system. */
 export function abilityCheck(character, statKey, dc = 10, rng = Math.random) {
-  const roll = Math.floor(rng() * 20) + 1;
-  const mod = getEffectiveStatMod(character, statKey);
-  const prof = character.proficientSkills?.includes(statKey) ? proficiencyBonus(character.level || 1) : 0;
-  const total = roll + mod + prof;
-  return { roll, mod, prof, total, dc, success: total >= dc };
+  const result = resolveAbilityCheck(character, statKey, dc, { rng });
+  return {
+    roll: result.naturalRoll,
+    mod: result.modifierTotal,
+    prof: result.breakdown.find((b) => b.source === "proficiency")?.value ?? 0,
+    total: result.total,
+    dc,
+    success: result.success,
+    critical: result.critical,
+    result,
+    summary: formatCheckSummary(result),
+  };
 }
 
 export function savingThrow(character, statKey, dc = 10, rng = Math.random) {
-  const prof = character.proficientSaves?.includes(statKey) ? proficiencyBonus(character.level || 1) : 0;
-  const roll = Math.floor(rng() * 20) + 1;
-  const mod = getEffectiveStatMod(character, statKey) + prof;
-  const total = roll + mod;
-  return { roll, mod, total, dc, success: total >= dc };
+  const result = resolveSave(character, statKey, dc, { rng });
+  return {
+    roll: result.naturalRoll,
+    mod: result.modifierTotal,
+    total: result.total,
+    dc,
+    success: result.success,
+    critical: result.critical,
+    result,
+    summary: formatCheckSummary(result),
+  };
 }
 
-/** Force-feed / grapple style check — Str vs target's Str or Dex */
+/** Force-feed / grapple — Overwhelm (Str) vs Athletics or Grace (defender's better stat). */
 export function forceFeedCheck(attacker, target, rng = Math.random) {
-  const atk = abilityCheck(attacker, "str", 0, rng);
-  const defStat = getEffectiveStatMod(target, "str") >= getEffectiveStatMod(target, "dex") ? "str" : "dex";
-  const def = abilityCheck(target, defStat, 0, rng);
+  const strMod = getEffectiveStatMod(target, "str");
+  const dexMod = getEffectiveStatMod(target, "dex");
+  const defenderSkillId = strMod >= dexMod ? "athletics" : "grace";
+
+  const contested = resolveContestedCheck(attacker, target, {
+    attackerSkillId: "overwhelm",
+    defenderSkillId,
+    rng,
+    label: "Force Feed",
+  });
+
   return {
-    success: atk.total >= def.total,
-    attacker: atk.total,
-    defender: def.total,
+    success: contested.attackerWins,
+    attacker: contested.attackerResult.total,
+    defender: contested.defenderResult.total,
+    contested,
+    summary: `${contested.label}: ${contested.attackerResult.total} vs ${contested.defenderResult.total} — ${
+      contested.attackerWins ? "SUCCESS" : "FAIL"
+    }`,
   };
 }
 
