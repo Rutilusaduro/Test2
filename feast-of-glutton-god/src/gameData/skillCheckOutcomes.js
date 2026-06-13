@@ -4,7 +4,6 @@
  */
 
 import { advanceStage } from './stages.js';
-import { addAbundancePoints } from './player.js';
 
 export const CRIT_SUCCESS_EFFECTS = {
   seduce: {

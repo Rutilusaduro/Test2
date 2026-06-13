@@ -6,7 +6,15 @@ import {
   canSpendMovement, spendMovement, canUseAction, spendAction, onUnitGrew,
   ACTION_TYPES, getCombatUnitId,
 } from "./combatTurn.js";
-import { getMeleeAttackBonus, getMeleeDamageBonus } from "./stats.js";
+import {
+  resolveAttackRoll,
+  resolveMeleeDamage,
+  applyCombatDamage,
+  applyAttackCritEffects,
+  formatAttackSummary,
+  ATTACK_TYPES,
+  getAttackReach,
+} from "./combatRolls.js";
 import { resolveCastCost, getSpellPowerMultiplier } from "./spellSlots.js";
 import { getSpellForCast } from "./spells.js";
 
@@ -160,20 +168,50 @@ export function attackUnit(combat, attacker, target) {
     return combat;
   }
 
-  const atkBonus = getMeleeAttackBonus(attacker);
-  const dmgBonus = getMeleeDamageBonus(attacker);
-  const attackRoll = Math.floor(Math.random() * 20) + 1 + atkBonus;
-  const baseDmg = 4 + Math.floor(getStage(attacker.lbs).id / 2) + dmgBonus;
-  const dmg = Math.max(1, baseDmg + Math.floor(Math.random() * 4));
+  const reach = getAttackReach(attacker, ATTACK_TYPES.MELEE);
+  const dist = Math.abs(attacker.x - target.x) + Math.abs(attacker.y - target.y);
+  const atkSize = getTileSize(getStage(attacker.lbs).id);
+  if (dist > reach + atkSize + 1) {
+    combat.log.push(`${attacker.name} cannot reach ${target.name}!`);
+    return combat;
+  }
 
-  if (attackRoll >= 10) {
-    target.hp = Math.max(0, target.hp - dmg);
-    combat.log.push(`${attacker.name} strikes ${target.name} for ${dmg} damage!`);
+  const applyGrowthFn = (unit, stages) => {
+    const g = applyGrowth(unit, stages);
+    onUnitGrew(combat.turnState, unit, g);
+    combat.lastGrowth = { unit, ...g };
+    return g;
+  };
+
+  const attack = resolveAttackRoll(attacker, target, {
+    attackType: ATTACK_TYPES.MELEE,
+    label: `${attacker.name} attacks`,
+  });
+
+  if (attack.hit) {
+    const damage = resolveMeleeDamage(attacker, { critical: attack.isCriticalHit });
+    const applied = applyCombatDamage(target, damage, { applyGrowthFn });
+    applyAttackCritEffects(attacker, target, attack, { applyGrowthFn });
+    combat.log.push(formatAttackSummary(attack, damage, applied));
+
+    if (attack.isCriticalHit) {
+      combat.log.push(`★ Critical hit — ${target.name} swells under the voluptuous impact!`);
+    }
+    if (applied.growthStages > 0) {
+      combat.log.push(`${target.name}'s body blooms with pleasurable abundance.`);
+      addCorruption(target, 3 * applied.growthStages);
+    }
     if (getStage(attacker.lbs).id >= 6) {
-      combat.log.push(`The weight of ${attacker.name}'s body adds crushing force.`);
+      combat.log.push(`The weight of ${attacker.name}'s glorious mass adds crushing force.`);
     }
   } else {
-    combat.log.push(`${attacker.name}'s attack glances off ${target.name}.`);
+    combat.log.push(formatAttackSummary(attack));
+    if (attack.isCriticalMiss) {
+      applyAttackCritEffects(attacker, target, attack, { applyGrowthFn });
+      combat.log.push(`${attacker.name} wobbles delightfully off-balance — still magnificent.`);
+    } else {
+      combat.log.push(`${attacker.name}'s strike glances off ${target.name}'s curves.`);
+    }
   }
 
   if (entry) spendAction(combat.turnState, entry.id, ACTION_TYPES.ACTION);
