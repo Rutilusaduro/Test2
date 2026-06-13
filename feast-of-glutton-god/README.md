@@ -12,6 +12,26 @@ npm run dev
 
 Open the URL shown in the terminal (typically http://localhost:5173).
 
+## GitHub Pages
+
+The game deploys automatically on pushes to `main`, or manually via **Actions → Deploy Feast of the Glutton God to GitHub Pages → Run workflow**.
+
+**One-time repo setup:**
+
+1. Open **Settings → Pages**
+2. Under **Build and deployment**, set **Source** to **GitHub Actions**
+
+After a successful deploy, the game is live at:
+
+**https://rutilusaduro.github.io/Test2/**
+
+Local preview of the Pages build:
+
+```bash
+npm run build:pages
+npm run preview:pages
+```
+
 ## Features
 
 - **Modular Text Engine** — ported from the Professor Sim reference branch; slots, phrase pools, selectors, and context-driven prose adapt to size stage, relationship, corruption, body type, and location.
