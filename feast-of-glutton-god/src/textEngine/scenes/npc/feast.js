@@ -1,6 +1,9 @@
 import { registerPool, createContext, render } from '../../engine.js';
 import '../../modules.js';
 
+// ── npc.feast — multi-beat scene (see docs/AUTHORING.md) ─────────────────────
+// Name rule: {subject.name} on first subject mention in eating beat; {subject.first} in climax.
+
 registerPool('npc.feast.intro', [
   { when: {}, text: [
     'The feast hall fills with golden light and impossible aromas.',
