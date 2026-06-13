@@ -200,7 +200,23 @@ export const MOVEMENT_WORDS = {
   leviathan: ["barely shifts", "settles rather than walks", "exists more than arrives", "moves like geography rearranging", "arrives by accumulation not stride"],
 };
 
-// ── clothing fit — season × stage ─────────────────────────────
+// Participial / descriptive phrases for "stands before you, …" — not bare verbs.
+export const STANDING_MOVEMENT_WORDS = {
+  slight:   ["poised and light on her feet", "still and slender", "easy in her posture"],
+  slim:     ["relaxed and unhurried", "balanced and natural", "light in her stance"],
+  soft:     ["settling into a softer sway", "carrying new curves with easy grace", "shifting with a gentle bounce"],
+  chubby:   ["rounded and comfortable in her stance", "shifting with thighs that nearly brush", "carrying new weight with easy rhythm"],
+  plump:    ["settled and deliberately soft", "rocking slightly as she finds her balance", "wide and unapologetic in her posture"],
+  heavy:    ["waddling slightly in place", "rocking her weight from side to side", "breathing audibly as she holds still"],
+  fat:      ["waddling gently in place", "rocking side to side with each shift of weight", "laboring pleasantly even to stand still"],
+  veryFat:  ["waddling slowly even at rest", "settling her mass before she speaks", "moving with great deliberation"],
+  enormous: ["lumbering even in stillness", "a ponderous presence that reshapes the air", "holding still like weather about to move"],
+  colossal: ["shuffling her weight in small careful shifts", "barely shifting, vast and warm", "repositioning rather than merely standing"],
+  blob:     ["settling more than standing", "rippling softly even at rest", "a slow tide of flesh at pause"],
+  leviathan:["barely shifting", "existing more than standing", "warm immobility made person"],
+};
+
+// ─── clothing fit — season × stage ─────────────────────────────
 
 const seasonRow = (slight, slim, soft, chubby, plump, heavy, fat, veryFat, enormous, colossal, blob, leviathan) =>
   ({ slight, slim, soft, chubby, plump, heavy, fat, veryFat, enormous, colossal, blob, leviathan: leviathan || blob });
@@ -305,6 +321,8 @@ function byBucket(dict) {
 registerModule("word.size", [{ when: {}, text: byBucket(SIZE_WORDS) }]);
 
 registerModule("word.movement", [{ when: {}, text: byBucket(MOVEMENT_WORDS) }]);
+
+registerModule("word.standingMovement", [{ when: {}, text: byBucket(STANDING_MOVEMENT_WORDS) }]);
 
 registerModule("word.body", [{
   when: {},

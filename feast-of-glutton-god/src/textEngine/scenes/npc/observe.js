@@ -4,7 +4,7 @@ import '../../lexicon.js';
 
 registerPool('npc.observe.pose', [
   { when: { pose: 'standing' }, text: [
-    '{subject.name} stands before you, {word.movement}. {npc.observe.body} {npc.observe.clothing}',
+    '{subject.name} stands before you, {word.standingMovement}. {npc.observe.body} {npc.observe.clothing}',
     'You take in {subject.name} — {char.desc}. {npc.observe.body} {npc.observe.clothing}',
   ]},
   { when: { pose: 'sitting' }, text: [
