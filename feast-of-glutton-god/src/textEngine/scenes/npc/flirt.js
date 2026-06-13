@@ -43,5 +43,5 @@ export function renderFlirt(npc, player, opts = {}) {
     seed: opts.seed,
     history: opts.history,
   });
-  return render('{npc.flirt.line} {npc.flirt.response}', ctx);
+  return render('{npc.flirt.line} {npc.flirt.response}', ctx, { trace: opts.trace });
 }

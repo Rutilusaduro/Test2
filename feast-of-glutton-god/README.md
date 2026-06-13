@@ -43,7 +43,15 @@ npm run preview:pages
 - **Five world regions** — Harvest's Hearth, Market Square, Fertile Heartlands, Gorgara's Cradle, Ancient Temple Ruins.
 - **Save system** — localStorage persistence.
 
-## Architecture
+## Debug Tools
+
+While playing (world or combat), use the floating buttons at bottom-right:
+
+- **Debug** — Text Engine tab with Dialogue Lab (roll 5 random prose samples, flag individual text nodes, copy tuning notes) and a 6-combo observe/feed sweep. Game Cheats tab for AP, weight stages, region jumps.
+- **Bug** — Quick bug log with auto-captured context (screen, region, combat state, last rendered text). Notes persist in localStorage. Copy all notes for pasting into issues.
+
+NPC interactions also have an inline **Log bug** button. Console playground: `window.__textEngine` exposes `render`, `createContext`, etc.
+
 
 ```
 src/

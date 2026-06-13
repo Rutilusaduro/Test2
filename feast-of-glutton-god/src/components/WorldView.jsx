@@ -7,7 +7,7 @@ import { getTier } from "../gameData/relationships.js";
 import { getCorruptionTier } from "../gameData/corruption.js";
 import NpcModal from "./NpcModal.jsx";
 
-export default function WorldView({ game, onUpdate, onEncounter, onSave }) {
+export default function WorldView({ game, onUpdate, onEncounter, onSave, onDebugContext }) {
   const [npcModal, setNpcModal] = useState(null);
   const region = getRegion(game.region);
   const player = game.player;
@@ -20,6 +20,7 @@ export default function WorldView({ game, onUpdate, onEncounter, onSave }) {
   const openNpc = (npc) => {
     const state = getNpcState(game, npc);
     setNpcModal(state);
+    onDebugContext?.({ npc: state, region: game.region, interaction: "npc_open" });
   };
 
   const handleNpcUpdate = (npc) => {
@@ -124,6 +125,7 @@ export default function WorldView({ game, onUpdate, onEncounter, onSave }) {
           game={game}
           onClose={() => setNpcModal(null)}
           onUpdate={handleNpcUpdate}
+          onDebugContext={onDebugContext}
         />
       )}
     </div>

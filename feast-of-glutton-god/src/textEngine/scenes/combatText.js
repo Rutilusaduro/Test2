@@ -29,5 +29,5 @@ export function renderCombatBeat(unit, opts = {}) {
     globals: { interaction: opts.interaction || 'attack' },
     seed: opts.seed,
   });
-  return render('{combat.action}', ctx);
+  return render('{combat.action}', ctx, { trace: opts.trace });
 }

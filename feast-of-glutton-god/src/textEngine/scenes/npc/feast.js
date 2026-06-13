@@ -41,5 +41,5 @@ export function renderFeast(npc, player, opts = {}) {
     seed: opts.seed,
     history: opts.history,
   });
-  return render('{npc.feast.intro} {npc.feast.eating} {npc.feast.climax}', ctx);
+  return render('{npc.feast.intro} {npc.feast.eating} {npc.feast.climax}', ctx, { trace: opts.trace });
 }

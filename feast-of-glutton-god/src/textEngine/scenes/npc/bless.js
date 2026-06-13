@@ -40,5 +40,5 @@ export function renderBless(npc, player, opts = {}) {
     seed: opts.seed,
     history: opts.history,
   });
-  return render(`{${slot}}`, ctx);
+  return render(`{${slot}}`, ctx, { trace: opts.trace });
 }

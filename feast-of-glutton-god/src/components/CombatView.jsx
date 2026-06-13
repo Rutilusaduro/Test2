@@ -8,7 +8,9 @@ import { getSpellsForClass } from "../gameData/spells.js";
 import { renderCombatNarration } from "../hooks/npcInteractions.js";
 import { renderGrowthScene } from "../textEngine/scenes/growthEvent/index.js";
 
-export default function CombatView({ game, combat, onUpdateCombat, onEnd }) {
+import { addBugNote, captureGameContext } from "../hooks/bugLog.js";
+
+export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebugContext }) {
   const [selectedUnit, setSelectedUnit] = useState(combat.allies[0]);
   const [mode, setMode] = useState("move");
   const [growthText, setGrowthText] = useState("");
@@ -17,9 +19,33 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd }) {
   const spells = getSpellsForClass(game.player.classId);
   const size = selectedUnit ? getTileSize(getStage(selectedUnit.lbs).id) : 1;
 
+  const reportCombat = (extra = {}) => {
+    onDebugContext?.({
+      screen: "combat",
+      region: game.region,
+      interaction: extra.interaction || "combat",
+      lastText: extra.lastText || growthText || combat.log.slice(-1)[0],
+    });
+  };
+
+  const quickLogBug = () => {
+    addBugNote({
+      category: "combat",
+      note: "Combat issue logged during encounter",
+      context: captureGameContext(game, {
+        screen: "combat",
+        region: game.region,
+        interaction: "combat",
+        lastText: growthText || combat.log.slice(-3).join("\n"),
+      }),
+    });
+    reportCombat({ interaction: "bug_logged" });
+  };
+
   const update = (c) => {
     onUpdateCombat({ ...c });
     if (c.victory) setTimeout(() => onEnd(c), 1500);
+    reportCombat({ lastText: growthText || c.log.slice(-1)[0] });
   };
 
   const selectMove = () => {
@@ -171,6 +197,7 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd }) {
           <button onClick={() => { setMode("attack"); setReachable([]); }}>Attack</button>
           <button onClick={() => { setMode("feed"); setReachable([]); }}>Feed Enemy</button>
           <button onClick={endTurn}>End Turn</button>
+          <button onClick={quickLogBug} style={{ background: "rgba(139,90,16,0.5)" }}>Log bug</button>
         </div>
       </div>
 
