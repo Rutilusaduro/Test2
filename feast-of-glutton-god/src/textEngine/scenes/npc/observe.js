@@ -4,19 +4,19 @@ import '../../lexicon.js';
 
 registerPool('npc.observe.pose', [
   { when: { pose: 'standing' }, text: [
-    '{subject.name} stands before you, {word.size} and {word.movement}. {join:npc.observe.body,npc.observe.clothing|prefix: }',
-    'You take in {subject.name} — {char.desc}. {join:npc.observe.body,npc.observe.clothing|prefix: }',
+    '{subject.name} stands before you, {word.movement}. {npc.observe.body} {npc.observe.clothing}',
+    'You take in {subject.name} — {char.desc}. {npc.observe.body} {npc.observe.clothing}',
   ]},
   { when: { pose: 'sitting' }, text: [
-    '{subject.name} sits heavily, {word.size}, her softness settled into the chair. {join:npc.observe.body,npc.observe.clothing|prefix: }',
-    'Seated, {subject.name} is a picture of {word.size} comfort. {join:npc.observe.body,npc.observe.clothing|prefix: }',
+    '{subject.name} sits heavily, {word.size}, her softness settled into the chair. {npc.observe.body} {npc.observe.clothing}',
+    'Seated, {subject.name} is a picture of {word.size} comfort. {npc.observe.body} {npc.observe.clothing}',
   ]},
   { when: { pose: 'walking' }, text: [
     '{subject.name} {word.movement}, each step sending a gentle ripple through her {word.size} form.',
     'You watch {subject.name} pass — {word.size}, unhurried, beautifully heavy.',
   ]},
   { when: {}, text: [
-    '{char.desc|cap}. {join:npc.observe.body,npc.observe.clothing|prefix: }',
+    '{char.desc|cap}. {npc.observe.body} {npc.observe.clothing}',
   ]},
 ]);
 
@@ -47,7 +47,8 @@ registerPool('npc.observe.body', [
 registerPool('npc.observe.clothing', [
   { when: { stageMin: 0, stageMax: 3 }, text: [
     'Her clothes fit well, though the fabric pulls slightly across her hips.',
-    '{word.clothingFit|cap}.',
+    'Her outfit hugs her figure a little more honestly than it used to.',
+    '{word.clothingFit}',
   ]},
   { when: { stageMin: 4, stageMax: 6 }, text: [
     'Fabric strains audibly when she moves — buttons threatening, seams whispering.',
@@ -57,7 +58,7 @@ registerPool('npc.observe.clothing', [
     'What remains of her clothing is mostly decoration on an overwhelming body.',
     'Straps and scraps of fabric cling to curves far beyond their design.',
   ]},
-  { when: {}, text: ['{word.clothingFit|cap}.'] },
+  { when: {}, text: ['{word.clothingFit}'] },
 ]);
 
 const POSES = ['standing', 'sitting', 'walking'];

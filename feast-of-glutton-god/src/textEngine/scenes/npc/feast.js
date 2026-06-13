@@ -28,7 +28,7 @@ registerPool('npc.feast.climax', [
     'By the final course, {subject.first} is nearly unrecognizable — vastly, beautifully obese.',
   ]},
   { when: {}, text: [
-    'When the last plate clears, {subject.name} sits in blissful, heavy satisfaction.',
+    'When the last plate clears, {subject.first} sits in blissful, heavy satisfaction.',
   ]},
 ]);
 
