@@ -6,19 +6,22 @@ import {
 import { getStage } from "../gameData/stages.js";
 import { getTier } from "../gameData/relationships.js";
 import { getCorruptionTier } from "../gameData/corruption.js";
+import SkillCheckRoll from "./SkillCheckRoll.jsx";
 
 import { addBugNote, captureGameContext } from "../hooks/bugLog.js";
 
 export default function NpcModal({ npc, player, game, onClose, onUpdate, onGameRefresh, onDebugContext }) {
   const [text, setText] = useState("");
   const [submenu, setSubmenu] = useState(null);
+  const [activeCheck, setActiveCheck] = useState(null);
+  const [pendingResult, setPendingResult] = useState(null);
 
   const stage = getStage(npc.lbs);
   const rel = getTier(npc.relationship || 0);
   const cor = getCorruptionTier(npc.corruption || 0);
   const menu = getInteractionMenu(npc, player);
 
-  const apply = (result, interaction) => {
+  const finishApply = (result, interaction) => {
     if (result.npc) onUpdate(result.npc);
     if (result.questNotes) onGameRefresh?.();
     setText(result.text || "");
@@ -29,6 +32,36 @@ export default function NpcModal({ npc, player, game, onClose, onUpdate, onGameR
       interaction,
       lastText: result.text,
     });
+  };
+
+  const apply = (result, interaction) => {
+    if (result.check) {
+      if (result.npc) onUpdate(result.npc);
+      if (result.questNotes) onGameRefresh?.();
+      setActiveCheck(result.check);
+      setPendingResult({
+        text: result.narrative || result.text || "",
+        interaction,
+        npc: result.npc,
+      });
+      setText("");
+      setSubmenu(null);
+      return;
+    }
+    finishApply(result, interaction);
+  };
+
+  const handleRollComplete = () => {
+    if (!pendingResult) return;
+    setText(pendingResult.text);
+    onDebugContext?.({
+      npc: pendingResult.npc || npc,
+      region: game.region,
+      interaction: pendingResult.interaction,
+      lastText: pendingResult.text,
+    });
+    setActiveCheck(null);
+    setPendingResult(null);
   };
 
   const handleAction = (id) => {
@@ -86,7 +119,11 @@ export default function NpcModal({ npc, player, game, onClose, onUpdate, onGameR
           {npc.role && <span className="stat">{npc.role}</span>}
         </div>
 
-        {text && (
+        {activeCheck && (
+          <SkillCheckRoll check={activeCheck} onComplete={handleRollComplete} />
+        )}
+
+        {text && !activeCheck && (
           <div className="panel prose" style={{ marginTop: "1rem" }}>
             {text}
           </div>
@@ -114,7 +151,7 @@ export default function NpcModal({ npc, player, game, onClose, onUpdate, onGameR
           </div>
         )}
 
-        {!submenu && (
+        {!submenu && !activeCheck && (
           <div className="modal-actions">
             {menu.map((item) => (
               <button

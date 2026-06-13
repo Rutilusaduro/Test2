@@ -40,6 +40,9 @@ function withQuestProgress(game, npc, interaction, meta, result) {
   }
   if (questMessages) {
     result.text = (result.text || '') + `\n\n---\n${questMessages}`;
+    if (result.narrative) {
+      result.narrative += `\n\n---\n${questMessages}`;
+    }
   }
   result.questNotes = quest;
   return result;
@@ -114,12 +117,14 @@ export function doFlirt(npc, player, game) {
     : check.critical === 'failure'
       ? '\n\n✦ A charming fumble — you blush, and she finds it endearing.'
       : '';
+  const narrative = `${text}${failNote}${critNote}`;
 
   return withQuestProgress(game, updatedNpc, 'flirt', null, {
-    text: `${summary}\n\n${text}${failNote}${critNote}`,
+    text: `${summary}\n\n${narrative}`,
+    narrative,
+    check,
     npc: updatedNpc,
     success: check.success,
-    check,
   });
 }
 

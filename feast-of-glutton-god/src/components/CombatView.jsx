@@ -15,11 +15,14 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebu
   const player = combat.allies.find((a) => a.isPlayer) || game.player;
   const [mode, setMode] = useState("move");
   const [growthText, setGrowthText] = useState("");
-  const [reachable, setReachable] = useState([]);
   const [overflowCast, setOverflowCast] = useState(false);
 
   const selectedUnit = getActiveUnit(combat) || combat.allies[0];
   const turnSummary = getTurnSummary(combat);
+  const playerTurn = isPlayerTurn(combat);
+  const reachable = mode === "move" && playerTurn && selectedUnit
+    ? getReachableTiles(combat, selectedUnit)
+    : [];
   const spells = getSpellsForClass(game.player.classId);
   const slots = player.spellSlots?.current || [];
 
@@ -54,16 +57,35 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebu
 
   const selectMove = () => {
     setMode("move");
-    if (selectedUnit) setReachable(getReachableTiles(combat, selectedUnit));
   };
 
-  const cloneCombat = () => ({
-    ...combat,
-    allies: combat.allies.map((a) => ({ ...a })),
-    enemies: combat.enemies.map((e) => ({ ...e })),
-    log: [...combat.log],
-    turnState: { ...combat.turnState, economy: { ...combat.turnState.economy } },
-  });
+  const cloneCombat = () => {
+    const allies = combat.allies.map((a) => ({ ...a }));
+    const enemies = combat.enemies.map((e) => ({ ...e }));
+    const unitById = new Map(
+      [...allies, ...enemies].map((u) => [u.combatId || u.id, u]),
+    );
+    const order = combat.turnState.order.map((entry) => ({
+      ...entry,
+      unit: unitById.get(entry.id) ?? entry.unit,
+    }));
+    const economy = {};
+    for (const [id, eco] of Object.entries(combat.turnState.economy ?? {})) {
+      economy[id] = { ...eco };
+    }
+    return {
+      ...combat,
+      allies,
+      enemies,
+      log: [...combat.log],
+      turnState: {
+        ...combat.turnState,
+        order,
+        economy,
+        log: combat.turnState.log ? [...combat.turnState.log] : [],
+      },
+    };
+  };
 
   const handleCellClick = (x, y) => {
     if (combat.victory || !isPlayerTurn(combat)) return;
@@ -74,8 +96,8 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebu
       const can = reachable.find((t) => t.x === x && t.y === y);
       if (can) {
         moveUnit(c, active, x, y);
-        setReachable([]);
-        setMode("action");
+        const summary = getTurnSummary(c);
+        setMode(summary?.movement > 0 ? "move" : "action");
         update(c);
       }
       return;
@@ -139,7 +161,6 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebu
   const finishTurn = () => {
     const c = cloneCombat();
     advanceTurn(c);
-    setReachable([]);
     setMode("move");
     update(c);
   };
@@ -226,8 +247,8 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebu
         <h2>Actions</h2>
         <div className="btn-grid">
           <button onClick={selectMove} disabled={!isPlayerTurn(combat)}>Move</button>
-          <button onClick={() => { setMode("attack"); setReachable([]); }} disabled={!isPlayerTurn(combat)}>Attack</button>
-          <button onClick={() => { setMode("feed"); setReachable([]); }} disabled={!isPlayerTurn(combat)}>Feed</button>
+          <button onClick={() => { setMode("attack"); }} disabled={!isPlayerTurn(combat)}>Attack</button>
+          <button onClick={() => { setMode("feed"); }} disabled={!isPlayerTurn(combat)}>Feed</button>
           <button onClick={finishTurn} disabled={!isPlayerTurn(combat)}>End Turn</button>
           <button onClick={quickLogBug}>Log bug</button>
         </div>
