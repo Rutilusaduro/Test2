@@ -18,6 +18,9 @@ import { renderGrowthProse } from '../textEngine/scenes/growth/index.js';
 import { renderQuestText } from '../textEngine/scenes/quests/index.js';
 import { onRedemptionQuestComplete } from '../hooks/questHooks.js';
 import { getDivineAttention } from './divineAttention.js';
+import { COMPANIONS } from './companions.js';
+import { ensureCompanionDevotion } from './companionDevotion.js';
+import { getPuzzleDefinition } from './puzzles/registry.js';
 
 const DEFAULT_UNLOCKED_REGIONS = [
   'harvest_hearth',
@@ -33,6 +36,9 @@ const PASSIVE_OBJECTIVE_TYPES = [
   OBJECTIVE_TYPE.VISIT_REGION,
   OBJECTIVE_TYPE.FLAG_SET,
   OBJECTIVE_TYPE.NPC_GROWTH_QUOTA,
+  OBJECTIVE_TYPE.COMPANION_PRESENT,
+  OBJECTIVE_TYPE.COMPANION_MILESTONE,
+  OBJECTIVE_TYPE.PUZZLE_SOLVED,
 ];
 
 const SCORE_FIELD_MAP = {
@@ -130,11 +136,26 @@ function getPlayerFlag(game, flag) {
   return Boolean(game.player?.storyFlags?.[flag]);
 }
 
+function isCompanionRecruited(game, companionId) {
+  return (game.party ?? []).some((c) => c.id === companionId);
+}
+
+function getCompanionHomeRegion(companionId) {
+  return COMPANIONS.find((c) => c.id === companionId)?.location ?? null;
+}
+
+function getCompanionInParty(game, companionId) {
+  return (game.party ?? []).find((c) => c.id === companionId) ?? null;
+}
+
 function meetsPrerequisites(game, questDef) {
   const pre = questDef.prerequisites ?? {};
   if (pre.minPlayerLevel && (game.player.level || 1) < pre.minPlayerLevel) return false;
   if (pre.minPlayerStage != null) {
     if (getStage(game.player.lbs).id < pre.minPlayerStage) return false;
+  }
+  for (const companionId of pre.companionsRequired ?? []) {
+    if (!isCompanionRecruited(game, companionId)) return false;
   }
   for (const flag of pre.flags ?? []) {
     if (!hasFlag(game, flag) && !getPlayerFlag(game, flag)) return false;
@@ -299,6 +320,25 @@ function objectiveTargetMet(game, obj, instance = null) {
       return hasFlag(game, obj.flag) || getPlayerFlag(game, obj.flag);
     case OBJECTIVE_TYPE.NPC_GROWTH_QUOTA:
       return instance ? refreshGrowthQuota(game, instance, obj) : false;
+    case OBJECTIVE_TYPE.COMPANION_PRESENT:
+      return isCompanionRecruited(game, obj.companionId);
+    case OBJECTIVE_TYPE.COMPANION_MILESTONE: {
+      if (!isCompanionRecruited(game, obj.companionId)) return false;
+      const companion = getCompanionInParty(game, obj.companionId);
+      if (!companion) return false;
+      const minDevotion = obj.minDevotion ?? 75;
+      if (ensureCompanionDevotion(companion) < minDevotion) return false;
+      const apotheosisFlag = `${obj.companionId}_apotheosis_complete`;
+      if (getPlayerFlag(game, apotheosisFlag)) return true;
+      const homeRegion = obj.regionId ?? getCompanionHomeRegion(obj.companionId);
+      return Boolean(homeRegion && game.region === homeRegion);
+    }
+    case OBJECTIVE_TYPE.PUZZLE_SOLVED: {
+      if (!obj.puzzleId) return false;
+      const puzzleDef = getPuzzleDefinition(obj.puzzleId);
+      if (!puzzleDef?.stateFlag) return false;
+      return Boolean(game.worldFlags?.[puzzleDef.stateFlag]);
+    }
     default:
       return false;
   }
@@ -542,6 +582,16 @@ export function notifyQuestEvent(game, event = {}) {
           recordGrowthQuotaProgress(game, instance, obj, event);
           matched = instance.objectives[obj.id].completed;
         }
+      } else if (obj.type === OBJECTIVE_TYPE.COMPANION_MILESTONE) {
+        if (event.type === 'visit_region' && objectiveTargetMet(game, obj, instance)) {
+          const apotheosisFlag = `${obj.companionId}_apotheosis_complete`;
+          if (!getPlayerFlag(game, apotheosisFlag)) {
+            game.player.storyFlags[apotheosisFlag] = true;
+          }
+          instance.objectives[obj.id].progress = obj.count ?? 1;
+          instance.objectives[obj.id].completed = true;
+          matched = true;
+        }
       } else if (PASSIVE_OBJECTIVE_TYPES.includes(obj.type) && obj.type !== OBJECTIVE_TYPE.NPC_GROWTH_QUOTA) {
         if (objectiveTargetMet(game, obj, instance)) {
           instance.objectives[obj.id].progress = obj.count ?? 1;
@@ -587,6 +637,12 @@ export function notifyQuestEvent(game, event = {}) {
       if (PASSIVE_OBJECTIVE_TYPES.includes(obj.type) && objectiveTargetMet(game, obj, instance)) {
         const rec = instance.objectives[obj.id];
         if (!rec.completed) {
+          if (obj.type === OBJECTIVE_TYPE.COMPANION_MILESTONE) {
+            const apotheosisFlag = `${obj.companionId}_apotheosis_complete`;
+            if (!getPlayerFlag(game, apotheosisFlag)) {
+              game.player.storyFlags[apotheosisFlag] = true;
+            }
+          }
           rec.progress = obj.count ?? 1;
           rec.completed = true;
           applyScores(instance, obj.score);

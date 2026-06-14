@@ -34,6 +34,7 @@ export const ENEMY_GROWTH_KIND = {
   cathedral_golem: 'stone_golem',
   divine_inquisitor_supreme: 'inquisitor_elite',
   korthak_titan: 'war_titan',
+  dream_echo: 'mirror_self',
   avatar_aurelan: 'divine_avatar_law',
   sylwen_revenant: 'divine_avatar_grief',
   veshanne_unbound: 'divine_avatar_death',

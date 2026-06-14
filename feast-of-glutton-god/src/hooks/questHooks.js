@@ -65,6 +65,17 @@ export function recordCombatEndForQuests(game, combat) {
     .filter((e) => e.hp <= 0 || e.converted)
     .map((e) => e.typeId || e.type || e.id)
     .filter(Boolean);
+  const foughtEnemyIds = (combat.enemies ?? [])
+    .map((e) => e.typeId || e.type || e.id)
+    .filter(Boolean);
+  if (foughtEnemyIds.includes('korthak_titan')) {
+    game.worldFlags = game.worldFlags || {};
+    game.worldFlags.korthak_titan_encountered = true;
+  }
+  if (defeatedEnemyIds.includes('dream_echo')) {
+    game.player.storyFlags = game.player.storyFlags || {};
+    game.player.storyFlags.dream_echo_faced = true;
+  }
   const { lines, growthSnippets } = notifyQuestEvent(game, {
     type: 'combat_end',
     victoryType,

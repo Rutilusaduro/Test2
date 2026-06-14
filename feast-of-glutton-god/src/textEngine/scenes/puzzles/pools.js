@@ -354,3 +354,39 @@ registerPuzzleCopy('puzzle.solve.citadel_cult', [
 registerPuzzleCopy('puzzle.solve.citadel_combat', [
   'The seal-guardian falls. Holy iron yields to appetite made manifest.',
 ]);
+
+registerPuzzleCopy('puzzle.solve.lumen_sylvie', [
+  'Sylvie\'s counter-rite misfiles the cosmos. The Index scribe blinks at equations that should not balance — yet do.',
+]);
+registerPuzzleCopy('puzzle.solve.lumen_theodric', [
+  'Theodric steals his own report. Heresy becomes footnotes only the faithful will read.',
+]);
+registerPuzzleCopy('puzzle.solve.lumen_charm', [
+  'Enchantment glosses the archive. Your patron\'s name becomes a smudge of cream and possibility.',
+]);
+registerPuzzleCopy('puzzle.solve.lumen_persuade', [
+  'You prove abundance obeys laws — stranger laws, but laws. The archivist hesitates, then nods.',
+]);
+
+registerPuzzleCopy('puzzle.solve.barrow_abundance', [
+  'Abundance pours into oath-stone. The deeps remember hunger older than the Wheel.',
+]);
+registerPuzzleCopy('puzzle.solve.barrow_ritual', [
+  'Banquet mist fills carved hunger. The oracle\'s cell exhales warm truth.',
+]);
+registerPuzzleCopy('puzzle.solve.barrow_endure', [
+  'You endure oath-pressure until stone yields. The barrow approves your appetite.',
+]);
+registerPuzzleCopy('puzzle.solve.barrow_combat', [
+  'The cathedral golem falls. Rubble and revelation share the same dust.',
+]);
+
+registerPuzzleCopy('puzzle.solve.vestibule_rite', [
+  'Apotheosis rite shakes divine geometry. The threshold admits you — reluctantly, gloriously.',
+]);
+registerPuzzleCopy('puzzle.solve.vestibule_mass', [
+  'Immensity asserts itself before law. The vestibule reclassifies you as weather.',
+]);
+registerPuzzleCopy('puzzle.solve.vestibule_abundance', [
+  'Abundance floods the threshold. Even gods\' architecture learns to make room.',
+]);

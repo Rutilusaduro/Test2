@@ -482,3 +482,215 @@ registerQuestCopy('quest.side.barrow.stage.oracle.complete', [
 registerQuestCopy('quest.side.barrow.complete', [
   'What the Dead Know — complete. Act III endings will remember this truth.',
 ]);
+
+// ─── Side: Iron Forge Master (Tier 2, level 6+) ─────────────────────────────
+
+registerQuestCopy('quest.side.iron_forge.title', ['The Smith Who Would Be Soft']);
+registerQuestCopy('quest.side.iron_forge.desc', [
+  'Greta\'s old mentor Jorvald views her softness as betrayal of Korthak. Steel must learn that hunger and honor are not enemies.',
+]);
+registerQuestCopy('quest.side.iron_forge.stage.confront.desc', [
+  'Bring Greta to Iron Peak. Face the forge-master who taught her to be lean.',
+]);
+registerQuestCopy('quest.side.iron_forge.stage.confront.complete', [
+  'Jorvald\'s hammer stills. He sees Greta — and sees something he cannot name yet.',
+]);
+registerQuestCopy('quest.side.iron_forge.stage.trial.desc', [
+  'Win his trial by combat. Let philosophy clash before appetite wins.',
+]);
+registerQuestCopy('quest.side.iron_forge.stage.trial.complete', [
+  'Steel rings. Greta speaks gospel; Jorvald listens with a jaw he cannot unclench.',
+]);
+registerQuestCopy('quest.side.iron_forge.stage.hunger.desc', [
+  'Feed the forge-master until iron remembers it was always meant to bend.',
+]);
+registerQuestCopy('quest.side.iron_forge.stage.hunger.complete', [
+  'Jorvald laughs — surprised, ashamed, hungry. Iron Peak will never be lean again.',
+]);
+registerQuestCopy('quest.side.iron_forge.complete', [
+  'The Smith Who Would Be Soft — complete. Greta\'s mentor kneels to abundance.',
+]);
+
+// ─── Side: Lumen Apostate (Tier 2, level 7+) ───────────────────────────────
+
+registerQuestCopy('quest.side.lumen_apostate.title', ['The Diviner\'s Heresy']);
+registerQuestCopy('quest.side.lumen_apostate.desc', [
+  'Theodric Ashwall detected your patron and wants understanding, not a warrant. Intercept the Index before orthodoxy files you away.',
+]);
+registerQuestCopy('quest.side.lumen_apostate.stage.intercept.desc', [
+  'Race the Lumen archivists. Misfile the report — or publish and draw the fire you may want.',
+]);
+registerQuestCopy('quest.side.lumen_apostate.stage.intercept.complete', [
+  'The report stalls in amber ink. Theodric breathes. Sylvie\'s equations smile.',
+]);
+registerQuestCopy('quest.side.lumen_apostate.stage.map.desc', [
+  'Map your patron\'s cosmological position together. Heresy as scholarship.',
+]);
+registerQuestCopy('quest.side.lumen_apostate.stage.map.complete', [
+  'Star-charts curve wrong — beautifully, consistently, undeniably yours.',
+]);
+registerQuestCopy('quest.side.lumen_apostate.stage.resolve.desc', [
+  'Choose: silent ally or published alarm. Either way, the Index will remember.',
+]);
+registerQuestCopy('quest.side.lumen_apostate.stage.resolve.complete', [
+  'Theodric\'s heresy resolves — not forgiven, but filed under truth.',
+]);
+registerQuestCopy('quest.side.lumen_apostate.complete', [
+  'The Diviner\'s Heresy — complete. Lumen\'s laws bend around your anomaly.',
+]);
+
+// ─── Side: Tarn Ledger (Tier 2, level 8+) ───────────────────────────────────
+
+registerQuestCopy('quest.side.tarn_ledger.title', ['The Merchant\'s Balance']);
+registerQuestCopy('quest.side.tarn_ledger.desc', [
+  'Tarn\'s guild-arbiters watch market disruption. Prove abundance increases trade — and sign a pact the ledger can love.',
+]);
+registerQuestCopy('quest.side.tarn_ledger.stage.audience.desc', [
+  'Vesperia opens the guild door. Pensha measures you in margins, not sermons.',
+]);
+registerQuestCopy('quest.side.tarn_ledger.stage.audience.complete', [
+  'Pensha\'s quill pauses. She has not decided — but she is listening.',
+]);
+registerQuestCopy('quest.side.tarn_ledger.stage.feast.desc', [
+  'Hold a communal feast in Market Square. Let commerce taste what conversion buys.',
+]);
+registerQuestCopy('quest.side.tarn_ledger.stage.feast.complete', [
+  'Receipts and revelry. Trade volume swells; the guild pretends it planned this.',
+]);
+registerQuestCopy('quest.side.tarn_ledger.stage.pact.desc', [
+  'Earn informed consent — Tarn\'s phrase for corruption they can audit.',
+]);
+registerQuestCopy('quest.side.tarn_ledger.stage.pact.complete', [
+  'The neutral pact is signed. Jealous nobles will find other markets to sulk in.',
+]);
+registerQuestCopy('quest.side.tarn_ledger.complete', [
+  'The Merchant\'s Balance — complete. Economic immunity settles over the square.',
+]);
+
+// ─── Side: Twin Feasts (Tier 3, level 12+) ──────────────────────────────────
+
+registerQuestCopy('quest.side.twin_feasts.title', ['A Tale of Two Feasts']);
+registerQuestCopy('quest.side.twin_feasts.desc', [
+  'Dawnmere and Grimwatch feud over dwindling plenty. Host rival feasts, arbitrate fallout, unify both in one swollen peace.',
+]);
+registerQuestCopy('quest.side.twin_feasts.stage.rival.desc', [
+  'Compete feasts in heartlands and marches — same day, different hungers.',
+]);
+registerQuestCopy('quest.side.twin_feasts.stage.rival.complete', [
+  'Two villages smell your cooking across the hills. Politics begins to salivate.',
+]);
+registerQuestCopy('quest.side.twin_feasts.stage.dispute.desc', [
+  'Faction blades flash. Settle the dispute before lean pride ruins the table.',
+]);
+registerQuestCopy('quest.side.twin_feasts.stage.dispute.complete', [
+  'Steel yields to sauce. The dispute ends louder than it began — and happier.',
+]);
+registerQuestCopy('quest.side.twin_feasts.stage.unified.desc', [
+  'One joint feast. Five souls blooming across both regions — proof that plenty need not be scarce.',
+]);
+registerQuestCopy('quest.side.twin_feasts.stage.unified.complete', [
+  'Dawnmere and Grimwatch share a table. The heartland exhales unified hunger.',
+]);
+registerQuestCopy('quest.side.twin_feasts.complete', [
+  'A Tale of Two Feasts — complete. Abundance aura settles over both regions.',
+]);
+
+// ─── Side: Divine Test (Tier 3, level 14+) ───────────────────────────────────
+
+registerQuestCopy('quest.side.divine_test.title', ['The Patron\'s Proving']);
+registerQuestCopy('quest.side.divine_test.desc', [
+  'The Fat Goddess sets a direct test — face your own excess in dream-combat, emerge blessed or challenged.',
+]);
+registerQuestCopy('quest.side.divine_test.stage.rite.desc', [
+  'Return to the cradle. Awaken the sacred pool and enter the dream passage.',
+]);
+registerQuestCopy('quest.side.divine_test.stage.rite.complete', [
+  'Golden water folds inward. The DM\'s irony falls silent — for once, earnest.',
+]);
+registerQuestCopy('quest.side.divine_test.stage.echo.desc', [
+  'Face the echo — mirror of your hunger, softer, merciless, yours.',
+]);
+registerQuestCopy('quest.side.divine_test.stage.echo.complete', [
+  'The echo shatters into butter-light. Your patron\'s voice is not amused — she is proud.',
+]);
+registerQuestCopy('quest.side.divine_test.stage.blessing.desc', [
+  'Receive her blessing — growth without apology, hunger made covenant.',
+]);
+registerQuestCopy('quest.side.divine_test.stage.blessing.complete', [
+  'The Fat Goddess touches your brow. You will never be small again — even when you wish you could be.',
+]);
+registerQuestCopy('quest.side.divine_test.complete', [
+  'The Patron\'s Proving — complete. Direct blessing seals your apotheosis path.',
+]);
+
+// ─── Side: Korthak Respect (Tier 3, level 13+) ─────────────────────────────
+
+registerQuestCopy('quest.side.korthak_respect.title', ['The Victor\'s Feast']);
+registerQuestCopy('quest.side.korthak_respect.desc', [
+  'Earn Korthak\'s grudging respect — defeat his Titan honorably, then feast him into satisfied departure.',
+]);
+registerQuestCopy('quest.side.korthak_respect.stage.challenge.desc', [
+  'Greta issues the formal challenge. Korthak\'s law demands spectacle.',
+]);
+registerQuestCopy('quest.side.korthak_respect.stage.challenge.complete', [
+  'Challenge accepted. The marches hold their breath for honest combat.',
+]);
+registerQuestCopy('quest.side.korthak_respect.stage.combat.desc', [
+  'Face the Titan — no tricks, no humiliation. Only strength and its aftermath.',
+]);
+registerQuestCopy('quest.side.korthak_respect.stage.combat.complete', [
+  'The Titan kneels, not broken — surprised. Korthak watches from somewhere distant and does not object.',
+]);
+registerQuestCopy('quest.side.korthak_respect.stage.feast.desc', [
+  'Feed the defeated champion. Send him away full, not shamed.',
+]);
+registerQuestCopy('quest.side.korthak_respect.stage.feast.complete', [
+  'The Titan departs rubbing his belly. Korthak\'s respect is grudging — and real.',
+]);
+registerQuestCopy('quest.side.korthak_respect.complete', [
+  'The Victor\'s Feast — complete. The frontier titan will not hunt you again.',
+]);
+
+// ─── Side: Blooming War (Tier 4, level 17+) ────────────────────────────────
+
+registerQuestCopy('quest.side.blooming_war.title', ['When Gods Bleed']);
+registerQuestCopy('quest.side.blooming_war.desc', [
+  'Before the final confrontation, choose which Wheel gods to convert. Each pathway alters the pantheon\'s last stand.',
+]);
+registerQuestCopy('quest.side.blooming_war.stage.threshold.desc', [
+  'Cross into the divine vestibule — illegal presence made flesh.',
+]);
+registerQuestCopy('quest.side.blooming_war.stage.threshold.complete', [
+  'The threshold yields. Geometry reconsiders you as fact, not error.',
+]);
+registerQuestCopy('quest.side.blooming_war.stage.convert.desc', [
+  'Sylwen through grief, Tarn through deal, Lumen through law — convert whom you can.',
+]);
+registerQuestCopy('quest.side.blooming_war.stage.convert.complete', [
+  'Gods bleed conversion. The final battle will remember who you softened first.',
+]);
+registerQuestCopy('quest.side.blooming_war.stage.herald.desc', [
+  'Break the Herald of Starvation guarding the vestibule heart.',
+]);
+registerQuestCopy('quest.side.blooming_war.stage.herald.complete', [
+  'The herald falls hungry. The Wheel\'s outer hall belongs to abundance now.',
+]);
+registerQuestCopy('quest.side.blooming_war.complete', [
+  'When Gods Bleed — complete. The pantheon\'s last stand weakens with every converted god.',
+]);
+
+// ─── Side: Companion Apotheosis (Tier 4, level 19+) ─────────────────────────
+
+registerQuestCopy('quest.side.companion_apotheosis.title', ['Six Who Walk Beside']);
+registerQuestCopy('quest.side.companion_apotheosis.desc', [
+  'Each companion reaches apotheosis in their home region — devotion made legendary, endings locked in flesh.',
+]);
+registerQuestCopy('quest.side.companion_apotheosis.stage.six.desc', [
+  'Visit each companion\'s homeland at the height of devotion. Witness what walks beside you become divine.',
+]);
+registerQuestCopy('quest.side.companion_apotheosis.stage.six.complete', [
+  'Six apotheoses witnessed. The Conversion Ending now has witnesses worthy of it.',
+]);
+registerQuestCopy('quest.side.companion_apotheosis.complete', [
+  'Six Who Walk Beside — complete. Your pilgrimage was never solitary.',
+]);

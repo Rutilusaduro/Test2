@@ -33,6 +33,10 @@ export const OBJECTIVE_TYPE = {
   PUZZLE_SOLVED: 'puzzle_solved',
   /** Examine a world feature / place of mystery. */
   FEATURE_EXAMINED: 'feature_examined',
+  /** Required companion recruited and present in party. */
+  COMPANION_PRESENT: 'companion_present',
+  /** Visit companion home region at devotion threshold (apotheosis beat). */
+  COMPANION_MILESTONE: 'companion_milestone',
 };
 
 /** Approach hints for UI — not mechanically enforced. */
@@ -61,6 +65,9 @@ export const QUEST_NPC_ALIASES = {
   lira: ['lira', 'lira_priestess'],
   sylvie: ['sylvie', 'sylvie_scholar', 'baker_sylvie'],
   greta: ['greta', 'greta_smith'],
+  jorvald: ['jorvald', 'jorvald_smith'],
+  pensha: ['pensha', 'pensha_arbiter'],
+  theodric: ['theodric', 'theodric_ashwall'],
   cael: ['cael', 'lumen_diviner'],
   verity: ['verity', 'measured_inquisitor'],
   maribel: ['maribel', 'harvest_priestess'],

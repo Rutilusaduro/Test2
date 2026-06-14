@@ -149,6 +149,30 @@ export const REGION_FEATURES = [
     puzzleId: 'citadel_purity_seal',
     icon: '✝',
   },
+  {
+    id: 'temple_index_archive',
+    regionId: 'ancient_temple',
+    name: 'Lumen Index Archive',
+    shortDesc: 'Scribes file heresy reports — your patron\'s signature glows on every page.',
+    puzzleId: 'lumen_archival_intercept',
+    icon: '📜',
+  },
+  {
+    id: 'barrow_oath_stone',
+    regionId: 'barrow_deeps',
+    name: 'Deep Oath-Stone',
+    shortDesc: 'Carved hunger seals the barrow oracle — the stone remembers what the Wheel forgot.',
+    puzzleId: 'barrow_deep_oath',
+    icon: '🪨',
+  },
+  {
+    id: 'vestibule_wheel_threshold',
+    regionId: 'divine_plane_vestibule',
+    name: 'Wheel Threshold',
+    shortDesc: 'Divine geometry bars the gods\' plane — your presence is technically illegal.',
+    puzzleId: 'vestibule_threshold',
+    icon: '◎',
+  },
 ];
 
 export function getFeature(featureId) {
