@@ -20,6 +20,7 @@ export default function FeatureModal({
   onClose,
   onGameUpdate,
   onDebugContext,
+  onStartPuzzleCombat,
 }) {
   const [text, setText] = useState('');
   const [activeCheck, setActiveCheck] = useState(null);
@@ -68,6 +69,16 @@ export default function FeatureModal({
     const res = attemptSolution(game, puzzle.id, solutionId);
     if (!res.ok) {
       setText(res.text);
+      return;
+    }
+    if (res.needsCombat) {
+      setText(res.narrative || 'Steel yourself — abundance can be won by appetite and strength alike.');
+      onStartPuzzleCombat?.({
+        puzzleId: res.puzzleId,
+        solutionId: res.solutionId,
+        enemyId: res.enemyId,
+        featureId: res.featureId ?? feature.id,
+      });
       return;
     }
     if (res.needsCheck) {

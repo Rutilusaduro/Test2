@@ -10,6 +10,7 @@ import {
 } from './puzzles/registry.js';
 import { getFeature, getFeaturesInRegion } from './regionFeatures.js';
 import { SOLUTION_KIND } from './puzzles/constants.js';
+import { QUEST_NPC_ALIASES } from './quests/constants.js';
 import { getStage, advanceStage } from './stages.js';
 import { getTier } from './relationships.js';
 import { getNpcState, spendAP } from './player.js';
@@ -20,7 +21,7 @@ import { getAbundanceSpread } from './abundanceSpread.js';
 import { getPuzzleCapabilities } from './stagePerks.js';
 import { renderPuzzleText } from '../textEngine/scenes/puzzles/index.js';
 import { awardAbundanceSpreadWithEvents } from './worldEvents.js';
-import { QUEST_NPC_ALIASES } from './quests/constants.js';
+import { getSpell, getSpellEnvironmentTags } from './spells.js';
 
 function resolveNpcAliases(npcId) {
   if (!npcId) return [];
@@ -175,6 +176,12 @@ function evaluateSolutionKind(game, solution, puzzle, context = {}) {
       return { available: Boolean(val), hint: solution.hint };
     }
 
+    case SOLUTION_KIND.COMBAT:
+      return {
+        available: true,
+        hint: solution.hint ?? 'Win the encounter — conversion or victory both count.',
+      };
+
     default:
       return { available: false, hint: 'Unknown approach.' };
   }
@@ -225,6 +232,10 @@ export function examineFeature(game, featureId) {
     .slice(0, 3);
 
   let text = prose;
+  const tight = puzzle?.tightSpace ? getTightSpaceModifiers(game, puzzle, null) : null;
+  if (!solved && tight?.note) {
+    text += `\n\n${tight.note}`;
+  }
   if (!solved && hints.length) {
     text += `\n\nYou sense several paths forward:\n${hints.join('\n')}`;
   }
@@ -235,15 +246,38 @@ export function examineFeature(game, featureId) {
   return { ok: true, text, feature, puzzle, solved };
 }
 
+function getTightSpaceModifiers(game, puzzle, solution) {
+  if (!puzzle.tightSpace) return { dcPenalty: 0, bonuses: [], note: null };
+  if (solution?.ignoresTightSpace) return { dcPenalty: 0, bonuses: [], note: null };
+
+  const perks = getPuzzleCapabilities(game.player);
+  if (!perks.tightSpacePenalty) return { dcPenalty: 0, bonuses: [], note: null };
+
+  const stageId = getStage(game.player.lbs).id;
+  const penalty = stageId >= 10 ? 4 : stageId >= 8 ? 3 : 2;
+
+  return {
+    dcPenalty: penalty,
+    bonuses: [{
+      type: 'penalty',
+      label: 'Immense bulk in tight quarters',
+      value: -penalty,
+      source: 'tight_space',
+    }],
+    note: `Your glorious size makes this cramped space harder (${-penalty} to checks).`,
+  };
+}
+
 function buildSkillCheck(game, puzzle, solution) {
   const bonuses = getCombinedPuzzleBonuses(game, puzzle.regionId);
   const perkMods = getPuzzleCapabilities(game.player);
-  const extraBonuses = [];
+  const tight = getTightSpaceModifiers(game, puzzle, solution);
+  const extraBonuses = [...tight.bonuses];
 
   if (bonuses.dcReduction > 0) {
     extraBonuses.push({
       type: 'circumstantial',
-      label: bonuses.auraLabel ? `${bonuses.auraLabel}` : 'Abundance blessing',
+      label: bonuses.auraLabel ? `${bonuses.auraLabel} (easier DC)` : 'Abundance blessing',
       value: 0,
       source: 'aura',
     });
@@ -257,13 +291,15 @@ function buildSkillCheck(game, puzzle, solution) {
     });
   }
 
-  const dc = Math.max(5, (solution.dc ?? 12) - bonuses.dcReduction);
-  return resolveSkillCheck(game.player, {
+  const dc = Math.max(5, (solution.dc ?? 12) - bonuses.dcReduction + tight.dcPenalty);
+  const check = resolveSkillCheck(game.player, {
     skillId: solution.skillId,
     dc,
     bonuses: extraBonuses,
     label: solution.label,
   });
+  check.tightSpaceNote = tight.note;
+  return check;
 }
 
 export function attemptSolution(game, puzzleId, solutionId, opts = {}) {
@@ -284,13 +320,31 @@ export function attemptSolution(game, puzzleId, solutionId, opts = {}) {
 
   if (solution.kind === SOLUTION_KIND.SKILL_CHECK) {
     const check = buildSkillCheck(game, puzzle, solution);
+    let narrative = renderPuzzleText('puzzle.attempt.skill', game, {
+      puzzle,
+      solution,
+      globals: { solutionLabel: solution.label },
+    });
+    if (check.tightSpaceNote) narrative += `\n\n${check.tightSpaceNote}`;
     return {
       ok: true,
       needsCheck: true,
       check,
       puzzleId,
       solutionId,
-      narrative: renderPuzzleText('puzzle.attempt.skill', game, {
+      narrative,
+    };
+  }
+
+  if (solution.kind === SOLUTION_KIND.COMBAT) {
+    return {
+      ok: true,
+      needsCombat: true,
+      enemyId: solution.enemyId,
+      puzzleId,
+      solutionId,
+      featureId: puzzle.featureId,
+      narrative: renderPuzzleText('puzzle.attempt.combat', game, {
         puzzle,
         solution,
         globals: { solutionLabel: solution.label },
@@ -374,20 +428,38 @@ export function applySolutionImmediate(game, puzzleId, solutionId, opts = {}) {
 }
 
 /** Check if a spell can solve a feature puzzle. */
-export function getSpellSolutionsForFeature(game, featureId, spellId) {
+export function getSpellSolutionsForFeature(game, featureId, spellId, opts = {}) {
   const puzzle = getPuzzleByFeature(featureId);
   if (!puzzle || isPuzzleSolved(game, puzzle.id)) return [];
 
+  const spell = getSpell(spellId);
+  const spellTags = getSpellEnvironmentTags(spell);
+
   return puzzle.solutions.filter((s) => {
     if (s.kind !== SOLUTION_KIND.SPELL) return false;
-    if (!(s.spellIds ?? []).includes(spellId)) return false;
-    const evalResult = evaluateSolutionKind(game, s, puzzle, { spellId });
-    return evalResult.available;
+    const idsMatch = (s.spellIds ?? []).includes(spellId);
+    const tagMatch = opts.overflow
+      && spellTags.length
+      && (s.environmentTags ?? []).some((t) => spellTags.includes(t));
+    if (!idsMatch && !tagMatch) return false;
+    const evalResult = evaluateSolutionKind(game, s, puzzle, { spellId, overflow: opts.overflow });
+    return evalResult.available || (opts.overflow && (idsMatch || tagMatch));
   });
 }
 
-export function trySpellSolveFeature(game, featureId, spellId) {
-  const solutions = getSpellSolutionsForFeature(game, featureId, spellId);
+export function trySpellSolveFeature(game, featureId, spellId, opts = {}) {
+  const solutions = getSpellSolutionsForFeature(game, featureId, spellId, opts);
   if (!solutions.length) return null;
-  return applySolutionImmediate(game, getPuzzleByFeature(featureId).id, solutions[0].id);
+  const puzzle = getPuzzleByFeature(featureId);
+  const result = applySolutionImmediate(game, puzzle.id, solutions[0].id, { overflow: opts.overflow });
+  if (opts.overflow) {
+    const overflowProse = renderPuzzleText('puzzle.spell_cast.overflow', game, {
+      globals: {
+        spellName: getSpell(spellId)?.name ?? spellId,
+        featureName: getFeature(featureId)?.name,
+      },
+    });
+    result.text = `${overflowProse}\n\n---\n\n${result.text}`;
+  }
+  return result;
 }

@@ -17,7 +17,7 @@ import QuestLog from "./QuestLog.jsx";
 import SpellbookPanel from "./SpellbookPanel.jsx";
 import CharacterSheet from "./CharacterSheet.jsx";
 
-export default function WorldView({ game, onUpdate, onEncounter, onSave, onDebugContext }) {
+export default function WorldView({ game, onUpdate, onEncounter, onPuzzleCombat, onSave, onDebugContext }) {
   const [npcModal, setNpcModal] = useState(null);
   const [featureModal, setFeatureModal] = useState(null);
   const [showSheet, setShowSheet] = useState(false);
@@ -246,6 +246,10 @@ export default function WorldView({ game, onUpdate, onEncounter, onSave, onDebug
           onClose={() => setFeatureModal(null)}
           onGameUpdate={onUpdate}
           onDebugContext={onDebugContext}
+          onStartPuzzleCombat={(pending) => {
+            setFeatureModal(null);
+            onPuzzleCombat?.(pending);
+          }}
         />
       )}
 

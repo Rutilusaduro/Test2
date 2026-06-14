@@ -26,11 +26,7 @@ import { spendAP } from '../gameData/player.js';
 import { checkSeduce, formatCheckSummary, toTextContext, DC } from '../gameData/skillChecks.js';
 import { recordNpcInteractionForQuests, recordNpcGrowthForQuests } from './questHooks.js';
 import { awardAbundanceSpreadWithEvents } from '../gameData/worldEvents.js';
-import {
-  getQuestOffersForNpc,
-  buildQuestOfferNarrative,
-  acceptQuestFromNpc,
-} from '../gameData/questOffers.js';
+import { appendPuzzleHintToTalk } from '../gameData/puzzleHints.js';
 
 function withQuestProgress(game, npc, interaction, meta, result) {
   const quest = recordNpcInteractionForQuests(game, {
@@ -141,7 +137,7 @@ export function doTalk(npc, player, game) {
     npc,
     questOffers: offers.map((o) => ({ id: o.id, title: o.title, type: o.type })),
   }, npc, relResult);
-  return withQuestProgress(game, npc, 'talk', null, result);
+  return withQuestProgress(game, npc, 'talk', null, appendPuzzleHintToTalk(result, game, npc));
 }
 
 export function doFlirt(npc, player, game) {

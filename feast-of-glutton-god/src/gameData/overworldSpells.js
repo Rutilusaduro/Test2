@@ -171,9 +171,9 @@ export function castSpellOnFeature(game, featureId, spellId, opts = {}) {
   else if (cost.method === 'ap') spendAP(game, cost.ap);
 
   const auraBonus = getCombinedPuzzleBonuses(game, game.region);
-  const puzzleSolutions = getSpellSolutionsForFeature(game, featureId, spellId);
+  const puzzleSolutions = getSpellSolutionsForFeature(game, featureId, spellId, { overflow: opts.overflow });
   const puzzleSolve = puzzleSolutions.length
-    ? trySpellSolveFeature(game, featureId, spellId)
+    ? trySpellSolveFeature(game, featureId, spellId, { overflow: opts.overflow })
     : null;
 
   const envProse = renderPuzzleText('puzzle.spell_cast.environment', game, {

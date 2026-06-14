@@ -18,4 +18,6 @@ export const SOLUTION_KIND = {
   AP_SPEND: 'ap_spend',
   FLAG_SET: 'flag_set',
   ABUNDANCE_MIN: 'abundance_min',
+  /** Win a linked encounter — conversion or defeat clears obstacle. */
+  COMBAT: 'combat',
 };

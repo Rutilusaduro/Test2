@@ -13,6 +13,8 @@ import { awardCombatXp, initializeStartingSpells } from "./gameData/leveling.js"
 import { initSpellSlots } from "./gameData/spellSlots.js";
 import { ensureQuestState } from "./gameData/questEngine.js";
 import { recordCombatEndForQuests } from "./hooks/questHooks.js";
+import { recordPuzzleSolvedForQuests } from "./hooks/puzzleHooks.js";
+import { applySolutionImmediate } from "./gameData/puzzleEngine.js";
 import { ensureSpellState, getCharacterSpells } from "./gameData/spellLearning.js";
 import { autoPrepareSpells } from "./gameData/spellPreparation.js";
 import { completePendingLevelUp as completeLevelUpChoice } from "./gameData/levelUpChoices.js";
@@ -107,6 +109,20 @@ export default function App() {
     setScreen("combat");
   }, []);
 
+  const startPuzzleCombat = useCallback((pending) => {
+    setGame((prev) => {
+      const combat = createCombatState(prev.player, prev.party, pending.enemyId, prev.region);
+      const next = {
+        ...prev,
+        combat,
+        pendingPuzzleCombat: pending,
+      };
+      saveGame(next);
+      return next;
+    });
+    setScreen("combat");
+  }, []);
+
   const endCombat = useCallback((combat) => {
     setGame((prev) => {
       let next = syncPlayerFromCombat(prev, combat);
@@ -118,6 +134,26 @@ export default function App() {
       if (quest.questMessages) {
         next.lastQuestMessage = quest.questMessages;
       }
+
+      const pending = prev.pendingPuzzleCombat;
+      if (pending && (combat.victory === 'win' || combat.victory === 'converted')) {
+        const solveResult = applySolutionImmediate(next, pending.puzzleId, pending.solutionId);
+        const puzzleQuest = recordPuzzleSolvedForQuests(next, {
+          puzzleId: pending.puzzleId,
+          solutionId: pending.solutionId,
+        });
+        const puzzleNote = solveResult.text || 'The obstacle yields to your victory.';
+        next.lastQuestMessage = [next.lastQuestMessage, puzzleNote, puzzleQuest.questMessages]
+          .filter(Boolean)
+          .join('\n\n---\n\n');
+        next.pendingPuzzleCombat = null;
+      } else if (pending) {
+        next.pendingPuzzleCombat = null;
+        next.lastQuestMessage = [next.lastQuestMessage, 'The obstacle remains — but you live to try another delicious approach.']
+          .filter(Boolean)
+          .join('\n\n---\n\n');
+      }
+
       next.combat = null;
       saveGame(next);
       return next;
@@ -144,6 +180,7 @@ export default function App() {
         game={game}
         onUpdate={updateGame}
         onEncounter={randomEncounter}
+        onPuzzleCombat={startPuzzleCombat}
         onSave={() => saveGame(game)}
         onDebugContext={updateDebugContext}
       />

@@ -123,3 +123,151 @@ registerPuzzleCopy('puzzle.solve.arch_squeeze', [
 registerPuzzleCopy('puzzle.solve.arch_sylvie', [
   'Sylvie recites the arch\'s feasting inscription. Stone shivers, remembers ritual, and stands aside.',
 ]);
+
+registerPuzzleCopy('puzzle.attempt.combat', [
+  'You brace for battle — appetite and power another path through {solutionLabel}.',
+  'Steel and softness alike may win here. You meet the challenge head-on, belly warm with certainty.',
+]);
+
+registerPuzzleCopy('puzzle.spell_cast.overflow', [
+  'Overflow magic crashes into {featureName} — excess abundance makes the world yield eagerly.',
+  'You pour more than necessary into {featureName}, and the goddess approves of your generous excess.',
+]);
+
+registerPuzzleCopy('puzzle.hint.craving', [
+  '{npcName} leans close, voice husky with trust: "I\'ve been thinking about {featureName}… have you tried {solutionHint}?"',
+  '"You\'re clever enough for this," {npcName} murmurs. "{featureName} might yield if you {solutionHint}."',
+]);
+
+registerPuzzleCopy('puzzle.hint.devoted', [
+  '{npcName} takes your hand without hesitation: "For {featureName}, do this — {solutionLabel}. I\'ll be thinking of you swelling with pride when you succeed."',
+  '"My love," {npcName} breathes, "the answer at {featureName} is {solutionLabel}. Go — make abundance proud."',
+]);
+
+registerPuzzleCopy('puzzle.solve.cellar_combat', [
+  'The goblins scatter, stuffed and humbled. The cellar door stands open, rich with pastry-scented victory.',
+]);
+
+registerPuzzleCopy('puzzle.solve.vesperia_combat', [
+  'Your rival yields — converted or defeated, she no longer blocks the garden. Iron swings wide.',
+]);
+
+registerPuzzleCopy('puzzle.solve.ravine_combat', [
+  'Harpies flee your divine presence. The ravine exhales; the path to the cradle clears.',
+]);
+
+registerPuzzleCopy('puzzle.solve.arch_combat', [
+  'The guardian kneels, softened by battle. Rubble parts as if remembering feasts.',
+]);
+
+registerPuzzleCopy('puzzle.solve.windmill_grace', [
+  'Gears sigh and turn. Flour dust sparkles — the village breathes again.',
+]);
+
+registerPuzzleCopy('puzzle.solve.windmill_greta', [
+  'Greta\'s hammer rings true. The wheel turns, doughy and magnificent.',
+]);
+
+registerPuzzleCopy('puzzle.solve.windmill_flavor', [
+  'Flavor Burst greases every stubborn joint. The mill purrs like a well-fed cat.',
+]);
+
+registerPuzzleCopy('puzzle.solve.windmill_combat', [
+  'Goblins tumble from the housing, bellies full and egos bruised. The wheel spins free.',
+]);
+
+registerPuzzleCopy('puzzle.solve.shrine_overwhelm', [
+  'Your presence rings the bell without touching it — a peal of abundance across the village.',
+]);
+
+registerPuzzleCopy('puzzle.solve.shrine_mass', [
+  'Your mass pulls the rope like a lover. The bell sings; the festival stirs.',
+]);
+
+registerPuzzleCopy('puzzle.solve.shrine_mira', [
+  'Mira\'s ballad climbs the bronze. The bell answers in harmonies of hunger and joy.',
+]);
+
+registerPuzzleCopy('puzzle.solve.shrine_perform', [
+  'Your performance makes the shrine itself applaud. The bell rings for you alone.',
+]);
+
+registerPuzzleCopy('puzzle.solve.vault_sneak', [
+  'You slip through vents slick with saffron. The vault opens to your clever touch.',
+]);
+
+registerPuzzleCopy('puzzle.solve.vault_seduce', [
+  'Desire unlocks what keys could not. The vault keeper sighs; spices are yours.',
+]);
+
+registerPuzzleCopy('puzzle.solve.vault_sylvie', [
+  'Sylvie whispers the combination like a recipe. The vault yields its aromatic treasure.',
+]);
+
+registerPuzzleCopy('puzzle.solve.vault_combat', [
+  'Victory leaves the vault unguarded. Saffron and cinnamon welcome your abundance.',
+]);
+
+registerPuzzleCopy('puzzle.solve.hedge_persuade', [
+  'The hedge parts with a rustle of pleasure. The hidden grove beckons, swollen with fruit.',
+]);
+
+registerPuzzleCopy('puzzle.solve.hedge_mist', [
+  'Mist softens thorns into velvet. The dryad\'s grove sighs open.',
+]);
+
+registerPuzzleCopy('puzzle.solve.hedge_lira', [
+  'Lira\'s prayer makes thorns bloom instead of bite. The grove welcomes you.',
+]);
+
+registerPuzzleCopy('puzzle.solve.hedge_combat', [
+  'The dryad yields — converted or conquered. Thorns curl aside with delicious grace.',
+]);
+
+registerPuzzleCopy('puzzle.solve.altar_indulge', [
+  'Indulgence at the altar becomes sacrament. First Hunger stirs, pleased and golden.',
+]);
+
+registerPuzzleCopy('puzzle.solve.altar_thalia', [
+  'Thalia\'s rite sets the altar pulsing. Hunger becomes worship; worship becomes feast.',
+]);
+
+registerPuzzleCopy('puzzle.solve.altar_abundance', [
+  'Your spreading influence pours into stone. The altar drinks and swells with divine appetite.',
+]);
+
+registerPuzzleCopy('puzzle.solve.altar_combat', [
+  'The inquisitor flees your victorious abundance. The altar glows, unshackled.',
+]);
+
+registerPuzzleCopy('puzzle.solve.hall_endure', [
+  'You endure the hall\'s hunger-pressure until marble remembers mercy. Doors groan open.',
+]);
+
+registerPuzzleCopy('puzzle.solve.hall_divine', [
+  'Divine plump magic swells the seals until they surrender. Warm feast-air rushes out.',
+]);
+
+registerPuzzleCopy('puzzle.solve.hall_squeeze', [
+  'Immensity finds the seam. You squeeze through, breathless and triumphant — the hall adores your size.',
+]);
+
+registerPuzzleCopy('puzzle.solve.hall_combat', [
+  'The guardian falls or converts. Sealed doors unlock as if hungry to be opened.',
+]);
+
+registerPuzzleCopy('puzzle.solve.font_feed', [
+  'Feast magic purifies the curdled water. The font flows golden again.',
+]);
+
+registerPuzzleCopy('puzzle.solve.font_sylvie', [
+  'Sylvie\'s inscription burns famine away. The font sings with restored appetite.',
+]);
+
+registerPuzzleCopy('puzzle.solve.font_abundance', [
+  'Golden Overflow drowns the curse. The font swells with beautiful, holy hunger.',
+]);
+
+registerPuzzleCopy('puzzle.solve.font_combat', [
+  'The Famine Hag shrieks and withdraws. The font purifies itself in victory\'s wake.',
+]);
