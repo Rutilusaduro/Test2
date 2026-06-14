@@ -3,16 +3,39 @@ import TitleScreen from "./components/TitleScreen.jsx";
 import CharacterCreation from "./components/CharacterCreation.jsx";
 import WorldView from "./components/WorldView.jsx";
 import CombatView from "./components/CombatView.jsx";
+import LevelUpModal from "./components/LevelUpModal.jsx";
 import GameDebugShell from "./components/GameDebugShell.jsx";
 import { createNewGame, addAbundancePoints, syncPlayerFromCombat } from "./gameData/player.js";
 import { saveGame, loadGame } from "./gameData/save.js";
 import { createCombatState, getCombatRewards } from "./gameData/combat.js";
 import { pickEncounter } from "./gameData/enemies.js";
-import { awardCombatXp } from "./gameData/leveling.js";
+import { awardCombatXp, initializeStartingSpells } from "./gameData/leveling.js";
 import { initSpellSlots } from "./gameData/spellSlots.js";
 import { ensureQuestState } from "./gameData/questEngine.js";
 import { recordCombatEndForQuests } from "./hooks/questHooks.js";
+import { completePendingLevelUp, ensureSpellState, getCharacterSpells } from "./gameData/spellLearning.js";
 import "./textEngine/scenes/index.js";
+
+function migratePlayerSpells(player) {
+  ensureSpellState(player);
+  if (!player.spellsKnown?.length && player.spells?.length) {
+    player.spellsKnown = player.spells.map((s) => s.id).filter(Boolean);
+  }
+  if (!player.spells?.length && player.spellsKnown?.length) {
+    player.spells = getCharacterSpells(player);
+  }
+  if (!player.spellsKnown?.length) {
+    initializeStartingSpells(player);
+  }
+}
+
+function applyLevelUpResults(game, levelUps) {
+  if (!levelUps?.length) return game;
+  const last = levelUps[levelUps.length - 1];
+  game.lastLevelUpResult = last;
+  game.lastLevelUpMessage = levelUps.map((lu) => lu.narrative || `Level ${lu.level}! ${lu.flavor}`).join("\n\n---\n\n");
+  return game;
+}
 
 export default function App() {
   const [screen, setScreen] = useState("title");
@@ -32,6 +55,7 @@ export default function App() {
       if (!g.player.sizeCap) g.player.sizeCap = 5;
       if (!g.player.raceId) g.player.raceId = 'human';
       if (!g.player.raceName) g.player.raceName = 'Human';
+      migratePlayerSpells(g.player);
       ensureQuestState(g);
       setGame(g);
       setScreen("world");
@@ -41,6 +65,23 @@ export default function App() {
   const updateGame = useCallback((updater) => {
     setGame((prev) => {
       const next = typeof updater === "function" ? updater(prev) : updater;
+      saveGame(next);
+      return next;
+    });
+  }, []);
+
+  const handleLevelUpComplete = useCallback((selectedSpellIds) => {
+    setGame((prev) => {
+      const next = { ...prev };
+      const learned = completePendingLevelUp(next.player, selectedSpellIds);
+      if (learned?.learned?.length) {
+        const names = learned.learned.map((s) => s.name).join(', ');
+        next.lastLevelUpMessage = (next.lastLevelUpMessage || '') + `\n\nLearned: ${names}`;
+      }
+      next.lastLevelUpResult = null;
+      if (next.player.levelUpsPending?.length) {
+        next.lastLevelUpResult = { level: next.player.levelUpsPending[0].level, narrative: next.player.levelUpsPending[0].narrative };
+      }
       saveGame(next);
       return next;
     });
@@ -62,9 +103,7 @@ export default function App() {
       const rewards = getCombatRewards(combat);
       next = addAbundancePoints(next, rewards.ap);
       const { levelUps } = awardCombatXp(next.player, combat);
-      if (levelUps.length) {
-        next.lastLevelUpMessage = levelUps.map((lu) => `Level ${lu.level}! ${lu.flavor}`).join("\n");
-      }
+      applyLevelUpResults(next, levelUps);
       const quest = recordCombatEndForQuests(next, combat);
       if (quest.questMessages) {
         next.lastQuestMessage = quest.questMessages;
@@ -86,6 +125,29 @@ export default function App() {
     setDebugContext((prev) => ({ ...prev, ...patch }));
   }, []);
 
+  const levelUpPending = game?.player?.levelUpsPending?.[0] ?? null;
+  const showLevelUp = game && (levelUpPending || game.lastLevelUpResult);
+
+  const worldContent = game ? (
+    <>
+      <WorldView
+        game={game}
+        onUpdate={updateGame}
+        onEncounter={randomEncounter}
+        onSave={() => saveGame(game)}
+        onDebugContext={updateDebugContext}
+      />
+      {showLevelUp && (
+        <LevelUpModal
+          game={game}
+          pending={levelUpPending}
+          levelUpResult={game.lastLevelUpResult}
+          onComplete={handleLevelUpComplete}
+        />
+      )}
+    </>
+  ) : null;
+
   if (screen === "combat" && game?.combat) {
     return (
       <GameDebugShell game={game} onUpdateGame={updateGame} screen="combat" debugContext={debugContext}>
@@ -103,13 +165,7 @@ export default function App() {
   if (screen === "world" && game) {
     return (
       <GameDebugShell game={game} onUpdateGame={updateGame} screen="world" debugContext={debugContext}>
-        <WorldView
-          game={game}
-          onUpdate={updateGame}
-          onEncounter={randomEncounter}
-          onSave={() => saveGame(game)}
-          onDebugContext={updateDebugContext}
-        />
+        {worldContent}
       </GameDebugShell>
     );
   }

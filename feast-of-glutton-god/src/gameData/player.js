@@ -1,10 +1,9 @@
 import { getClass } from "./classes.js";
 import { getStage } from "./stages.js";
-import { getSpellsForBuild } from "./spells.js";
 import { createCompanionData, COMPANIONS } from "./companions.js";
 import { initSpellSlots } from "./spellSlots.js";
 import { getMaxAbundancePoints, getArmorClass } from "./stats.js";
-import { getSizeCapForLevel } from "./leveling.js";
+import { getSizeCapForLevel, initializeStartingSpells } from "./leveling.js";
 import { CLASS_SKILL_PROFICIENCIES } from "./skills.js";
 import { applyRaceStatBonuses, getRace } from "./races.js";
 import { getSubclass, getDefaultSubclassId } from "./subclasses.js";
@@ -59,13 +58,17 @@ export function createPlayer(name, classId, options = {}) {
     storyFlags: {},
     raceFeatures: race.features?.map((f) => f.id) || [],
     subclassFeatures: subclass?.features || [],
-    spells: getSpellsForBuild(cls.id, subclassId),
+    spellsKnown: [],
+    spellbook: classId === 'wizard' ? [] : undefined,
+    features: [],
+    spells: [],
     levelUpsPending: [],
     tempFlags: {},
     restFlags: { hungerForMoreUsed: false },
   };
 
   initSpellSlots(player);
+  initializeStartingSpells(player);
   player.ap = Math.min(player.ap, getMaxAbundancePoints(player));
   return player;
 }

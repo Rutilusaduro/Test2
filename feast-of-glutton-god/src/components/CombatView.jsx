@@ -5,7 +5,7 @@ import {
   advanceTurn, checkVictory, checkConversion, convertEnemy, getTurnSummary,
   getActiveUnit, isPlayerTurn,
 } from "../gameData/combat.js";
-import { getSpellsForClass } from "../gameData/spells.js";
+import { getCharacterSpells } from "../gameData/spellLearning.js";
 import { hasSpellSlot } from "../gameData/spellSlots.js";
 import { renderCombatNarration } from "../hooks/npcInteractions.js";
 import { renderGrowthScene } from "../textEngine/scenes/growthEvent/index.js";
@@ -23,7 +23,7 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebu
   const reachable = mode === "move" && playerTurn && selectedUnit
     ? getReachableTiles(combat, selectedUnit)
     : [];
-  const spells = getSpellsForClass(game.player.classId);
+  const spells = getCharacterSpells(player);
   const slots = player.spellSlots?.current || [];
 
   const reportCombat = (extra = {}) => {

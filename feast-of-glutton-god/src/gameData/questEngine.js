@@ -333,7 +333,8 @@ function applyRewardBundle(game, bundle = {}) {
     const { levelUps } = addExperience(game.player, amount, source);
     messages.push(`+${amount} XP`);
     if (levelUps.length) {
-      game.lastLevelUpMessage = levelUps.map((lu) => `Level ${lu.level}! ${lu.flavor}`).join('\n');
+      game.lastLevelUpMessage = levelUps.map((lu) => lu.narrative || `Level ${lu.level}! ${lu.flavor}`).join('\n\n---\n\n');
+      game.lastLevelUpResult = levelUps[levelUps.length - 1];
     }
   }
   for (const flag of Object.keys(bundle.flags ?? {})) {
