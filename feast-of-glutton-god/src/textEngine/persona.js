@@ -7,13 +7,13 @@
 // girl's own lines dominate without silencing the shared pools.
 //
 //   definePersona({
-//     id: 2,                       // matches characterId / studentId
+//     id: 2,                       // matches characterId / numericId
 //     weight: 4,                   // share vs shared fragments (default 4)
 //     when: { stageMin: 2 },       // optional gate applied to every line
 //     voice: {
 //       'enc.owned': [             // plain strings → one pooled variant
 //         'No filter. Just me, and more of me every week.',
-//         'This is the content now. This is the brand.',
+//         'This is the feast now. This is the gospel.',
 //       ],
 //       'wi.reply': [              // objects → their own gated variants
 //         { when: { attitude: [2] }, text: ['Weigh me. I want the number.'] },
