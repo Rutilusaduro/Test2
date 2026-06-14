@@ -3,6 +3,7 @@
  * Consumes forced-growth signals from Prompt 3A.
  */
 import { getRegion } from './regions.js';
+import { raiseDivineAttentionFromHostility } from './divineAttention.js';
 
 export const HOSTILITY_MAX = 100;
 
@@ -79,6 +80,9 @@ export function raiseRegionHostility(game, regionId, severity) {
   store[regionId] = rec;
 
   const afterTier = getHostilityTier(rec.level).id;
+  if (afterTier > beforeTier) {
+    raiseDivineAttentionFromHostility(game, regionId);
+  }
   if (afterTier >= 3 && !game.worldFlags.crackdown[regionId]) {
     triggerCrackdown(game, regionId);
   } else if (afterTier > beforeTier) {

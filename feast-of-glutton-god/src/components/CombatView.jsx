@@ -5,7 +5,10 @@ import {
   getReachableTiles, moveUnit, attackUnit, castSpell, feedTarget,
   advanceTurn, checkVictory, checkConversion, convertEnemy, getTurnSummary,
   getActiveUnit, isPlayerTurn, useBonusAction, getAvailableBonusActions,
+  canTrivializeTarget, trivializeTarget,
 } from "../gameData/combat.js";
+import { getEnemyThreatTier } from "../gameData/enemies.js";
+import { renderTrivializeGag } from "../textEngine/scenes/dm/combat_gag.js";
 import { getPreparedSpells } from "../gameData/spellPreparation.js";
 import { previewCastCost } from "../gameData/spellSlots.js";
 import { getSpellForCast } from "../gameData/spells.js";
@@ -250,6 +253,38 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onVict
     update(c, "Attack spent.");
   };
 
+  const confirmTrivialize = () => {
+    if (!selectedEnemyId || !playerTurn) return;
+    const c = cloneCombat();
+    const active = getActiveUnit(c);
+    const target = c.enemies.find((e) => (e.combatId || e.id) === selectedEnemyId);
+    if (!target || !active) return;
+    const result = trivializeTarget(c, active, target);
+    if (!result.ok) {
+      update(result.combat, result.combat.log.slice(-1)[0] || "Cannot trivialize.");
+      return;
+    }
+    result.combat.trivializeGag = renderTrivializeGag(game, result.combat, target);
+    if (result.combat.lastGrowth) {
+      const gt = renderGrowthScene(target, {
+        growthMethod: "feed",
+        startStage: result.combat.lastGrowth.startStage,
+        endStage: result.combat.lastGrowth.endStage,
+        week: game.day,
+      });
+      setGrowthText(gt);
+    }
+    flashSpend("action");
+    setSelectedEnemyId(null);
+    update(result.combat, "Trivialized — the dread foe is dessert now.");
+  };
+
+  const trivializeReady = selectedEnemy
+    && selectedEnemy.hp > 0
+    && !selectedEnemy.converted
+    && canTrivializeTarget(player, selectedEnemy)
+    && getEnemyThreatTier(selectedEnemy) !== "cosmic";
+
   const handleCellClick = (x, y) => {
     if (sceneBlocked || combat.victory || !isPlayerTurn(combat)) return;
     const c = cloneCombat();
@@ -454,6 +489,7 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onVict
             <span className="stat">Role: <strong>{selectedEnemy.role || 'foe'}</strong></span>
             <span className="stat">Corruption: <strong>{getCorruptionTier(selectedEnemy.corruption || 0).label}</strong></span>
             <span className="stat">Convert: <strong>{Math.round((selectedEnemy.conversion ?? 0) * 100)}%</strong></span>
+            <span className="stat">Threat: <strong>{getEnemyThreatTier(selectedEnemy) === 'cosmic' ? 'Cosmic' : 'Mundane'}</strong></span>
           </div>
         </div>
       )}
@@ -535,6 +571,19 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onVict
           >
             Attack
           </button>
+          {trivializeReady && (
+            <button
+              className="primary"
+              onClick={() => {
+                if (selectedEnemy) confirmTrivialize();
+                else { setActionConfirm("Select a mundane foe to trivialize."); }
+              }}
+              disabled={!isPlayerTurn(combat) || !turnSummary?.action || sceneBlocked}
+              title="End this mundane threat instantly — one action, comic conversion."
+            >
+              Trivialize
+            </button>
+          )}
           <button onClick={() => { setMode("feed"); cancelSpellCast(); setActionConfirm("Tap an enemy to feed."); }} disabled={!isPlayerTurn(combat) || sceneBlocked}>Feed</button>
           {bonusActions.map((ba) => (
             <button key={ba.id} onClick={() => doBonus(ba.id)} disabled={!isPlayerTurn(combat) || !turnSummary?.bonus}>

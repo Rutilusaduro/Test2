@@ -24,6 +24,9 @@ import { recordPuzzleSolvedForQuests } from "./hooks/puzzleHooks.js";
 import { applySolutionImmediate } from "./gameData/puzzleEngine.js";
 import { recordCombatVictory } from "./gameData/obstacleUnlocks.js";
 import { syncGateUnlocks } from "./gameData/regionObstacles.js";
+import { awardAbundanceSpreadWithEvents } from "./gameData/worldEvents.js";
+import { ensureDivineAttentionState, raiseDivineAttention } from "./gameData/divineAttention.js";
+import { renderTrivializeGag } from "./textEngine/scenes/dm/combat_gag.js";
 import { ensureSpellState, getCharacterSpells, ensureDamageCantrip } from "./gameData/spellLearning.js";
 import { autoPrepareSpells } from "./gameData/spellPreparation.js";
 import { completePendingLevelUp as completeLevelUpChoice } from "./gameData/levelUpChoices.js";
@@ -58,6 +61,7 @@ function applyLevelUpResults(game, levelUps) {
 
 function applyCombatEndState(prev, combat) {
   let next = syncPlayerFromCombat(prev, combat);
+  ensureDivineAttentionState(next);
   const rewards = getCombatRewards(combat);
   next = addAbundancePoints(next, rewards.ap);
   const { levelUps } = awardCombatXp(next.player, combat);
@@ -71,6 +75,27 @@ function applyCombatEndState(prev, combat) {
   }
 
   if (combat.victory === 'win' || combat.victory === 'converted') {
+    const spreadSource = combat.victory === 'converted' ? 'combat_convert' : 'combat_win';
+    const spread = awardAbundanceSpreadWithEvents(next, spreadSource);
+    if (spread.worldEvent?.message) {
+      narrateEvent(next, spread.worldEvent.message, 'growth');
+    }
+    for (const portent of spread.divineAttention?.portents ?? []) {
+      if (portent.message) narrateEvent(next, portent.message, 'quest');
+    }
+
+    if (combat.trivialized) {
+      const gag = combat.trivializeGag
+        || renderTrivializeGag(next, combat, combat.enemies.find((e) =>
+          (e.typeId || e.type) === combat.trivializedEnemyId
+        ) || combat.enemies[0]);
+      if (gag) narrateEvent(next, gag, 'event');
+      const trivialDivine = raiseDivineAttention(next, 'trivialize');
+      for (const portent of trivialDivine.portents ?? []) {
+        if (portent.message) narrateEvent(next, portent.message, 'quest');
+      }
+    }
+
     for (const enemy of combat.enemies ?? []) {
       const enemyId = enemy.typeId ?? enemy.enemyTypeId ?? enemy.id;
       if (enemyId) recordCombatVictory(next, enemyId);
@@ -116,6 +141,7 @@ export default function App() {
     ensureReactivityState(g);
     ensureDmState(g);
     ensureScarcityState(g);
+    ensureDivineAttentionState(g);
     setGame(g);
     setScreen("world");
   }, []);
@@ -128,6 +154,7 @@ export default function App() {
       ensureInfluenceState(g);
       ensureTransformationState(g);
       ensureReactivityState(g);
+      ensureDivineAttentionState(g);
       if (!g.player.raceId) g.player.raceId = 'human';
       if (!g.player.raceName) g.player.raceName = 'Human';
       migratePlayerSpells(g.player);

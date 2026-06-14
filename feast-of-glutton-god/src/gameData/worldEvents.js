@@ -6,6 +6,7 @@ import { getAbundanceSpread, awardAbundanceSpread } from './abundanceSpread.js';
 import { addAbundancePoints } from './player.js';
 import { getRegion } from './regions.js';
 import { renderWorldEvent } from '../textEngine/scenes/world/events.js';
+import { raiseDivineAttention } from './divineAttention.js';
 
 export const MILESTONE_WORLD_EVENTS = {
   50: {
@@ -100,11 +101,23 @@ export function checkMilestoneWorldEvent(game, spreadResult) {
   return { triggered: true, event: eventDef, message };
 }
 
-/** Award abundance spread and fire world event if milestone crossed. */
+/** Award Goddess Ascension spread and fire world event if milestone crossed. */
 export function awardAbundanceSpreadWithEvents(game, source, amountOverride) {
   const spread = awardAbundanceSpread(game, source, amountOverride);
+  let divine = { gained: 0, portents: [] };
+  if (spread.gained > 0) {
+    divine = raiseDivineAttention(game, 'growth_event', Math.max(2, Math.round(spread.gained / 2)));
+  }
   const worldEvent = spread.milestoneUp ? checkMilestoneWorldEvent(game, spread) : { triggered: false };
-  return { ...spread, worldEvent };
+  if (spread.milestoneUp) {
+    const milestoneDivine = raiseDivineAttention(game, 'ascension_milestone');
+    divine = {
+      ...divine,
+      ...milestoneDivine,
+      portents: [...(divine.portents ?? []), ...(milestoneDivine.portents ?? [])],
+    };
+  }
+  return { ...spread, worldEvent, divineAttention: divine };
 }
 
 export function getTriggeredWorldEvents(game) {

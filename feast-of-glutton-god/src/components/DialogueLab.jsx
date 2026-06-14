@@ -23,6 +23,8 @@ import { renderSpecial } from "../textEngine/scenes/npc/special.js";
 import { renderRegionHostilityBeat } from "../textEngine/scenes/dm/region.js";
 import { renderFavorWarning, renderSpecialCooldown } from "../textEngine/scenes/dm/favor.js";
 import { renderIndulge } from "../textEngine/scenes/player/indulge.js";
+import { renderTrivializeGag } from "../textEngine/scenes/dm/combat_gag.js";
+import { renderPortentBeat } from "../textEngine/scenes/dm/portent.js";
 import { ENEMY_TYPES } from "../gameData/enemies.js";
 import { REGIONS } from "../gameData/regions.js";
 import { resolveGrowthZone } from "../textEngine/growthLexicon.js";
@@ -45,6 +47,8 @@ const CONSENT_STATES = ["willing", "forced"];
 const FAVOR_STATES = ["flush", "low", "empty"];
 const HOSTILITY_TIERS = ["0", "1", "2", "3"];
 const SATIATION_TIER_IDS = ["0", "1", "2", "3"];
+const PORTENT_IDS = ['omen_lantern', 'inquisition_whispers', 'schism_rumor', 'refugee_tide', 'divine_council'];
+const ESCALATION_TIERS = ['0', '1', '2', '3'];
 const ENEMY_TYPE_IDS = Object.keys(ENEMY_TYPES);
 const REGION_IDS = REGIONS.map((r) => r.id);
 
@@ -276,6 +280,23 @@ const SECTIONS = {
       trace: opts.trace,
     }),
   },
+  "dm.gag.trivialize": {
+    params: ["enemyType", "region", "escalationTier"],
+    fn: (_s, opts) => renderTrivializeGag(
+      { player: MOCK_PLAYER, region: opts.region === RANDOM ? pick(REGION_IDS) : opts.region, worldFlags: { escalationTier: Number(opts.escalationTier === RANDOM ? pick(ESCALATION_TIERS) : opts.escalationTier) } },
+      { regionId: opts.region === RANDOM ? pick(REGION_IDS) : opts.region },
+      { typeId: opts.enemyType === RANDOM ? pick(ENEMY_TYPE_IDS) : opts.enemyType },
+      { trace: opts.trace },
+    ),
+  },
+  "dm.portent": {
+    params: ["portentId", "escalationTier"],
+    fn: (_s, opts) => renderPortentBeat(
+      { player: MOCK_PLAYER, worldFlags: { escalationTier: Number(opts.escalationTier === RANDOM ? pick(ESCALATION_TIERS) : opts.escalationTier) } },
+      opts.portentId === RANDOM ? pick(PORTENT_IDS) : opts.portentId,
+      { trace: opts.trace },
+    ),
+  },
   "char.desc": {
     params: STATE_PARAMS,
     fn: (s, opts) => render("{char.desc}", createContext({ subject: s, ref: MOCK_PLAYER, week: 3 }), { trace: opts.trace }),
@@ -307,6 +328,10 @@ const PARAM_DEFS = [
   { key: "failCause", label: "Fail cause", options: FAIL_CAUSES },
   { key: "consentState", label: "Consent", options: CONSENT_STATES },
   { key: "satiationTier", label: "Satiation tier", options: SATIATION_TIER_IDS },
+  { key: "hostilityTier", label: "Hostility tier", options: HOSTILITY_TIERS },
+  { key: "favorState", label: "Favor state", options: FAVOR_STATES },
+  { key: "escalationTier", label: "Escalation tier", options: ESCALATION_TIERS },
+  { key: "portentId", label: "Portent", options: PORTENT_IDS },
 ];
 
 function rollSample(params) {

@@ -1,15 +1,19 @@
 /**
- * Long-term power progression — influence, holdings, institutions.
- * Influence primarily drives others' growth; size grants presence not office.
+ * Long-term power progression — mortal takeover via courts, shrines, and culture.
  */
 import { getTier } from './relationships.js';
 import { getStageMechanics } from './stageMechanics.js';
 import { getAbundanceSpread } from './abundanceSpread.js';
 
+export const INFLUENCE_META = {
+  label: 'Mortal Takeover',
+  desc: 'Your spreading grip on courts, temples, and culture across the Reach.',
+};
+
 export const INFLUENCE_TRACKS = {
-  political: { label: 'Political', desc: 'Courts, charters, and land learn your name.' },
-  religious: { label: 'Religious', desc: 'Hidden shrines multiply; your patron\'s rites spread in shadow.' },
-  cultural: { label: 'Cultural', desc: 'Feast, fashion, and song carry your aesthetic across the Reach.' },
+  political: { label: 'Courts & Land', desc: 'Charters, manors, and law learn your name.' },
+  religious: { label: 'Shrines & Orders', desc: 'Hidden shrines multiply; your patron\'s rites spread in shadow.' },
+  cultural: { label: 'Feast & Fashion', desc: 'Song, dress, and public appetite carry your aesthetic.' },
 };
 
 export const HOLDING_TYPES = {
@@ -57,8 +61,8 @@ export const TITLE_THRESHOLDS = [
   { id: 'feast_envoy', track: 'cultural', min: 25, label: 'Feast Envoy' },
   { id: 'abundance_preacher', track: 'religious', min: 50, label: 'Preacher of Abundance' },
   { id: 'landed_patron', track: 'political', min: 75, label: 'Landed Patron' },
-  { id: 'high_matron', track: 'religious', min: 120, label: 'High Matron of Plenty' },
-  { id: 'duchess_of_indulgence', track: 'political', min: 180, label: 'Duchess of Indulgence' },
+  { id: 'high_matron', track: 'religious', min: 120, label: 'High Matron of the Reach' },
+  { id: 'duchess_of_indulgence', track: 'political', min: 180, label: 'Duchess of the Heartlands' },
   { id: 'rival_incarnate', track: 'religious', min: 300, label: 'Avatar of the Hunger Beyond' },
 ];
 
@@ -195,10 +199,10 @@ export function getAvailablePowerPaths(game) {
   const inf = ensureInfluenceState(game);
   const paths = [];
   if (inf.cultural >= 20) paths.push({ id: 'cultural', label: 'Cultural — feasts, fashion, taverns' });
-  if (inf.religious >= 20) paths.push({ id: 'religious', label: 'Religious — temples, orders, rites' });
+  if (inf.religious >= 20) paths.push({ id: 'religious', label: 'Religious — shrines, orders, rites' });
   if (inf.political >= 20) paths.push({ id: 'political', label: 'Political — land, courts, decrees' });
   if (getTotalInfluence(game) >= 100) {
-    paths.push({ id: 'replacement', label: 'Patron Incarnate — heresy made flesh across the Reach' });
+    paths.push({ id: 'replacement', label: 'Patron Incarnate — Act III mortal throne' });
   }
   return paths;
 }

@@ -4,6 +4,7 @@
 import { getAbundanceSpread } from './abundanceSpread.js';
 import { getRegion } from './regions.js';
 import { renderWorldText } from '../textEngine/scenes/world/transformation.js';
+import { raiseDivineAttention } from './divineAttention.js';
 
 export const TRANSFORMATION_LEVELS = [
   { level: 0, label: 'Untouched', minPoints: 0, desc: 'Restrictive norms still hold — abundance is a rumor.' },
@@ -72,6 +73,7 @@ export function awardRegionTransformation(game, regionId, source, amountOverride
   const levelUp = newLevel > oldLevel;
 
   let message = null;
+  let divineAttention = null;
   if (levelUp) {
     message = renderWorldText('transformation.level_up', game, {
       globals: {
@@ -79,9 +81,10 @@ export function awardRegionTransformation(game, regionId, source, amountOverride
         levelLabel: getTransformationLevel(rec.points).current.label,
       },
     });
+    divineAttention = raiseDivineAttention(game, 'region_flip');
   }
 
-  return { gained, total: rec.points, levelUp, level: newLevel, message };
+  return { gained, total: rec.points, levelUp, level: newLevel, message, divineAttention };
 }
 
 export function getRegionPresentation(game, regionId) {

@@ -99,6 +99,10 @@ export function createNewGame(name, classId, options = {}) {
     worldFlags: {
       regions_unlocked: ['harvest_hearth', 'market_square', 'fertile_heartlands'],
       abundanceSpread: 0,
+      divineAttention: 0,
+      escalationTier: 0,
+      divineAttentionTier: 0,
+      portentLog: [],
       regionTransformation: {},
     },
     influence: {

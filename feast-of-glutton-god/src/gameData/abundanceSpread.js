@@ -1,10 +1,12 @@
 /**
- * Abundance Spread — tracks how your patron's hunger grows across the earnest world.
- * Feeds quest scoring, region auras, and celebratory milestones.
+ * Abundance Spread — Goddess Ascension track (feeding your patron across the Reach).
+ * Feeds quest scoring, region auras, celebratory milestones, and divine attention.
  */
 
+export const GODDESS_ASCENSION_LABEL = 'Goddess Ascension';
+
 export const ABUNDANCE_MILESTONES = [
-  { points: 0, label: 'First Spark', desc: 'A single heresy flickers — your patron tastes the world.' },
+  { points: 0, label: 'First Offering', desc: 'A single heresy flickers — your patron tastes the world.' },
   { points: 50, label: 'Warm Hearth', desc: 'Homes grow softer; kitchens never empty along your road.' },
   { points: 120, label: 'Feast Tide', desc: 'Whole neighborhoods swell with shared appetite.' },
   { points: 250, label: 'Golden Overflow', desc: 'Abundance spills into streets and shrine-corners alike.' },
@@ -59,11 +61,15 @@ export function awardAbundanceSpread(game, source, amountOverride) {
   };
 }
 
-export function getAbundanceProgress(game) {
+export function getGoddessAscensionProgress(game) {
   const points = getAbundanceSpread(game);
   const { current, next } = getAbundanceMilestone(points);
   if (!next) return { points, current, next: null, pct: 100 };
   const span = next.points - current.points;
   const into = points - current.points;
   return { points, current, next, pct: Math.min(100, Math.round((into / span) * 100)) };
+}
+
+export function getAbundanceProgress(game) {
+  return getGoddessAscensionProgress(game);
 }

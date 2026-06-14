@@ -3,7 +3,7 @@ import { getRegion, CONTINENT_NAME } from "../gameData/regions.js";
 import { getRegionPresentation, getRegionTransformation } from "../gameData/worldTransformation.js";
 import { getCommandMode, resolveTravelMethod } from "../gameData/commandMode.js";
 import { getStageMechanics, getMobilityLabel } from "../gameData/stageMechanics.js";
-import { getInfluenceProgress } from "../gameData/influence.js";
+import { getInfluenceProgress, INFLUENCE_META, INFLUENCE_TRACKS } from "../gameData/influence.js";
 import { spendAP } from "../gameData/player.js";
 import { getNpcsInRegion } from "../gameData/npcs.js";
 import { getNpcState, applyNpcState } from "../gameData/player.js";
@@ -27,7 +27,8 @@ import { renderRegionHostilityBeat } from "../textEngine/scenes/dm/region.js";
 import { getPlayerDerivedStats } from "../gameData/player.js";
 import { getTravelOptions } from "../gameData/regionObstacles.js";
 import { getVisibleFeatures } from "../gameData/puzzleEngine.js";
-import { getAbundanceProgress } from "../gameData/abundanceSpread.js";
+import { getAbundanceProgress, GODDESS_ASCENSION_LABEL } from "../gameData/abundanceSpread.js";
+import { getDivineAttentionProgress, getLastPortent } from "../gameData/divineAttention.js";
 import { recordRegionVisitForQuests } from "../hooks/questHooks.js";
 import { advanceWorldSettling, getRegionReactivitySummary } from "../gameData/worldReactivity.js";
 import { syncGateUnlocks } from "../gameData/regionObstacles.js";
@@ -67,6 +68,8 @@ export default function WorldView({ game, onUpdate, onEncounter, onHostilityEnco
   const xp = getXpProgress(player);
   const derived = getPlayerDerivedStats(player);
   const abundance = getAbundanceProgress(game);
+  const divineAttention = getDivineAttentionProgress(game);
+  const lastPortent = getLastPortent(game);
   const reactivity = getRegionReactivitySummary(game, game.region);
   const tensionLabel = getRegionTensionLabel(game, game.region);
 
@@ -206,7 +209,10 @@ export default function WorldView({ game, onUpdate, onEncounter, onHostilityEnco
           </span>
         )}
         <span className="stat" title={abundance.current.desc}>
-          Influence: <strong>{abundance.current.label}</strong>
+          {GODDESS_ASCENSION_LABEL}: <strong>{abundance.current.label}</strong>
+        </span>
+        <span className="stat" title={divineAttention.current.desc}>
+          Divine Attention: <strong>{divineAttention.current.label}</strong>
         </span>
         <span className="stat">AC <strong>{derived.ac}</strong></span>
         <span className="stat">AP: <strong>{player.ap}</strong>/{derived.maxAp}</span>
@@ -225,12 +231,29 @@ export default function WorldView({ game, onUpdate, onEncounter, onHostilityEnco
       {abundance.next && (
         <div style={{ padding: '0 1rem', marginBottom: '0.5rem' }}>
           <div style={{ fontSize: '0.7rem', color: 'var(--text-dim)' }}>
-            Abundance spreading — {abundance.points} pts toward {abundance.next.label}
+            {GODDESS_ASCENSION_LABEL} — {abundance.points} pts toward {abundance.next.label}
           </div>
           <div style={{ height: 4, background: 'rgba(0,0,0,0.3)', borderRadius: 2 }}>
             <div style={{ width: `${abundance.pct}%`, height: '100%', background: 'var(--gold)' }} />
           </div>
         </div>
+      )}
+
+      {divineAttention.next && (
+        <div style={{ padding: '0 1rem', marginBottom: '0.5rem' }}>
+          <div style={{ fontSize: '0.7rem', color: 'var(--text-dim)' }}>
+            Divine Attention — toward {divineAttention.next.label}
+          </div>
+          <div style={{ height: 4, background: 'rgba(0,0,0,0.3)', borderRadius: 2 }}>
+            <div style={{ width: `${divineAttention.pct}%`, height: '100%', background: 'var(--rose)' }} />
+          </div>
+        </div>
+      )}
+
+      {lastPortent && (
+        <p style={{ padding: '0 1rem', fontSize: '0.75rem', color: 'var(--rose)', marginBottom: '0.5rem' }}>
+          Latest portent: <strong>{lastPortent.label}</strong> — {lastPortent.message}
+        </p>
       )}
 
       <DmBanner game={game} onDismissEvent={dismissDmEvent} />
@@ -389,7 +412,7 @@ export default function WorldView({ game, onUpdate, onEncounter, onHostilityEnco
         <div className="btn-grid">
           <button onClick={() => setShowSheet(true)}>Character Sheet</button>
           <button onClick={() => setShowRegionDash((v) => !v)}>Region Chronicle</button>
-          <button onClick={() => setShowInfluence((v) => !v)}>Influence & Power</button>
+          <button onClick={() => setShowInfluence((v) => !v)}>{INFLUENCE_META.label}</button>
           <button onClick={onEncounter}>Seek Encounter</button>
           <button onClick={() => onUpdate((g) => {
             longRest(g.player, g);
@@ -504,11 +527,12 @@ export default function WorldView({ game, onUpdate, onEncounter, onHostilityEnco
 
       {showInfluence && (
         <div className="panel" style={{ borderColor: 'var(--gold)' }}>
-          <h2>Influence & Power</h2>
+          <h2>{INFLUENCE_META.label}</h2>
+          <p className="prose" style={{ fontSize: '0.85rem', marginBottom: '0.5rem' }}>{INFLUENCE_META.desc}</p>
           <div className="stats-bar" style={{ flexWrap: 'wrap', marginBottom: '0.5rem' }}>
-            <span className="stat">Political: <strong>{influence.political}</strong></span>
-            <span className="stat">Religious: <strong>{influence.religious}</strong></span>
-            <span className="stat">Cultural: <strong>{influence.cultural}</strong></span>
+            <span className="stat">{INFLUENCE_TRACKS.political.label}: <strong>{influence.political}</strong></span>
+            <span className="stat">{INFLUENCE_TRACKS.religious.label}: <strong>{influence.religious}</strong></span>
+            <span className="stat">{INFLUENCE_TRACKS.cultural.label}: <strong>{influence.cultural}</strong></span>
             <span className="stat">Holdings: <strong>{influence.holdings}</strong></span>
             <span className="stat">Institutions: <strong>{influence.institutions}</strong></span>
           </div>
@@ -518,7 +542,7 @@ export default function WorldView({ game, onUpdate, onEncounter, onHostilityEnco
             </p>
           )}
           <p className="prose" style={{ fontSize: '0.85rem', marginTop: '0.5rem' }}>
-            Influence makes others grow — through land, temples, courts, and quiet cult-like devotion.
+            Mortal takeover — land, shrines, courts, and quiet cult-like devotion.
             Size grants presence, not office. Build power through multiple paths.
           </p>
         </div>

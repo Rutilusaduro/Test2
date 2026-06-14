@@ -102,10 +102,20 @@ function withQuestProgress(game, npc, interaction, meta, result) {
       result.text = (result.text || '') + `\n\n---\n${spread.worldEvent.message}`;
       if (result.narrative) result.narrative += `\n\n---\n${spread.worldEvent.message}`;
     }
+    for (const portent of spread?.divineAttention?.portents ?? []) {
+      if (portent.message) {
+        result.text = (result.text || '') + `\n\n---\n${portent.message}`;
+        if (result.narrative) result.narrative += `\n\n---\n${portent.message}`;
+      }
+    }
     const transform = awardRegionTransformation(game, game.region, key);
     if (transform.levelUp && transform.message) {
       result.text = (result.text || '') + `\n\n---\n${transform.message}`;
       if (result.narrative) result.narrative += `\n\n---\n${transform.message}`;
+    }
+    if (transform.divineAttention?.portent?.message) {
+      result.text = (result.text || '') + `\n\n---\n${transform.divineAttention.portent.message}`;
+      if (result.narrative) result.narrative += `\n\n---\n${transform.divineAttention.portent.message}`;
     }
     const relBonus = getRelationshipInfluenceBonus(result.npc ?? npc);
     if (interaction === 'feast' || interaction === 'bless' || interaction?.startsWith('bless')) {

@@ -2,7 +2,7 @@ import { getStage, getTileSize, getMovement, getHpBonus } from "./stages.js";
 import { advanceStageUniversal } from "./growthPresentation.js";
 import { addCorruption } from "./corruption.js";
 import { getCombatModifiers } from "./stagePerks.js";
-import { createEnemy } from "./enemies.js";
+import { createEnemy, getEnemyThreatTier } from "./enemies.js";
 import {
   initCombatTurnState, beginTurn, endTurn, getActiveEntry, getEconomy,
   canSpendMovement, spendMovement, canUseAction, spendAction, onUnitGrew,
@@ -28,6 +28,8 @@ import { renderCastFeedback } from "../textEngine/scenes/dm/cast.js";
 import { awardFatteningXp } from "./leveling.js";
 
 const GRID_SIZE = 10;
+const TRIVIALIZE_MIN_PLAYER_STAGE = 6;
+const TRIVIALIZE_SIZE_GAP = 3;
 
 function prepareCombatUnit(unit, team, index) {
   return {
@@ -294,6 +296,48 @@ export function useBonusAction(combat, unit, actionId, target = null) {
 }
 
 export { getAvailableBonusActions };
+
+export function canTrivializeTarget(player, enemy) {
+  if (!player || !enemy || enemy.hp <= 0 || enemy.converted) return false;
+  if (getEnemyThreatTier(enemy) === "cosmic") return false;
+  const playerStage = getStage(player.lbs).id;
+  const enemyStage = getStage(enemy.lbs).id;
+  return playerStage >= TRIVIALIZE_MIN_PLAYER_STAGE
+    || playerStage >= enemyStage + TRIVIALIZE_SIZE_GAP;
+}
+
+/** One-action OPM pacify — instant convert via feed/conversion path (mundane foes only). */
+export function trivializeTarget(combat, feeder, target) {
+  const entry = getActiveEntry(combat.turnState);
+  if (entry && !canUseAction(combat.turnState, entry.id, ACTION_TYPES.ACTION)) {
+    combat.log.push("Action already used this turn!");
+    return { combat, ok: false };
+  }
+  if (!canTrivializeTarget(feeder, target)) {
+    combat.log.push("This foe cannot be trivialized — not yet, or not ever.");
+    return { combat, ok: false };
+  }
+
+  const playerStage = getStage(feeder.lbs).id;
+  const enemyStage = getStage(target.lbs).id;
+  const growthStages = Math.max(1, Math.min(4, playerStage - enemyStage + 1));
+  const growth = applyGrowth(target, growthStages);
+  target.hunger = 100;
+  target.corruption = 100;
+  maybeAwardFatteningXp(combat, feeder, target, growth);
+  combat.lastGrowth = { unit: target, ...growth };
+  convertEnemy(combat, target);
+  combat.log.push(`${feeder.name} trivializes ${target.name} — dread becomes dessert, resistance becomes bliss.`);
+  combat.trivialized = true;
+  combat.trivializedEnemyId = target.typeId || target.type || target.id;
+
+  if (entry) {
+    spendAction(combat.turnState, entry.id, ACTION_TYPES.ACTION);
+    onUnitGrew(combat.turnState, target, growth);
+  }
+  checkVictory(combat);
+  return { combat, ok: true, enemy: target };
+}
 
 export function feedTarget(combat, feeder, target, amount = 1, opts = {}) {
   const entry = getActiveEntry(combat.turnState);

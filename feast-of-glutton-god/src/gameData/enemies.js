@@ -1,5 +1,8 @@
 import { MAX_STAGE_ID } from "./stages.js";
 
+const MUNDANE = { threatTier: "mundane" };
+const COSMIC = { threatTier: "cosmic", conversion: 0.05 };
+
 export const ENEMY_TYPES = {
   harvest_harpy: {
     id: "harvest_harpy",
@@ -12,6 +15,7 @@ export const ENEMY_TYPES = {
     role: "skirmisher",
     conversion: 0.8,
     desc: "Winged farm girls with feathered accents — fast and greedy.",
+    ...MUNDANE,
   },
   vinebound_dryad: {
     id: "vinebound_dryad",
@@ -24,6 +28,7 @@ export const ENEMY_TYPES = {
     role: "controller",
     conversion: 0.9,
     desc: "Nature spirits bound in living vines, swelling with fertility.",
+    ...MUNDANE,
   },
   gluttonous_goblin: {
     id: "gluttonous_goblin",
@@ -36,6 +41,7 @@ export const ENEMY_TYPES = {
     role: "swarmer",
     conversion: 0.95,
     desc: "Curvy, greedy green-skinned girls who live to eat.",
+    ...MUNDANE,
   },
   temple_guardian: {
     id: "temple_guardian",
@@ -48,6 +54,7 @@ export const ENEMY_TYPES = {
     role: "tank",
     conversion: 0.7,
     desc: "Stoic armored priestess-knights guarding ancient halls.",
+    ...MUNDANE,
   },
   rival_adventurer: {
     id: "rival_adventurer",
@@ -60,6 +67,7 @@ export const ENEMY_TYPES = {
     role: "balanced",
     conversion: 0.85,
     desc: "Proud slim rivals who hate what you're becoming.",
+    ...MUNDANE,
   },
   purity_inquisitor: {
     id: "purity_inquisitor",
@@ -72,6 +80,7 @@ export const ENEMY_TYPES = {
     role: "elite",
     conversion: 0.6,
     desc: "Militant paladins of the orthodox Church who enforce divine moderation and hunt heresy.",
+    ...MUNDANE,
   },
   famine_hag: {
     id: "famine_hag",
@@ -82,15 +91,29 @@ export const ENEMY_TYPES = {
     mp: 20,
     movement: 2,
     role: "boss",
-    conversion: 0.5,
     desc: "Sylwen's Scourge — a sanctioned divine instrument; famine as the answer to gluttony.",
+    ...COSMIC,
   },
 };
+
+export function getEnemyThreatTier(enemyOrTypeId) {
+  if (!enemyOrTypeId) return "mundane";
+  if (typeof enemyOrTypeId === "string") {
+    return ENEMY_TYPES[enemyOrTypeId]?.threatTier ?? "mundane";
+  }
+  const typeId = enemyOrTypeId.typeId || enemyOrTypeId.type || enemyOrTypeId.id;
+  return enemyOrTypeId.threatTier ?? ENEMY_TYPES[typeId]?.threatTier ?? "mundane";
+}
+
+export function isCosmicThreat(enemyOrTypeId) {
+  return getEnemyThreatTier(enemyOrTypeId) === "cosmic";
+}
 
 export function createEnemy(typeId) {
   const t = ENEMY_TYPES[typeId] || ENEMY_TYPES.harvest_harpy;
   return {
     ...t,
+    typeId: t.id,
     lbs: t.startLbs,
     corruption: 0,
     hunger: 0,

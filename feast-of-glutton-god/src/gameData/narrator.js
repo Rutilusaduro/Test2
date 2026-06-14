@@ -6,6 +6,7 @@ import { getNpcState, ensureDmState } from './player.js';
 import { getQuestOffersForNpc } from './questOffers.js';
 import { renderDmLine } from '../textEngine/scenes/dm/index.js';
 import { renderGenreBeat } from '../textEngine/scenes/dm/genre.js';
+import { syncEscalationTier } from '../gameData/divineAttention.js';
 
 const IDLE_ACTION_THRESHOLD = 5;
 
@@ -26,6 +27,7 @@ export function narrate(game, kind, params = {}) {
   const regionId = params.regionId ?? game.region;
   const region = getRegion(regionId);
   const transform = getRegionTransformation(game, regionId);
+  syncEscalationTier(game);
 
   if (kind === 'arrival') {
     const visited = dm.visitedRegions || {};
