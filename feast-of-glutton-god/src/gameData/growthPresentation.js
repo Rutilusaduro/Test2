@@ -8,6 +8,7 @@ import { countLargePresencesInRegion } from './growthCrowd.js';
 import { renderGrowthScene, renderStageCrossingLine } from '../textEngine/scenes/growthEvent/index.js';
 import { renderGrowthProse } from '../textEngine/scenes/growth/index.js';
 import { renderWorldGrowthReaction } from '../textEngine/scenes/growthEvent/worldReactions.js';
+import { notifyWorldReaction } from './worldReactivity.js';
 
 /**
  * Advance size with universal cap rules and return narrative bundle.
@@ -80,6 +81,20 @@ export function buildGrowthNarrative(character, game, params) {
     observer,
   });
 
+  let persistentReactionLines = [];
+  if (endStage >= 10 && game) {
+    const reaction = notifyWorldReaction(game, {
+      type: 'growth',
+      character,
+      startStage,
+      endStage,
+      stagesJumped,
+      regionId,
+      growthMethod,
+    });
+    persistentReactionLines = reaction.lines ?? [];
+  }
+
   const snippet = !scene && stagesJumped > 0
     ? renderGrowthProse(
       resolveGrowthPoolKey(growthMethod, stagesJumped),
@@ -89,10 +104,17 @@ export function buildGrowthNarrative(character, game, params) {
     )
     : '';
 
-  const parts = [scene || snippet, crossing, worldReaction].filter(Boolean);
+  const parts = [scene || snippet, crossing, worldReaction, ...persistentReactionLines].filter(Boolean);
   const text = parts.join('\n\n');
 
-  return { text, worldReaction, scene, crossing, snippet };
+  return {
+    text,
+    worldReaction,
+    persistentReactionLines,
+    scene,
+    crossing,
+    snippet,
+  };
 }
 
 function resolveGrowthPoolKey(method, stagesJumped) {

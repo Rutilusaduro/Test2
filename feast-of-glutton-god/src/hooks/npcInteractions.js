@@ -28,6 +28,7 @@ import { awardAbundanceSpreadWithEvents } from '../gameData/worldEvents.js';
 import { awardInfluence, getRelationshipInfluenceBonus } from '../gameData/influence.js';
 import { awardRegionTransformation } from '../gameData/worldTransformation.js';
 import { appendPuzzleHintToTalk } from '../gameData/puzzleHints.js';
+import { getReactivityGlobals } from '../gameData/worldReactivity.js';
 
 function withQuestProgress(game, npc, interaction, meta, result) {
   const quest = recordNpcInteractionForQuests(game, {
@@ -130,20 +131,23 @@ export function renderBodyDesc(character, player, game) {
     pose: 'standing',
     location: game?.region,
     history: getTextHistory(game),
+    reactivity: game ? getReactivityGlobals(game, game.region) : {},
   });
 }
 
 export function doObserve(npc, player, game) {
   const poses = ['standing', 'sitting', 'walking'];
   const pose = poses[Math.floor(Math.random() * poses.length)];
-  const text = renderObserve(npc, player, { pose, location: game.region, history: getTextHistory(game) });
+  const reactivity = getReactivityGlobals(game, game.region);
+  const text = renderObserve(npc, player, { pose, location: game.region, history: getTextHistory(game), reactivity });
   addCorruption(npc, 1);
   const relResult = applyRelationshipGain(npc, 'observe');
   return withQuestProgress(game, npc, 'observe', null, appendTierUp({ text, npc }, npc, relResult));
 }
 
 export function doTalk(npc, player, game) {
-  const text = renderTalk(npc, player, { location: game.region, history: getTextHistory(game) });
+  const reactivity = getReactivityGlobals(game, game.region);
+  const text = renderTalk(npc, player, { location: game.region, history: getTextHistory(game), reactivity });
   const relResult = applyRelationshipGain(npc, 'talk');
   const offers = getQuestOffersForNpc(game, npc);
   let questOfferText = '';

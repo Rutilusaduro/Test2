@@ -5,4 +5,5 @@ registerSelectors(
   'pose', 'region', 'locale', 'causeType', 'featureId',
   'growthType', 'growthPerspective',
   'questId', 'questType', 'questTitle', 'endingId', 'stageId',
+  'reactionType', 'landmarkRole', 'band', 'rumorWhat', 'hasRumor', 'rumorWho',
 );

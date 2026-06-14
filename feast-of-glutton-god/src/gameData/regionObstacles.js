@@ -2,6 +2,11 @@
  * Connection gates — travel blocked until puzzle solved or flag set.
  */
 import { getRegion, isRegionLocked } from './regions.js';
+import {
+  isExitBlockedByGiant,
+  isImpassableToSmall,
+  isSmallTraveler,
+} from './worldReactivity.js';
 
 export const CONNECTION_GATES = [
   {
@@ -35,20 +40,40 @@ export function isConnectionBlocked(game, fromRegionId, toRegionId) {
 export function getTravelOptions(game, regionId) {
   const region = getRegion(regionId);
   const unlocked = game.worldFlags?.regions_unlocked ?? [];
+  const smallTraveler = isSmallTraveler(game);
+  const regionImpassable = isImpassableToSmall(game, regionId);
+
   return region.connections.map((toId) => {
     const gateCheck = isConnectionBlocked(game, regionId, toId);
+    const giantCheck = isExitBlockedByGiant(game, regionId, toId);
     const regionLocked = !unlocked.includes(toId) || isRegionLocked(game, toId);
+
+    let blocked = gateCheck.blocked || regionLocked || giantCheck.blocked;
+    let blockedReason = null;
+    let puzzleId = gateCheck.puzzleId ?? null;
+    let gateId = gateCheck.gate?.id ?? null;
+
+    if (gateCheck.blocked) {
+      blockedReason = gateCheck.reason;
+    } else if (giantCheck.blocked) {
+      blockedReason = giantCheck.reason;
+    } else if (regionLocked) {
+      blockedReason = 'This region has not yet been unlocked.';
+    }
+
+    if (!blocked && regionImpassable && smallTraveler) {
+      blocked = true;
+      blockedReason = 'The roads are impassable to travelers your size — only the vast can cross this swollen land.';
+    }
+
     return {
       regionId: toId,
       name: getRegion(toId).name,
-      blocked: gateCheck.blocked || regionLocked,
-      blockedReason: gateCheck.blocked
-        ? gateCheck.reason
-        : regionLocked
-          ? 'This region has not yet been unlocked.'
-          : null,
-      puzzleId: gateCheck.puzzleId ?? null,
-      gateId: gateCheck.gate?.id ?? null,
+      blocked,
+      blockedReason,
+      puzzleId,
+      gateId,
+      giantBlocked: giantCheck.blocked,
     };
   });
 }

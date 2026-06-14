@@ -44,6 +44,12 @@ registerPool('npc.observe.body', [
     '{They} {verb:be} colossal — a vast, warm presence that reshapes the space around {them}.',
     '{Their} body is a temple of abundance, impossibly soft and impossibly large.',
   ]},
+  { when: { nearbyLandmarkTierMin: 1 }, text: [
+    'Even beside {them}, your thoughts drift to the landmark dominating the region — flesh become civic architecture.',
+  ]},
+  { when: { refStageMin: 10 }, text: [
+    'You loom in {their} gaze — vast enough that {they} {verb:look} up as if addressing weather.',
+  ]},
   { when: {}, text: [
     '{Their} body speaks of Gorgara\'s blessing — soft, full, and beautiful.',
   ]},
@@ -85,7 +91,12 @@ export function renderObserve(npc, player, opts = {}) {
   const ctx = createContext({
     subject: npc,
     ref: player,
-    globals: { pose, location: opts.location, interaction: 'observe' },
+    globals: {
+      pose,
+      location: opts.location,
+      interaction: 'observe',
+      ...(opts.reactivity ?? {}),
+    },
     seed: opts.seed,
     history: opts.history,
   });

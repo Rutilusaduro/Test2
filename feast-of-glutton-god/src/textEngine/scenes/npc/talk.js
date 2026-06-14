@@ -60,6 +60,20 @@ registerPool('npc.talk.topic', [
   { when: { stageMin: 5 }, text: [
     'She runs her hands over her softened body without shame. "I\'ve never felt more myself."',
   ]},
+  { when: { nearbyLandmarkTierMin: 1, hasRumor: true }, text: [
+    'She keeps glancing toward the landmark everyone whispers about — the road still bears the scar of impossible growth.',
+    '"Have you seen what happened?" she asks. "They say {globals.rumorWho} grew until the city had to build around them."',
+  ]},
+  { when: { nearbyLandmarkTierMin: 2 }, text: [
+    'Her voice drops to reverent awe. "The pilgrims won\'t stop coming. I caught myself leaving honeycakes at the shrine-walk."',
+    '"They\'re worshipping {globals.rumorWho} now," she admits, cheeks pink. "I almost understand why."',
+  ]},
+  { when: { landmarkTierMin: 1 }, text: [
+    'She studies your vastness like a performer sizing a stage. "The whole region is your audience now."',
+  ]},
+  { when: { footprintMin: 12 }, text: [
+    'She speaks of blocked roads and cracked foundations — abundance has become civic engineering.',
+  ]},
   { when: {}, text: [
     'You talk of abundance, of Gorgara\'s awakening, of the pleasure in growing.',
   ]},
@@ -71,7 +85,11 @@ export function renderTalk(npc, player, opts = {}) {
   const ctx = createContext({
     subject: npc,
     ref: player,
-    globals: { location: opts.location, interaction: 'talk' },
+    globals: {
+      location: opts.location,
+      interaction: 'talk',
+      ...(opts.reactivity ?? {}),
+    },
     seed: opts.seed,
     history: opts.history,
   });

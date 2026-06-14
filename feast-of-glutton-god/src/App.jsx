@@ -14,6 +14,7 @@ import { initSpellSlots } from "./gameData/spellSlots.js";
 import { ensureQuestState } from "./gameData/questEngine.js";
 import { ensureInfluenceState } from "./gameData/influence.js";
 import { ensureTransformationState } from "./gameData/worldTransformation.js";
+import { ensureReactivityState } from "./gameData/worldReactivity.js";
 import { ensurePartyUniversalSize } from "./gameData/universalSize.js";
 import { recordCombatEndForQuests } from "./hooks/questHooks.js";
 import { recordPuzzleSolvedForQuests } from "./hooks/puzzleHooks.js";
@@ -58,6 +59,7 @@ export default function App() {
     ensureQuestState(g);
     ensureInfluenceState(g);
     ensureTransformationState(g);
+    ensureReactivityState(g);
     setGame(g);
     setScreen("world");
   }, []);
@@ -69,6 +71,7 @@ export default function App() {
       if (!g.player.sizeCap) g.player.sizeCap = 3;
       ensureInfluenceState(g);
       ensureTransformationState(g);
+      ensureReactivityState(g);
       if (!g.player.raceId) g.player.raceId = 'human';
       if (!g.player.raceName) g.player.raceName = 'Human';
       migratePlayerSpells(g.player);
