@@ -5,19 +5,21 @@ import { getNpcState, applyNpcState } from "../gameData/player.js";
 import { getStage, isAtSizeCap } from "../gameData/stages.js";
 import { getTier } from "../gameData/relationships.js";
 import { getCorruptionTier } from "../gameData/corruption.js";
-import { getXpProgress } from "../gameData/leveling.js";
-import { longRest } from "../gameData/leveling.js";
+import { getXpProgress, longRest } from "../gameData/leveling.js";
 import { getPlayerDerivedStats } from "../gameData/player.js";
-import { getUnlockedConnections } from "../gameData/questEngine.js";
+import { getTravelOptions } from "../gameData/regionObstacles.js";
+import { getVisibleFeatures } from "../gameData/puzzleEngine.js";
 import { getAbundanceProgress } from "../gameData/abundanceSpread.js";
 import { recordRegionVisitForQuests } from "../hooks/questHooks.js";
 import NpcModal from "./NpcModal.jsx";
+import FeatureModal from "./FeatureModal.jsx";
 import QuestLog from "./QuestLog.jsx";
 import SpellbookPanel from "./SpellbookPanel.jsx";
 import CharacterSheet from "./CharacterSheet.jsx";
 
 export default function WorldView({ game, onUpdate, onEncounter, onSave, onDebugContext }) {
   const [npcModal, setNpcModal] = useState(null);
+  const [featureModal, setFeatureModal] = useState(null);
   const [showSheet, setShowSheet] = useState(false);
   const region = getRegion(game.region);
   const player = game.player;
@@ -68,6 +70,12 @@ export default function WorldView({ game, onUpdate, onEncounter, onSave, onDebug
   };
 
   const npcs = getNpcsInRegion(game.region, game).map((n) => getNpcState(game, n));
+  const features = getVisibleFeatures(game, game.region);
+
+  const openFeature = (feature) => {
+    setFeatureModal(feature);
+    onDebugContext?.({ feature, region: game.region, interaction: "feature_open" });
+  };
 
   return (
     <div className="app">
@@ -123,20 +131,59 @@ export default function WorldView({ game, onUpdate, onEncounter, onSave, onDebug
       <div className="panel">
         <h2>Travel</h2>
         <div className="btn-grid">
-          {getUnlockedConnections(game, game.region).map((id) => {
-            const r = getRegion(id);
-            return (
-              <button key={id} onClick={() => travel(id)}>Go to {r.name}</button>
-            );
-          })}
+          {getTravelOptions(game, game.region).map((opt) => (
+            <button
+              key={opt.regionId}
+              disabled={opt.blocked}
+              title={opt.blockedReason || undefined}
+              onClick={() => !opt.blocked && travel(opt.regionId)}
+            >
+              Go to {opt.name}
+              {opt.blocked && opt.puzzleId && (
+                <div style={{ fontSize: "0.75rem", color: "var(--rose)" }}>
+                  Blocked — solve nearby mystery
+                </div>
+              )}
+              {opt.blocked && !opt.puzzleId && (
+                <div style={{ fontSize: "0.75rem", color: "var(--text-dim)" }}>
+                  Locked
+                </div>
+              )}
+            </button>
+          ))}
         </div>
       </div>
+
+      {features.length > 0 && (
+        <div className="panel">
+          <h2>Places & Mysteries</h2>
+          <p className="prose" style={{ fontSize: "0.85rem", marginBottom: "0.75rem" }}>
+            Obstacles and wonders await clever abundance — grow, cast, bond, or skill your way through.
+          </p>
+          <div className="btn-grid">
+            {features.map((f) => (
+              <button key={f.id} onClick={() => openFeature(f)}>
+                {f.icon} {f.name}
+                <div style={{ fontSize: "0.8rem", color: "var(--text-dim)" }}>
+                  {f.solved ? "✦ Solved" : f.examined ? "Examined — try a solution" : "Unexplored mystery"}
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
 
       <SpellbookPanel
         game={game}
         npcs={npcs}
+        features={features}
         onGameUpdate={onUpdate}
         onCastResult={(npc) => handleNpcUpdate(npc)}
+        onFeatureCast={(result) => {
+          if (result.puzzleSolve?.solved) {
+            onUpdate((g) => ({ ...g, lastQuestMessage: result.questMessages || g.lastQuestMessage }));
+          }
+        }}
       />
 
       <div className="panel">
@@ -191,6 +238,16 @@ export default function WorldView({ game, onUpdate, onEncounter, onSave, onDebug
           </div>
         ))}
       </div>
+
+      {featureModal && (
+        <FeatureModal
+          feature={featureModal}
+          game={game}
+          onClose={() => setFeatureModal(null)}
+          onGameUpdate={onUpdate}
+          onDebugContext={onDebugContext}
+        />
+      )}
 
       {npcModal && (
         <NpcModal

@@ -25,7 +25,8 @@ export const STAGE_PERKS = [
     combat: { reachBonus: 0, damageBonus: 1, acBonus: 1 },
     social: { flirtBonus: 1 },
     growth: { selfFeedUnlocked: true },
-    desc: 'A real belly grants presence — bonus damage and self-feed in combat.',
+    puzzle: { blockPath: true, shoulderObstacle: true, skillBonus: 1 },
+    desc: 'A real belly grants presence — bonus damage, self-feed in combat, and puzzle force.',
   },
   {
     minStage: 6,
@@ -33,7 +34,8 @@ export const STAGE_PERKS = [
     combat: { reachBonus: 1, damageBonus: 2, acBonus: 2 },
     social: { flirtBonus: 2 },
     growth: { growthDamageBonus: 1 },
-    desc: 'Mass becomes weapon — crushing melee and harder to budge.',
+    puzzle: { livingBridge: true, reachHigh: true, skillBonus: 1 },
+    desc: 'Mass becomes weapon — crushing melee, living bridges, and harder-to-budge presence.',
   },
   {
     minStage: 8,
@@ -41,7 +43,8 @@ export const STAGE_PERKS = [
     combat: { reachBonus: 1, damageBonus: 3, acBonus: 3 },
     social: { flirtBonus: 2 },
     growth: { bodySlamUnlocked: true, growthDamageBonus: 2 },
-    desc: 'Your size dominates the field — body slam and aura tactics unlock.',
+    puzzle: { crushObstacle: true, squeezeThrough: true, skillBonus: 2 },
+    desc: 'Your size dominates the field — body slam, aura tactics, and puzzle-crushing mass.',
   },
   {
     minStage: 10,
@@ -49,7 +52,8 @@ export const STAGE_PERKS = [
     combat: { reachBonus: 2, damageBonus: 4, acBonus: 4 },
     social: { flirtBonus: 3 },
     growth: { crushingAuraUnlocked: true, growthDamageBonus: 3 },
-    desc: 'Near-apotheosis of flesh — crushing aura and legendary presence.',
+    puzzle: { immovablePresence: true, tightSpacePenalty: true, skillBonus: 3 },
+    desc: 'Near-apotheosis of flesh — crushing aura, legendary presence, and world-shaping puzzle power.',
   },
 ];
 
@@ -70,4 +74,22 @@ export function getCombatModifiers(character) {
 export function hasGrowthUnlock(character, unlockKey) {
   const perk = getStagePerk(character);
   return Boolean(perk.growth?.[unlockKey]);
+}
+
+/** Puzzle-solving capabilities unlocked by size stage. */
+export function getPuzzleCapabilities(character) {
+  const perk = getStagePerk(character);
+  const puzzle = perk.puzzle ?? {};
+  return {
+    blockPath: Boolean(puzzle.blockPath),
+    shoulderObstacle: Boolean(puzzle.shoulderObstacle),
+    livingBridge: Boolean(puzzle.livingBridge),
+    reachHigh: Boolean(puzzle.reachHigh),
+    crushObstacle: Boolean(puzzle.crushObstacle),
+    squeezeThrough: Boolean(puzzle.squeezeThrough),
+    immovablePresence: Boolean(puzzle.immovablePresence),
+    tightSpacePenalty: Boolean(puzzle.tightSpacePenalty),
+    skillBonus: puzzle.skillBonus ?? 0,
+    label: perk.label,
+  };
 }

@@ -23,6 +23,7 @@ export const ABUNDANCE_AWARDS = {
   combat_win: 3,
   overworld_spell_growth: 4,
   companion_devoted: 20,
+  puzzle_solved: 6,
 };
 
 export function getAbundanceSpread(game) {

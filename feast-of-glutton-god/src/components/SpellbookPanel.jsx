@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getOverworldCastableSpells, castSpellOnNpc } from '../gameData/overworldSpells.js';
+import { getOverworldCastableSpells, castSpellOnNpc, castSpellOnFeature } from '../gameData/overworldSpells.js';
 import { hasSpellSlot } from '../gameData/spellSlots.js';
 import { getStage } from '../gameData/stages.js';
 import { recordNpcGrowthForQuests, recordNpcInteractionForQuests } from '../hooks/questHooks.js';
@@ -14,9 +14,13 @@ import {
 import { getSpell } from '../gameData/spells.js';
 import { isGrowthThemedSpell } from '../gameData/spellLearning.js';
 
-export default function SpellbookPanel({ game, npcs, onCastResult, onGameUpdate }) {
+import { recordSpellOnFeatureForQuests } from '../hooks/puzzleHooks.js';
+
+export default function SpellbookPanel({ game, npcs, features = [], onCastResult, onGameUpdate, onFeatureCast }) {
   const [selectedSpell, setSelectedSpell] = useState(null);
   const [targetNpc, setTargetNpc] = useState(null);
+  const [targetFeature, setTargetFeature] = useState(null);
+  const [targetMode, setTargetMode] = useState('npc');
   const [overflow, setOverflow] = useState(false);
   const [result, setResult] = useState('');
   const [mode, setMode] = useState('cast');
@@ -35,7 +39,7 @@ export default function SpellbookPanel({ game, npcs, onCastResult, onGameUpdate 
     return (player.ap || 0) >= ap;
   };
 
-  const handleCast = () => {
+  const handleCastOnNpc = () => {
     if (!selectedSpell || !targetNpc) return;
     const spell = spells.find((s) => s.id === selectedSpell);
     if (!spell || !canCast(spell)) return;
@@ -71,8 +75,49 @@ export default function SpellbookPanel({ game, npcs, onCastResult, onGameUpdate 
 
     onCastResult?.(res.npc);
     setResult(res.text);
+    resetCast();
+  };
+
+  const handleCastOnFeature = () => {
+    if (!selectedSpell || !targetFeature) return;
+    const spell = spells.find((s) => s.id === selectedSpell);
+    if (!spell || !canCast(spell)) return;
+
+    const res = castSpellOnFeature(game, targetFeature.id, selectedSpell, { overflow });
+    if (!res.ok) {
+      setResult(res.text);
+      return;
+    }
+
+    onGameUpdate?.((g) => {
+      const next = { ...g, player: { ...g.player, ...player } };
+      if (res.spread?.total != null) {
+        next.worldFlags = { ...next.worldFlags, abundanceSpread: res.spread.total };
+      }
+      return next;
+    });
+
+    const quest = recordSpellOnFeatureForQuests(game, {
+      featureId: targetFeature.id,
+      spellId: selectedSpell,
+      solved: res.puzzleSolve?.solved,
+      puzzleId: targetFeature.puzzle?.id,
+    });
+
+    onFeatureCast?.({ ...res, questMessages: quest.questMessages });
+    setResult(res.text);
+    resetCast();
+  };
+
+  const resetCast = () => {
     setSelectedSpell(null);
     setTargetNpc(null);
+    setTargetFeature(null);
+  };
+
+  const handleCast = () => {
+    if (targetMode === 'environment') return handleCastOnFeature();
+    return handleCastOnNpc();
   };
 
   const handleTogglePrep = (spellId) => {
@@ -132,8 +177,14 @@ export default function SpellbookPanel({ game, npcs, onCastResult, onGameUpdate 
       ) : (
         <>
           <p className="prose" style={{ fontSize: '0.85rem', marginBottom: '0.75rem' }}>
-            Cast growth magic on people nearby. They swell with pleasure — always beautiful, always hungry for more.
+            Cast abundance magic on people or places nearby. Clever spell use can solve mysteries without combat.
           </p>
+          <div className="btn-grid" style={{ marginBottom: '0.5rem' }}>
+            <button className={targetMode === 'npc' ? 'primary' : ''} onClick={() => { setTargetMode('npc'); setTargetFeature(null); }}>Target: People</button>
+            {features.length > 0 && (
+              <button className={targetMode === 'environment' ? 'primary' : ''} onClick={() => { setTargetMode('environment'); setTargetNpc(null); }}>Target: Environment</button>
+            )}
+          </div>
           <label style={{ fontSize: '0.85rem', display: 'block', marginBottom: '0.5rem' }}>
             <input type="checkbox" checked={overflow} onChange={(e) => setOverflow(e.target.checked)} />
             {' '}Overflow cast (extra growth)
@@ -156,9 +207,20 @@ export default function SpellbookPanel({ game, npcs, onCastResult, onGameUpdate 
           </div>
           {selectedSpell && (
             <>
-              <p style={{ fontSize: '0.85rem', marginBottom: '0.5rem' }}>Who receives your magic?</p>
+              <p style={{ fontSize: '0.85rem', marginBottom: '0.5rem' }}>
+                {targetMode === 'environment' ? 'Which place receives your magic?' : 'Who receives your magic?'}
+              </p>
               <div className="btn-grid" style={{ gridTemplateColumns: '1fr' }}>
-                {npcs.map((n) => (
+                {targetMode === 'environment' ? features.map((f) => (
+                  <button
+                    key={f.id}
+                    className={targetFeature?.id === f.id ? 'primary' : ''}
+                    onClick={() => setTargetFeature(f)}
+                  >
+                    {f.icon} {f.name}
+                    {f.solved ? ' (solved)' : ''}
+                  </button>
+                )) : npcs.map((n) => (
                   <button
                     key={n.id}
                     className={targetNpc?.id === n.id ? 'primary' : ''}
@@ -171,10 +233,10 @@ export default function SpellbookPanel({ game, npcs, onCastResult, onGameUpdate 
               <button
                 className="primary"
                 style={{ marginTop: '0.75rem' }}
-                disabled={!targetNpc}
+                disabled={targetMode === 'environment' ? !targetFeature : !targetNpc}
                 onClick={handleCast}
               >
-                Cast on {targetNpc?.name || '…'}
+                Cast on {targetMode === 'environment' ? (targetFeature?.name || '…') : (targetNpc?.name || '…')}
               </button>
             </>
           )}

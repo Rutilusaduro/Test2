@@ -300,3 +300,23 @@ registerPool('quest.complete', [
     'The feast closes with sighs of satisfaction — and hunger for more.',
   ]},
 ]);
+
+registerQuestCopy('quest.side.paths.title', ['Paths of Abundance']);
+registerQuestCopy('quest.side.paths.desc', [
+  'Elara whispers of strange obstacles across the land — doors that demand cleverness, ravines that hunger for growth. She believes you can solve them all with abundance, not violence.',
+]);
+registerQuestCopy('quest.side.paths.stage.discover.desc', [
+  'Find a regional mystery and examine it. Then solve it — by spell, skill, size, bond, or any delicious combination.',
+]);
+registerQuestCopy('quest.side.paths.stage.discover.complete', [
+  'Elara claps her flour-dusted hands. "See? The world bends to those who think with their bellies *and* their brilliance."',
+]);
+registerQuestCopy('quest.side.paths.stage.master.desc', [
+  'Solve three mysteries across the regions. Each one teaches the land that abundance is clever, sensual, and unstoppable.',
+]);
+registerQuestCopy('quest.side.paths.stage.master.complete', [
+  'Word spreads: the Chosen solves problems the way Gorgara intended — with pleasure, growth, and glorious ingenuity.',
+]);
+registerQuestCopy('quest.side.paths.complete', [
+  'Paths of Abundance complete. You are a problem-solver of divine appetite — and the world is softer for it.',
+]);

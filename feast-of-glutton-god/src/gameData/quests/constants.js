@@ -27,6 +27,10 @@ export const OBJECTIVE_TYPE = {
   NPC_GROWTH_QUOTA: 'npc_growth_quota',
   /** Any feast interaction in a region (communal abundance). */
   COMMUNAL_FEAST: 'communal_feast',
+  /** Solve a region puzzle or feature obstacle. */
+  PUZZLE_SOLVED: 'puzzle_solved',
+  /** Examine a world feature / place of mystery. */
+  FEATURE_EXAMINED: 'feature_examined',
 };
 
 /** Approach hints for UI — not mechanically enforced. */

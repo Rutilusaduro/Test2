@@ -5,12 +5,12 @@ import { getSubclass } from './subclasses.js';
 export const CANTRIPS = [
   { id: 'gentle_plump', name: 'Gentle Plump', slotLevel: 0, school: 'abundance', desc: 'Softly swell a willing target by one stage with a pleasurable surge.', effect: { growth: 1 } },
   { id: 'indulgent_touch', name: 'Indulgent Touch', slotLevel: 0, school: 'abundance', desc: 'Touch a willing creature and cause a small, pleasurable growth surge.', effect: { growth: 1, corruption: 1 } },
-  { id: 'feasts_whisper', name: "Feast's Whisper", slotLevel: 0, school: 'enchantment', desc: 'Whisper temptations that make a target crave indulgence.', effect: { charm: 1, corruption: 2 } },
+  { id: 'feasts_whisper', name: "Feast's Whisper", slotLevel: 0, school: 'enchantment', desc: 'Whisper temptations that make a target crave indulgence.', effect: { charm: 1, corruption: 2 }, environment: { charm: true } },
   { id: 'gorgaras_spark', name: "Gorgara's Spark", slotLevel: 0, school: 'abundance', desc: 'A minor divine spark of growth — can be upcast with higher slots.', effect: { growth: 1 } },
-  { id: 'rich_cream', name: 'Rich Cream', slotLevel: 0, school: 'conjuration', desc: 'Conjure slippery, creamy abundance. Contact causes minor pleasurable weight gain.', effect: { growth: 1, corruption: 2, feed: 1 } },
+  { id: 'rich_cream', name: 'Rich Cream', slotLevel: 0, school: 'conjuration', desc: 'Conjure slippery, creamy abundance. Contact causes minor pleasurable weight gain.', effect: { growth: 1, corruption: 2, feed: 1 }, environment: { soften: true, slick: true } },
   { id: 'flavor_burst', name: 'Flavor Burst', slotLevel: 0, school: 'abundance', desc: 'Conjure delicious food that tempts and feeds.', effect: { feed: 1, corruption: 3 } },
-  { id: 'jiggle_charm', name: 'Jiggle Charm', slotLevel: 0, school: 'enchantment', desc: 'Hypnotic sway that charms and distracts.', effect: { charm: 1 } },
-  { id: 'softening_ray', name: 'Softening Ray', slotLevel: 0, school: 'abundance', desc: 'A ray of plush caloric energy.', effect: { growth: 1, corruption: 2 } },
+  { id: 'jiggle_charm', name: 'Jiggle Charm', slotLevel: 0, school: 'enchantment', desc: 'Hypnotic sway that charms and distracts.', effect: { charm: 1 }, environment: { charm: true } },
+  { id: 'softening_ray', name: 'Softening Ray', slotLevel: 0, school: 'abundance', desc: 'A ray of plush caloric energy.', effect: { growth: 1, corruption: 2 }, environment: { soften: true, swell: true } },
 ];
 
 /** Spells granted by specific subclasses or shared across classes. */
@@ -49,11 +49,13 @@ export const BONUS_SPELLS = {
     id: 'form_of_abundance', name: 'Form of Abundance', slotLevel: 2, school: 'transmutation',
     desc: 'Major growth toward higher size stages. Concentration. Pleasurable and powerful.',
     effect: { growth: 2, corruption: 4 },
+    environment: { swell: true, crush: true },
   },
   pleasurable_pressure: {
     id: 'pleasurable_pressure', name: 'Pleasurable Pressure', slotLevel: 3, school: 'evocation',
     desc: 'Crushing but euphoric force that causes growth instead of harm.',
     effect: { growth: 2, corruption: 6 },
+    environment: { crush: true, swell: true },
   },
   overflow_cascade: {
     id: 'overflow_cascade', name: 'Overflow Cascade', slotLevel: 4, school: 'abundance',
@@ -99,6 +101,7 @@ export const BONUS_SPELLS = {
     id: 'banquet_mist', name: 'Banquet Mist', slotLevel: 3, school: 'conjuration',
     desc: 'Perfumed fog of impossible feasts — all who breathe it grow drunk on fullness.',
     effect: { growth: 1, aoe: true, corruption: 5, feed: 1 },
+    environment: { fertile: true, soften: true, ritual: true, slick: true },
   },
   divine_plump: {
     id: 'divine_plump', name: 'Divine Plump', slotLevel: 6, school: 'abundance',
@@ -232,6 +235,16 @@ export function getSpellForCast(spell, overflow = false) {
     apCost: spell.overflow.apCost ?? spell.apCost,
     effect: { ...spell.effect, ...spell.overflow.effect },
   };
+}
+
+export function getSpellEnvironmentTags(spell) {
+  const env = spell?.environment ?? {};
+  return Object.keys(env).filter((k) => env[k]);
+}
+
+export function spellHasEnvironmentUse(spell) {
+  return getSpellEnvironmentTags(spell).length > 0
+    || spell.effect?.growth || spell.effect?.charm || spell.effect?.feed;
 }
 
 export function getCastableSpells(character) {

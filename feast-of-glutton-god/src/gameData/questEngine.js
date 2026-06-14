@@ -512,6 +512,14 @@ export function notifyQuestEvent(game, event = {}) {
         matched = event.type === 'npc_interaction'
           && event.interaction === 'feast'
           && (!obj.regionId || event.regionId === obj.regionId || game.region === obj.regionId);
+      } else if (obj.type === OBJECTIVE_TYPE.PUZZLE_SOLVED) {
+        matched = event.type === 'puzzle_solved'
+          && (!obj.puzzleId || event.puzzleId === obj.puzzleId)
+          && (!obj.regionId || event.regionId === obj.regionId);
+      } else if (obj.type === OBJECTIVE_TYPE.FEATURE_EXAMINED) {
+        matched = event.type === 'feature_examined'
+          && (!obj.featureId || event.featureId === obj.featureId)
+          && (!obj.regionId || event.regionId === obj.regionId);
       } else if (obj.type === OBJECTIVE_TYPE.NPC_GROWTH_QUOTA) {
         if (event.type === 'npc_growth') {
           recordGrowthQuotaProgress(game, instance, obj, event);
@@ -529,6 +537,8 @@ export function notifyQuestEvent(game, event = {}) {
         OBJECTIVE_TYPE.NPC_INTERACTION,
         OBJECTIVE_TYPE.COMBAT_VICTORY,
         OBJECTIVE_TYPE.COMMUNAL_FEAST,
+        OBJECTIVE_TYPE.PUZZLE_SOLVED,
+        OBJECTIVE_TYPE.FEATURE_EXAMINED,
       ].includes(obj.type)) {
         const rec = instance.objectives[obj.id];
         rec.progress += 1;
