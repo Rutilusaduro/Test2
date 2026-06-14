@@ -10,6 +10,7 @@ import { getPreparedSpells, isSpellPrepared } from './spellPreparation.js';
 import { awardAbundanceSpreadWithEvents } from './worldEvents.js';
 import { renderOverworldSpellCast } from '../textEngine/scenes/overworld/spellCast.js';
 import { applyGrowthWithPresentation } from './growthPresentation.js';
+import { awardFatteningXp } from './leveling.js';
 import { getStage } from './stages.js';
 import { getStagePerk } from './stagePerks.js';
 import { getFeature } from './regionFeatures.js';
@@ -60,6 +61,9 @@ function applyOverworldSpellEffects(game, npc, player, spell) {
     const stages = (eff.growth || 0) + relBonus;
     const presentation = applyGrowthWithPresentation(npc, game, stages, { growthMethod: 'spell' });
     results.growth = presentation;
+    if (presentation.stagesJumped > 0) {
+      results.fattenXp = awardFatteningXp(player, presentation.stagesJumped, 'overworld_spell');
+    }
     addCorruption(npc, 3 * stages);
     results.relationship = awardRelationship(npc, 'spell_bless', 4 + stages);
     awardAbundanceSpreadWithEvents(game, 'overworld_spell_growth');
@@ -67,6 +71,9 @@ function applyOverworldSpellEffects(game, npc, player, spell) {
   if (eff.feed && !eff.growth) {
     const presentation = applyGrowthWithPresentation(npc, game, 1 + relBonus, { growthMethod: 'feed' });
     results.growth = presentation;
+    if (presentation.stagesJumped > 0) {
+      results.fattenXp = awardFatteningXp(player, presentation.stagesJumped, 'overworld_feed');
+    }
     addCorruption(npc, 4);
     results.relationship = awardRelationship(npc, 'feed');
     awardAbundanceSpreadWithEvents(game, 'overworld_spell_growth');

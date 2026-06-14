@@ -37,6 +37,7 @@ export const XP_SOURCES = {
   recruit_companion: 200,
   major_story: 500,
   npc_growth_milestone: 25,
+  fatten_stage: 20,
   quest_complete: 100,
 };
 
@@ -205,6 +206,13 @@ export function addExperience(character, amount, source = "general", context = {
     levelUps.push(applyLevelUp(character, context));
   }
   return { character, levelUps, source, amount };
+}
+
+/** Award XP when the player fattens someone else (overworld or combat). */
+export function awardFatteningXp(player, stagesGained = 1, source = 'fatten_other') {
+  if (!player || stagesGained <= 0) return { levelUps: [], amount: 0 };
+  const amount = (XP_SOURCES.fatten_stage ?? 20) * stagesGained;
+  return addExperience(player, amount, source);
 }
 
 /** Award XP from combat results */

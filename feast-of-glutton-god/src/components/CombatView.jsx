@@ -13,6 +13,17 @@ import { renderGrowthScene } from "../textEngine/scenes/growthEvent/index.js";
 import { addBugNote, captureGameContext } from "../hooks/bugLog.js";
 import SpellSlotPips from "./SpellSlotPips.jsx";
 import DmBanner from "./DmBanner.jsx";
+import {
+  deriveSpellTargeting,
+  getSpellRangeTiles,
+  findUnitAtCell,
+  isUnitValidSpellTarget,
+  getUnitsInAoE,
+  resolveAutoTargets,
+  targetingNeedsInput,
+  getTargetingHint,
+  TARGET_KIND,
+} from "../gameData/spellTargeting.js";
 
 function findEnemyAt(combat, x, y) {
   return combat.enemies.find((e) => {
@@ -39,6 +50,9 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebu
   const [actionConfirm, setActionConfirm] = useState("");
   const [logOpen, setLogOpen] = useState(false);
   const [flashAction, setFlashAction] = useState(null);
+  const [showIntro, setShowIntro] = useState(Boolean(combat.introLine));
+  const [pendingSpell, setPendingSpell] = useState(null);
+  const [spellTargetIds, setSpellTargetIds] = useState([]);
 
   const selectedUnit = getActiveUnit(combat) || combat.allies[0];
   const turnSummary = getTurnSummary(combat);
@@ -52,6 +66,11 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebu
   const selectedEnemy = combat.enemies.find((e) => (e.combatId || e.id) === selectedEnemyId)
     ?? combat.enemies.find((e) => e.id === selectedEnemyId);
   const latestLog = combat.log.slice(-1)[0] || "";
+  const caster = activeUnit?.isPlayer ? activeUnit : player;
+  const spellTargeting = pendingSpell ? deriveSpellTargeting(pendingSpell) : null;
+  const spellRangeTiles = (mode === "spell" && pendingSpell && caster)
+    ? getSpellRangeTiles(combat, caster, spellTargeting)
+    : [];
 
   const reportCombat = (extra = {}) => {
     onDebugContext?.({
@@ -116,6 +135,67 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebu
     };
   };
 
+  const resetSpellMode = () => {
+    setPendingSpell(null);
+    setSpellTargetIds([]);
+    setMode("action");
+  };
+
+  const finishSpellCast = (c, spell, targets) => {
+    const active = c.allies.find((a) => a.isPlayer) || c.allies[0];
+    const primary = targets[0] || active;
+    castSpell(c, active, spell, primary, {
+      overflow: overflowCast && spell.overflow,
+      targets,
+    });
+    if (c.lastGrowth) {
+      const gt = renderGrowthScene(c.lastGrowth.unit, {
+        growthMethod: "blessing",
+        startStage: c.lastGrowth.startStage,
+        endStage: c.lastGrowth.endStage,
+        week: game.day,
+      });
+      setGrowthText(gt);
+      c.log.push(renderCombatNarration(c.lastGrowth.unit, "growth"));
+    }
+    flashSpend("action");
+    checkVictory(c);
+    resetSpellMode();
+    update(c, `Cast ${spell.name}.`);
+  };
+
+  const beginSpellCast = (spell) => {
+    if (!isPlayerTurn(combat) || showIntro) return;
+    const targeting = deriveSpellTargeting(spell);
+    if (!targetingNeedsInput(targeting)) {
+      const c = cloneCombat();
+      const active = c.allies.find((a) => a.isPlayer) || c.allies[0];
+      const targets = resolveAutoTargets(c, active, spell, targeting);
+      finishSpellCast(c, spell, targets.length ? targets : [active]);
+      return;
+    }
+    setPendingSpell(spell);
+    setMode("spell");
+    setSpellTargetIds([]);
+    setSelectedEnemyId(null);
+    setActionConfirm(getTargetingHint(spell, targeting));
+  };
+
+  const confirmSpellCast = () => {
+    if (!pendingSpell || !spellTargetIds.length) return;
+    const c = cloneCombat();
+    const targets = spellTargetIds
+      .map((id) => c.enemies.find((e) => (e.combatId || e.id) === id))
+      .filter(Boolean);
+    if (!targets.length) return;
+    finishSpellCast(c, pendingSpell, targets);
+  };
+
+  const cancelSpellCast = () => {
+    resetSpellMode();
+    setActionConfirm("");
+  };
+
   const confirmAttack = () => {
     if (!selectedEnemyId || !playerTurn) return;
     const c = cloneCombat();
@@ -132,9 +212,41 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebu
   };
 
   const handleCellClick = (x, y) => {
-    if (combat.victory || !isPlayerTurn(combat)) return;
+    if (showIntro || combat.victory || !isPlayerTurn(combat)) return;
     const c = cloneCombat();
     const active = getActiveUnit(c);
+
+    if (mode === "spell" && pendingSpell && caster) {
+      const targeting = deriveSpellTargeting(pendingSpell);
+      if (targeting.kind === TARGET_KIND.AOE_CENTER) {
+        const inRange = spellRangeTiles.some((t) => t.x === x && t.y === y);
+        if (!inRange) return;
+        const targets = getUnitsInAoE(c, x, y, targeting.radius ?? 2);
+        finishSpellCast(c, pendingSpell, targets);
+        return;
+      }
+      const hit = findUnitAtCell(c, x, y);
+      if (!hit) return;
+      if (targeting.kind === TARGET_KIND.MULTI_ENEMY) {
+        const id = hit.unit.combatId || hit.unit.id;
+        if (!isUnitValidSpellTarget(caster, hit.unit, hit.team, targeting)) return;
+        setSpellTargetIds((prev) => {
+          if (prev.includes(id)) return prev.filter((tid) => tid !== id);
+          if (prev.length >= (targeting.maxTargets ?? 3)) return prev;
+          const next = [...prev, id];
+          setActionConfirm(`Selected ${next.length} target(s) — press Cast.`);
+          return next;
+        });
+        if (hit.team === "enemy") setSelectedEnemyId(hit.unit.combatId || hit.unit.id);
+        return;
+      }
+      if (!isUnitValidSpellTarget(caster, hit.unit, hit.team, targeting)) {
+        setActionConfirm("That target is out of range.");
+        return;
+      }
+      finishSpellCast(c, pendingSpell, [hit.unit]);
+      return;
+    }
 
     if (mode === "move" && active) {
       const can = reachable.find((t) => t.x === x && t.y === y);
@@ -149,7 +261,7 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebu
 
     const target = findEnemyAt(c, x, y);
     if (!target) {
-      setSelectedEnemyId(null);
+      if (mode !== "attack") setSelectedEnemyId(null);
       return;
     }
 
@@ -175,28 +287,7 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebu
     }
   };
 
-  const cast = (spell) => {
-    if (!isPlayerTurn(combat)) return;
-    const c = cloneCombat();
-    const caster = c.allies.find((a) => a.isPlayer) || c.allies[0];
-    const target = selectedEnemy && selectedEnemy.hp > 0 && !selectedEnemy.converted
-      ? selectedEnemy
-      : c.enemies.find((e) => e.hp > 0 && !e.converted) || c.allies[1];
-    castSpell(c, caster, spell, target, { overflow: overflowCast && spell.overflow });
-    if (c.lastGrowth) {
-      const gt = renderGrowthScene(c.lastGrowth.unit, {
-        growthMethod: "blessing",
-        startStage: c.lastGrowth.startStage,
-        endStage: c.lastGrowth.endStage,
-        week: game.day,
-      });
-      setGrowthText(gt);
-      c.log.push(renderCombatNarration(c.lastGrowth.unit, "growth"));
-    }
-    flashSpend("action");
-    checkVictory(c);
-    update(c, `Cast ${spell.name}.`);
-  };
+  const cast = beginSpellCast;
 
   const doBonus = (actionId) => {
     if (!isPlayerTurn(combat)) return;
@@ -226,6 +317,7 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebu
     setMode("move");
     setSelectedEnemyId(null);
     setActionConfirm("");
+    resetSpellMode();
     update(c);
   };
 
@@ -251,11 +343,13 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebu
       if (x >= e.x && x < e.x + s && y >= e.y && y < e.y + s) {
         cls += " enemy";
         if ((e.combatId || e.id) === selectedEnemyId) cls += " selected";
+        if (spellTargetIds.includes(e.combatId || e.id)) cls += " spell-target";
         label = "E";
         hpPct = e.maxHp ? Math.round((e.hp / e.maxHp) * 100) : 100;
       }
     }
     if (reachable.find((t) => t.x === x && t.y === y)) cls += " move";
+    if (spellRangeTiles.some((t) => t.x === x && t.y === y)) cls += " spell-range";
     return (
       <div key={`${x}-${y}`} className={cls} onClick={() => handleCellClick(x, y)}>
         {label}
@@ -275,6 +369,18 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebu
 
   return (
     <div className="app combat-view">
+      {showIntro && combat.introLine && (
+        <div className="combat-intro-overlay">
+          <div className="panel panel--narration combat-intro">
+            <h2>Encounter</h2>
+            <p className="prose">{combat.introLine}</p>
+            <button type="button" className="primary" onClick={() => setShowIntro(false)}>
+              Engage!
+            </button>
+          </div>
+        </div>
+      )}
+
       <div className="header">
         <h1>Round {turnSummary?.round ?? combat.turn} — {turnSummary?.active ?? "…"}</h1>
         <p className="subtitle">
@@ -363,7 +469,12 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebu
           {spells.map((s) => {
             const canCast = s.slotLevel === 0 || hasSpellSlot(player, s.slotLevel) || (s.apCost && player.ap >= s.apCost);
             return (
-              <button key={s.id} onClick={() => cast(s)} disabled={!isPlayerTurn(combat) || !canCast}>
+              <button
+                key={s.id}
+                className={pendingSpell?.id === s.id ? "primary" : ""}
+                onClick={() => cast(s)}
+                disabled={!isPlayerTurn(combat) || !canCast || showIntro}
+              >
                 {s.name} {s.slotLevel ? `(L${s.slotLevel})` : "(cantrip)"}
                 {s.apCost ? ` / ${s.apCost} AP` : ""}
               </button>
@@ -377,17 +488,25 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebu
       <div className="combat-action-bar">
         {actionConfirm && <p className="combat-action-bar__confirm">{actionConfirm}</p>}
         <div className="combat-action-bar__buttons">
-          <button onClick={() => { setMode("move"); setActionConfirm(""); }} disabled={!isPlayerTurn(combat)}>Move</button>
+          {pendingSpell && spellTargeting?.kind === TARGET_KIND.MULTI_ENEMY && (
+            <>
+              <button className="primary" onClick={confirmSpellCast} disabled={!spellTargetIds.length}>
+                Cast {pendingSpell.name}
+              </button>
+              <button onClick={cancelSpellCast}>Cancel</button>
+            </>
+          )}
+          <button onClick={() => { setMode("move"); setActionConfirm(""); cancelSpellCast(); }} disabled={!isPlayerTurn(combat) || showIntro}>Move</button>
           <button
             onClick={() => {
               if (mode === "attack" && selectedEnemy) confirmAttack();
               else { setMode("attack"); setActionConfirm("Tap an enemy, then Attack again."); }
             }}
-            disabled={!isPlayerTurn(combat) || !turnSummary?.action}
+            disabled={!isPlayerTurn(combat) || !turnSummary?.action || showIntro}
           >
             Attack
           </button>
-          <button onClick={() => { setMode("feed"); setActionConfirm("Tap an enemy to feed."); }} disabled={!isPlayerTurn(combat)}>Feed</button>
+          <button onClick={() => { setMode("feed"); cancelSpellCast(); setActionConfirm("Tap an enemy to feed."); }} disabled={!isPlayerTurn(combat) || showIntro}>Feed</button>
           {bonusActions.map((ba) => (
             <button key={ba.id} onClick={() => doBonus(ba.id)} disabled={!isPlayerTurn(combat) || !turnSummary?.bonus}>
               {ba.label}

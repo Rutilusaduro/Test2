@@ -19,6 +19,9 @@ import {
 } from "./combatRolls.js";
 import { resolveCastCost, getSpellPowerMultiplier } from "./spellSlots.js";
 import { getSpellForCast } from "./spells.js";
+import { awardFatteningXp } from "./leveling.js";
+import { getRegion } from "./regions.js";
+import { renderCombatEncounterIntro } from "../textEngine/scenes/combat/encounter.js";
 
 const GRID_SIZE = 10;
 
@@ -36,6 +39,7 @@ export function createCombatState(player, party, enemyTypeId, regionId) {
   const count = enemyTypeId === "famine_hag" ? 1 : 1 + Math.floor(Math.random() * 2);
   for (let i = 0; i < count; i++) {
     const e = enemyTypeId ? createEnemy(enemyTypeId) : createEnemy("harvest_harpy");
+    e.typeId = enemyTypeId || e.id;
     e.x = GRID_SIZE - 2 - i * 2;
     e.y = 2 + i * 2;
     enemies.push(e);
@@ -53,6 +57,13 @@ export function createCombatState(player, party, enemyTypeId, regionId) {
   const log = ["Combat begins! Abundance fills the air."];
   if (turnState.log?.length) log.push(...turnState.log);
 
+  const region = getRegion(regionId);
+  const introLine = renderCombatEncounterIntro(
+    { player, region },
+    preparedEnemies,
+    { regionId, regionName: region?.name },
+  );
+
   const combat = {
     gridSize: GRID_SIZE,
     turn: turnState.round,
@@ -64,6 +75,8 @@ export function createCombatState(player, party, enemyTypeId, regionId) {
     regionId,
     log,
     lastGrowth: null,
+    introLine,
+    enemyTypeId: enemyTypeId || preparedEnemies[0]?.typeId,
   };
 
   return skipToPlayerTurn(combat);
@@ -220,6 +233,16 @@ export function attackUnit(combat, attacker, target) {
   return combat;
 }
 
+function maybeAwardFatteningXp(combat, caster, target, growth) {
+  if (!caster?.isPlayer || !growth?.stagesJumped || growth.stagesJumped <= 0) return;
+  if (!target || target.isPlayer || target === caster) return;
+  const { levelUps } = awardFatteningXp(caster, growth.stagesJumped, 'combat_fatten');
+  if (levelUps?.length) {
+    combat.fattenLevelUps = [...(combat.fattenLevelUps || []), ...levelUps];
+    caster.grewThisCombat = true;
+  }
+}
+
 export function applyGrowth(unit, stages = 1) {
   const result = advanceStageUniversal(unit, stages);
   const endStage = getStage(unit.lbs).id;
@@ -251,6 +274,7 @@ export function useBonusAction(combat, unit, actionId, target = null) {
     addCorruption(target, 5);
     combat.lastGrowth = { unit: target, ...growth };
     onUnitGrew(combat.turnState, target, growth);
+    maybeAwardFatteningXp(combat, unit, target, growth);
     combat.log.push(`${unit.name} body-slams ${target.name} with ${getStage(unit.lbs).label} mass!`);
   } else if (actionId === "crushing_aura") {
     for (const e of combat.enemies.filter((en) => en.hp > 0 && !en.converted)) {
@@ -276,6 +300,7 @@ export function feedTarget(combat, feeder, target, amount = 1) {
   const growth = applyGrowth(target, amount);
   target.hunger = Math.min(100, (target.hunger || 0) + 25 * amount);
   addCorruption(target, 5 * amount);
+  maybeAwardFatteningXp(combat, feeder, target, growth);
   combat.log.push(`${feeder.name} feeds ${target.name} — she swells with pleasure!`);
   combat.lastGrowth = { unit: target, ...growth };
   if (entry) {
@@ -314,7 +339,9 @@ export function castSpell(combat, caster, spell, target, opts = {}) {
   }
   if (eff.growth) {
     let targets;
-    if (eff.party && eff.aoe) {
+    if (opts.targets?.length) {
+      targets = opts.targets;
+    } else if (eff.party && eff.aoe) {
       targets = combat.allies.filter((a) => a.hp > 0);
     } else if (eff.aoe) {
       targets = [...combat.enemies, ...combat.allies].filter((t) => t?.hp > 0);
@@ -326,6 +353,7 @@ export function castSpell(combat, caster, spell, target, opts = {}) {
       addCorruption(t, 3 * scale(eff.growth));
       combat.lastGrowth = { unit: t, ...g };
       onUnitGrew(combat.turnState, t, g);
+      maybeAwardFatteningXp(combat, caster, t, g);
     }
     const label = eff.party ? 'your allies' : eff.aoe ? 'the battlefield' : target?.name;
     combat.log.push(`${castSpellData.name} swells ${label} with golden abundance!`);

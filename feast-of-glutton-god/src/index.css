@@ -156,7 +156,33 @@ button.primary:hover:not(:disabled) {
 .combat-cell.enemy { background: #301a20; }
 .combat-cell.feast { background: #302a10; }
 .combat-cell.move { background: #1a2838; outline: 2px solid var(--gold); }
+.combat-cell.spell-range {
+  box-shadow: inset 0 0 0 2px rgba(240, 201, 110, 0.45);
+  background: rgba(212, 168, 75, 0.08);
+}
+.combat-cell.spell-target { outline: 2px solid var(--gold-bright); }
 .combat-cell.selected { outline: 2px solid var(--rose); }
+
+.combat-intro-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  background: rgba(0, 0, 0, 0.82);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.combat-intro {
+  max-width: 520px;
+  width: 100%;
+}
+
+.combat-intro .primary {
+  margin-top: 1rem;
+  width: 100%;
+}
 
 .log {
   max-height: 200px;

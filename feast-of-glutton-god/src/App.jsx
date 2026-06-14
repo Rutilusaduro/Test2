@@ -154,6 +154,9 @@ export default function App() {
       next = addAbundancePoints(next, rewards.ap);
       const { levelUps } = awardCombatXp(next.player, combat);
       applyLevelUpResults(next, levelUps);
+      if (combat.fattenLevelUps?.length) {
+        applyLevelUpResults(next, combat.fattenLevelUps);
+      }
       const quest = recordCombatEndForQuests(next, combat);
       if (quest.questMessages) {
         narrateEvent(next, quest.questMessages, 'quest');

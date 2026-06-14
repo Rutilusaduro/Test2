@@ -30,6 +30,8 @@ import { awardRegionTransformation } from '../gameData/worldTransformation.js';
 import { appendPuzzleHintToTalk } from '../gameData/puzzleHints.js';
 import { getReactivityGlobals } from '../gameData/worldReactivity.js';
 import { syncGateUnlocks } from '../gameData/regionObstacles.js';
+import { getQuestOffersForNpc, buildQuestOfferNarrative, acceptQuestFromNpc } from '../gameData/questOffers.js';
+import { awardFatteningXp } from '../gameData/leveling.js';
 
 function withQuestProgress(game, npc, interaction, meta, result) {
   const quest = recordNpcInteractionForQuests(game, {
@@ -114,11 +116,16 @@ function growNpc(npc, game, baseStages, method = 'feed') {
   const startStage = getStage(npc.lbs).id;
   const presentation = applyGrowthWithPresentation(npc, game, stages, { growthMethod: method, raisedBy: 'player' });
   const gateMsgs = syncGateUnlocks(game, { regionId: game.region });
+  let fattenXp = null;
+  if (game?.player && presentation.stagesJumped > 0) {
+    fattenXp = awardFatteningXp(game.player, presentation.stagesJumped, method);
+  }
   return {
     ...presentation,
     startStage: presentation.startStage ?? startStage,
     bonusStages: bonus,
     gateMsgs,
+    fattenXp,
   };
 }
 

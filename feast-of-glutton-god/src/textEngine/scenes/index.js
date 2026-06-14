@@ -13,6 +13,7 @@ import './world/transformation.js';
 import './world/landmarkReactions.js';
 import './puzzles/index.js';
 import './combatText.js';
+import './combat/encounter.js';
 import './checks/index.js';
 import './growthEvent/index.js';
 import './growth/index.js';

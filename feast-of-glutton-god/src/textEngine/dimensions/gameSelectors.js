@@ -6,5 +6,5 @@ registerSelectors(
   'growthType', 'growthPerspective',
   'questId', 'questType', 'questTitle', 'endingId', 'stageId',
   'reactionType', 'landmarkRole', 'band', 'rumorWhat', 'hasRumor', 'rumorWho',
-  'firstVisit', 'dmKind', 'hintKind', 'regionTransformLevel',
+  'firstVisit', 'dmKind', 'hintKind', 'regionTransformLevel', 'enemyId', 'enemyCount', 'enemyPlural',
 );
