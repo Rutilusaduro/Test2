@@ -104,8 +104,32 @@ export function createNewGame(name, classId, options = {}) {
       titles: [],
     },
     lastQuestMessage: null,
+    dm: {
+      sceneLine: null,
+      eventLine: null,
+      idleSince: 1,
+      lastKind: null,
+      actionCount: 0,
+      visitedRegions: { harvest_hearth: true },
+      lastHintDay: null,
+    },
   };
   return ensurePartyUniversalSize(game);
+}
+
+export function ensureDmState(game) {
+  if (!game.dm) {
+    game.dm = {
+      sceneLine: null,
+      eventLine: null,
+      idleSince: game.day ?? 1,
+      lastKind: null,
+      actionCount: 0,
+      visitedRegions: game.region ? { [game.region]: true } : {},
+      lastHintDay: null,
+    };
+  }
+  return game.dm;
 }
 
 export function syncPlayerFromCombat(game, combat) {

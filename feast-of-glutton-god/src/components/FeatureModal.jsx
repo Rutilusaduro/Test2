@@ -12,6 +12,7 @@ import {
 } from '../hooks/puzzleHooks.js';
 import { getPuzzleCapabilities } from '../gameData/stagePerks.js';
 import { getCombinedPuzzleBonuses } from '../gameData/worldAuras.js';
+import { narrateEvent } from '../gameData/narrator.js';
 import SkillCheckRoll from './SkillCheckRoll.jsx';
 
 export default function FeatureModal({
@@ -39,7 +40,10 @@ export default function FeatureModal({
     setExamined(true);
     const quest = recordFeatureExaminedForQuests(game, { featureId: feature.id });
     if (quest.questMessages) {
-      onGameUpdate?.((g) => ({ ...g, lastQuestMessage: quest.questMessages }));
+      onGameUpdate?.((g) => {
+        narrateEvent(g, quest.questMessages, 'quest');
+        return g;
+      });
     }
     onDebugContext?.({ feature, region: game.region, interaction: 'feature_examine' });
   };
@@ -50,10 +54,10 @@ export default function FeatureModal({
         puzzleId: result.puzzleId,
         solutionId: result.solutionId,
       });
-      onGameUpdate?.((g) => ({
-        ...g,
-        lastQuestMessage: quest.questMessages || g.lastQuestMessage,
-      }));
+      onGameUpdate?.((g) => {
+        if (quest.questMessages) narrateEvent(g, quest.questMessages, 'quest');
+        return g;
+      });
     }
     setText(result.text || '');
     onDebugContext?.({

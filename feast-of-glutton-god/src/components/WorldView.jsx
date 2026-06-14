@@ -7,6 +7,8 @@ import { getInfluenceProgress } from "../gameData/influence.js";
 import { spendAP } from "../gameData/player.js";
 import { getNpcsInRegion } from "../gameData/npcs.js";
 import { getNpcState, applyNpcState } from "../gameData/player.js";
+import { clearTransient, narrate, narrateEvent, tickDmAction } from "../gameData/narrator.js";
+import { renderUnmetDescriptor } from "../textEngine/scenes/npc/unmet.js";
 import { getStage, isAtSizeCap } from "../gameData/stages.js";
 import { getTier } from "../gameData/relationships.js";
 import { getCorruptionTier } from "../gameData/corruption.js";
@@ -23,6 +25,19 @@ import FeatureModal from "./FeatureModal.jsx";
 import QuestLog from "./QuestLog.jsx";
 import SpellbookPanel from "./SpellbookPanel.jsx";
 import CharacterSheet from "./CharacterSheet.jsx";
+import DmBanner from "./DmBanner.jsx";
+
+const ARCHETYPE_GLYPH = {
+  nurturing: "♥",
+  performer: "♪",
+  competitive: "⚒",
+  devout: "✦",
+  scholar: "📜",
+  dominant: "☽",
+  haughty: "♛",
+  merchant: "◎",
+  chosen: "★",
+};
 
 export default function WorldView({ game, onUpdate, onEncounter, onPuzzleCombat, onSave, onDebugContext }) {
   const [npcModal, setNpcModal] = useState(null);
@@ -47,7 +62,7 @@ export default function WorldView({ game, onUpdate, onEncounter, onPuzzleCombat,
     const gateMsgs = syncGateUnlocks(g, { regionId: g.region });
     const lines = [...(settled.lines ?? []), ...gateMsgs];
     if (lines.length) {
-      return { ...g, lastQuestMessage: lines.join('\n\n') };
+      narrateEvent(g, lines.join('\n\n'), 'growth');
     }
     return g;
   };
@@ -55,28 +70,34 @@ export default function WorldView({ game, onUpdate, onEncounter, onPuzzleCombat,
   const travel = (regionId) => {
     const method = resolveTravelMethod(game, regionId);
     if (!method.ok) {
-      onUpdate((g) => ({ ...g, lastQuestMessage: method.message }));
+      onUpdate((g) => {
+        clearTransient(g);
+        narrateEvent(g, method.message, 'quest');
+        return g;
+      });
       return;
     }
     onUpdate((g) => {
+      clearTransient(g);
       if (method.apCost) spendAP(g, method.apCost);
       const next = applySettling({ ...g, region: regionId });
-      if (method.flavor) next.lastQuestMessage = method.flavor;
+      narrate(next, 'arrival', { regionId });
+      if (method.flavor) narrateEvent(next, method.flavor, 'quest');
       const quest = recordRegionVisitForQuests(next, regionId);
       if (quest.questMessages) {
-        next.lastQuestMessage = next.lastQuestMessage
-          ? `${next.lastQuestMessage}\n\n${quest.questMessages}`
-          : quest.questMessages;
+        narrateEvent(next, quest.questMessages, 'quest');
       }
+      tickDmAction(next, 'travel');
       return next;
     });
   };
 
   useEffect(() => {
     onUpdate((g) => {
+      narrate(g, 'arrival', { regionId: g.region });
       const quest = recordRegionVisitForQuests(g, g.region);
       if (quest.questMessages) {
-        return { ...g, lastQuestMessage: quest.questMessages };
+        narrateEvent(g, quest.questMessages, 'quest');
       }
       return g;
     });
@@ -84,9 +105,21 @@ export default function WorldView({ game, onUpdate, onEncounter, onPuzzleCombat,
   }, []);
 
   const openNpc = (npc) => {
-    const state = getNpcState(game, npc);
+    onUpdate((g) => {
+      applyNpcState(g, npc.id, { met: true });
+      tickDmAction(g, 'npc');
+      return g;
+    });
+    const state = getNpcState(game, { ...npc, met: true });
     setNpcModal(state);
     onDebugContext?.({ npc: state, region: game.region, interaction: "npc_open" });
+  };
+
+  const dismissDmEvent = () => {
+    onUpdate((g) => {
+      clearTransient(g);
+      return g;
+    });
   };
 
   const handleNpcUpdate = (npc) => {
@@ -108,8 +141,28 @@ export default function WorldView({ game, onUpdate, onEncounter, onPuzzleCombat,
   const features = getVisibleFeatures(game, game.region);
 
   const openFeature = (feature) => {
+    onUpdate((g) => {
+      tickDmAction(g, 'feature');
+      return g;
+    });
     setFeatureModal(feature);
     onDebugContext?.({ feature, region: game.region, interaction: "feature_open" });
+  };
+
+  const closeNpcModal = () => {
+    setNpcModal(null);
+    onUpdate((g) => {
+      clearTransient(g);
+      return g;
+    });
+  };
+
+  const closeFeatureModal = () => {
+    setFeatureModal(null);
+    onUpdate((g) => {
+      clearTransient(g);
+      return g;
+    });
   };
 
   return (
@@ -151,19 +204,9 @@ export default function WorldView({ game, onUpdate, onEncounter, onPuzzleCombat,
         </div>
       )}
 
-      {game.lastLevelUpMessage && (
-        <div className="panel prose" style={{ borderColor: "var(--gold)" }}>
-          {game.lastLevelUpMessage}
-        </div>
-      )}
+      <DmBanner game={game} onDismissEvent={dismissDmEvent} />
 
-      {game.lastQuestMessage && (
-        <div className="panel prose" style={{ borderColor: "var(--rose)", fontSize: "0.9rem" }}>
-          {game.lastQuestMessage}
-        </div>
-      )}
-
-      <div className="panel">
+      <div className="panel panel--narration">
         <h2>{regionPresent.name}</h2>
         <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)', marginBottom: '0.35rem' }}>
           Regional transformation: <strong>{regionTransform.level.label}</strong>
@@ -205,7 +248,7 @@ export default function WorldView({ game, onUpdate, onEncounter, onPuzzleCombat,
         </div>
       )}
 
-      <div className="panel">
+      <div className="panel panel--actions">
         <h2>Travel</h2>
         <div className="btn-grid">
           {getTravelOptions(game, game.region).map((opt) => (
@@ -232,7 +275,7 @@ export default function WorldView({ game, onUpdate, onEncounter, onPuzzleCombat,
       </div>
 
       {features.length > 0 && (
-        <div className="panel">
+        <div className="panel panel--actions">
           <h2>Places & Mysteries</h2>
           <p className="prose" style={{ fontSize: "0.85rem", marginBottom: "0.75rem" }}>
             Obstacles and wonders await clever abundance — grow, cast, bond, or skill your way through.
@@ -258,27 +301,48 @@ export default function WorldView({ game, onUpdate, onEncounter, onPuzzleCombat,
         onCastResult={(npc) => handleNpcUpdate(npc)}
         onFeatureCast={(result) => {
           if (result.puzzleSolve?.solved) {
-            onUpdate((g) => ({ ...g, lastQuestMessage: result.questMessages || g.lastQuestMessage }));
+            onUpdate((g) => {
+              if (result.questMessages) narrateEvent(g, result.questMessages, 'quest');
+              tickDmAction(g, 'spell');
+              return g;
+            });
           }
         }}
+        onClose={() => onUpdate((g) => { clearTransient(g); return g; })}
       />
 
-      <div className="panel">
+      <div className="panel panel--people">
         <h2>People Here</h2>
         {npcs.length === 0 ? (
           <p className="prose">The paths are quiet — only wind and the smell of baking bread.</p>
         ) : (
-          <div className="btn-grid">
+          <div className="btn-grid npc-grid">
             {npcs.map((npc) => {
+              const met = Boolean(npc.met);
               const ns = getStage(npc.lbs);
               const rel = getTier(npc.relationship || 0);
+              const glyph = ARCHETYPE_GLYPH[npc.archetype] || "◆";
               return (
-                <button key={npc.id} onClick={() => openNpc(npc)}>
-                  {npc.name}
-                  {npc.isCompanion && ' ★'}
-                  <div style={{ fontSize: "0.8rem", color: "var(--text-dim)" }}>
-                    {ns.label} · {rel.label}
-                  </div>
+                <button key={npc.id} className={`npc-card${met ? '' : ' npc-card--unmet'}`} onClick={() => openNpc(npc)}>
+                  <span className="npc-card__glyph">{glyph}</span>
+                  <span className="npc-card__body">
+                    {met ? (
+                      <>
+                        <strong>{npc.name}</strong>
+                        {npc.isCompanion && ' ★'}
+                        <div className="npc-card__meta">
+                          {ns.label}{rel.id > 0 ? ` · ${rel.label}` : ''}
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <span className="npc-card__unmet-label">Stranger</span>
+                        <div className="npc-card__meta npc-card__meta--unmet">
+                          {renderUnmetDescriptor(npc, player)}
+                        </div>
+                      </>
+                    )}
+                  </span>
                 </button>
               );
             })}
@@ -288,7 +352,7 @@ export default function WorldView({ game, onUpdate, onEncounter, onPuzzleCombat,
 
       <QuestLog game={game} regionId={game.region} onUpdate={onUpdate} />
 
-      <div className="panel">
+      <div className="panel panel--actions">
         <h2>Actions</h2>
         <div className="btn-grid">
           <button onClick={() => setShowSheet(true)}>Character Sheet</button>
@@ -323,7 +387,7 @@ export default function WorldView({ game, onUpdate, onEncounter, onPuzzleCombat,
         <FeatureModal
           feature={featureModal}
           game={game}
-          onClose={() => setFeatureModal(null)}
+          onClose={closeFeatureModal}
           onGameUpdate={onUpdate}
           onDebugContext={onDebugContext}
           onStartPuzzleCombat={(pending) => {
@@ -338,7 +402,7 @@ export default function WorldView({ game, onUpdate, onEncounter, onPuzzleCombat,
           npc={npcModal}
           player={player}
           game={game}
-          onClose={() => setNpcModal(null)}
+          onClose={closeNpcModal}
           onUpdate={handleNpcUpdate}
           onGameRefresh={() => onUpdate((g) => ({ ...g }))}
           onDebugContext={onDebugContext}

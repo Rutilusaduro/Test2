@@ -22,6 +22,9 @@ export default function NpcModal({ npc, player, game, onClose, onUpdate, onGameR
   const relProgress = getRelationshipProgress(npc.relationship || 0);
   const cor = getCorruptionTier(npc.corruption || 0);
   const menu = getInteractionMenu(npc, player);
+  const tierZero = new Set(['talk', 'observe', 'feed']);
+  const visibleMenu = menu.filter((item) => item.enabled || tierZero.has(item.id));
+  const isFirstMeeting = (npc.relationship || 0) === 0;
 
   const finishApply = (result, interaction) => {
     if (result.npc) onUpdate(result.npc);
@@ -128,7 +131,11 @@ export default function NpcModal({ npc, player, game, onClose, onUpdate, onGameR
         <h2>{npc.name}</h2>
         <div className="stats-bar">
           <span className="stat">{stage.label} ({Math.round(npc.lbs)} lbs)</span>
-          <span className="stat" title={rel.desc}>{rel.label}</span>
+          {isFirstMeeting ? (
+            <span className="stat" title="You haven't spoken yet">First meeting</span>
+          ) : (
+            <span className="stat" title={rel.desc}>{rel.label}</span>
+          )}
           <span className="stat">{cor.label}</span>
           {npc.bondFlags?.devoted && <span className="stat" style={{ color: "var(--gold-bright)" }}>★ Devoted</span>}
           {npc.role && <span className="stat">{npc.role}</span>}
@@ -200,7 +207,7 @@ export default function NpcModal({ npc, player, game, onClose, onUpdate, onGameR
 
         {!submenu && !activeCheck && (
           <div className="modal-actions">
-            {menu.map((item) => (
+            {visibleMenu.map((item) => (
               <button
                 key={item.id}
                 disabled={!item.enabled}
@@ -208,9 +215,11 @@ export default function NpcModal({ npc, player, game, onClose, onUpdate, onGameR
                 onClick={() => handleAction(item.id)}
               >
                 {item.label}
-                {!item.enabled && item.hint ? ` (${item.hint})` : ""}
               </button>
             ))}
+            {visibleMenu.length < menu.length && (
+              <p className="modal-footer-hint">Closer bonds will open more.</p>
+            )}
             <button onClick={onClose}>Leave</button>
             <button onClick={quickLogBug} style={{ background: "rgba(139,90,16,0.5)" }}>Log bug</button>
           </div>
