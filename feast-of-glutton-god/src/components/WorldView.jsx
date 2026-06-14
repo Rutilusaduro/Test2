@@ -27,12 +27,12 @@ export default function WorldView({ game, onUpdate, onEncounter, onPuzzleCombat,
   const [featureModal, setFeatureModal] = useState(null);
   const [showSheet, setShowSheet] = useState(false);
   const [showInfluence, setShowInfluence] = useState(false);
+  const player = game.player;
   const regionPresent = getRegionPresentation(game, game.region);
   const regionTransform = getRegionTransformation(game, game.region);
   const commandMode = getCommandMode(game);
   const stageMech = getStageMechanics(player);
   const influence = getInfluenceProgress(game);
-  const player = game.player;
   const stage = getStage(player.lbs);
   const xp = getXpProgress(player);
   const derived = getPlayerDerivedStats(player);

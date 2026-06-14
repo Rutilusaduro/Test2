@@ -55,6 +55,9 @@ export default function App() {
   const startNewGame = useCallback((name, classId, options = {}) => {
     const g = createNewGame(name, classId, options);
     ensurePartyUniversalSize(g);
+    ensureQuestState(g);
+    ensureInfluenceState(g);
+    ensureTransformationState(g);
     setGame(g);
     setScreen("world");
   }, []);
