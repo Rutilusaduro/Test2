@@ -9,6 +9,7 @@
  * Cha: Bard/Warlock casting, social, conversion
  */
 import { getStage } from "./stages.js";
+import { getRaceSizeStatModifiers } from "./raceFeatures.js";
 import {
   resolveAbilityCheck,
   resolveSavingThrow as resolveSave,
@@ -50,8 +51,9 @@ export function getEffectiveStat(character, statKey) {
   const base = character.stats?.[statKey] ?? 10;
   const stageId = getStage(character.lbs).id;
   const sizeMod = getSizeStatModifiers(stageId)[statKey] ?? 0;
+  const raceMod = getRaceSizeStatModifiers(character, stageId)[statKey] ?? 0;
   const temp = character.tempStatMods?.[statKey] ?? 0;
-  return base + sizeMod + temp;
+  return base + sizeMod + raceMod + temp;
 }
 
 export function getEffectiveStatMod(character, statKey) {

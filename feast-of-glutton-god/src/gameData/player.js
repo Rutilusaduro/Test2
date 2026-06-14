@@ -1,28 +1,49 @@
 import { getClass } from "./classes.js";
 import { getStage } from "./stages.js";
-import { getSpellsForClass } from "./spells.js";
+import { getSpellsForBuild } from "./spells.js";
 import { createCompanionData, COMPANIONS } from "./companions.js";
 import { initSpellSlots } from "./spellSlots.js";
-import { getMaxAbundancePoints, hpPerLevel, getArmorClass } from "./stats.js";
+import { getMaxAbundancePoints, getArmorClass } from "./stats.js";
 import { getSizeCapForLevel } from "./leveling.js";
 import { CLASS_SKILL_PROFICIENCIES } from "./skills.js";
+import { applyRaceStatBonuses, getRace } from "./races.js";
+import { getSubclass, getDefaultSubclassId } from "./subclasses.js";
+import { getStartLbsWithRace } from "./raceFeatures.js";
 
-export function createPlayer(name, classId) {
+/**
+ * @param {string} name
+ * @param {string} classId
+ * @param {{ raceId?: string, subclassId?: string, humanStatPicks?: string[] }} [options]
+ */
+export function createPlayer(name, classId, options = {}) {
   const cls = getClass(classId);
-  const stats = { ...cls.stats };
+  const raceId = options.raceId || 'human';
+  const race = getRace(raceId);
+  const subclassId = options.subclassId || getDefaultSubclassId(classId);
+  const subclass = getSubclass(subclassId);
+
+  const humanPicks = options.humanStatPicks || [cls.primaryStat, 'con'];
+  const stats = applyRaceStatBonuses({ ...cls.stats }, raceId, {
+    humanStatPicks: humanPicks,
+  });
+
   const level = 1;
   const maxHp = (cls.hitDie || 8) + Math.floor((stats.con - 10) / 2) + 10;
+  const startLbs = getStartLbsWithRace(cls.startLbs, raceId);
 
   const player = {
     id: "player",
     name: name || "Chosen of Gorgara",
     classId: cls.id,
     className: cls.name,
-    subclass: cls.subclass,
-    lbs: cls.startLbs,
+    subclassId,
+    subclass: subclass?.name || 'Unknown',
+    raceId,
+    raceName: race.name,
+    lbs: startLbs,
     corruption: 10,
     relationship: 0,
-    bodyType: "hourglass",
+    bodyType: race.bodyType || "hourglass",
     archetype: "chosen",
     hp: maxHp,
     maxHp,
@@ -36,8 +57,12 @@ export function createPlayer(name, classId) {
     gender: "she",
     pronouns: "she",
     storyFlags: {},
-    spells: getSpellsForClass(cls.id),
+    raceFeatures: race.features?.map((f) => f.id) || [],
+    subclassFeatures: subclass?.features || [],
+    spells: getSpellsForBuild(cls.id, subclassId),
     levelUpsPending: [],
+    tempFlags: {},
+    restFlags: { hungerForMoreUsed: false },
   };
 
   initSpellSlots(player);
@@ -45,8 +70,8 @@ export function createPlayer(name, classId) {
   return player;
 }
 
-export function createNewGame(name, classId) {
-  const player = createPlayer(name, classId);
+export function createNewGame(name, classId, options = {}) {
+  const player = createPlayer(name, classId, options);
   const elara = createCompanionData(COMPANIONS.find((c) => c.id === "elara"));
   return {
     player,
