@@ -1,7 +1,7 @@
 /**
  * Overworld spell casting — cast known spells on nearby NPCs and environment features.
  */
-import { getSpell, getSpellForCast, spellHasEnvironmentUse } from './spells.js';
+import { getSpell, getSpellForCast, spellHasEnvironmentUse, getSpellEnvironmentTags } from './spells.js';
 import { hasSpellSlot, spendSpellSlot } from './spellSlots.js';
 import { spendAP } from './player.js';
 import { addCorruption } from './corruption.js';
@@ -19,6 +19,8 @@ import {
 } from './puzzleEngine.js';
 import { renderPuzzleText } from '../textEngine/scenes/puzzles/index.js';
 import { getCombinedPuzzleBonuses } from './worldAuras.js';
+import { CONNECTION_GATES, syncGateUnlocks } from './regionObstacles.js';
+import { tryClearObstacle } from './obstacleUnlocks.js';
 
 export function getOverworldCastableSpells(player) {
   return getPreparedSpells(player).filter((spell) => {
@@ -169,6 +171,8 @@ export function castSpellOnFeature(game, featureId, spellId, opts = {}) {
     ? trySpellSolveFeature(game, featureId, spellId, { overflow: opts.overflow })
     : null;
 
+  const gateMessages = tryUnlockGatesWithSpell(game, spellId, { overflow: opts.overflow });
+
   const envProse = renderPuzzleText('puzzle.spell_cast.environment', game, {
     globals: {
       spellName: cost.spell.name,
@@ -187,6 +191,9 @@ export function castSpellOnFeature(game, featureId, spellId, opts = {}) {
   } else if (!puzzleSolutions.length) {
     text += '\n\nYour magic washes over the place — abundance lingers sweetly, though another approach may still be needed.';
   }
+  if (gateMessages.length) {
+    text += `\n\n${gateMessages.join('\n\n')}`;
+  }
 
   return {
     ok: true,
@@ -195,5 +202,31 @@ export function castSpellOnFeature(game, featureId, spellId, opts = {}) {
     puzzleSolve,
     spread,
     spell: cost.spell,
+    gateUnlocked: gateMessages.length > 0,
   };
+}
+
+/** Try environment-tagged spells against travel gates in the current region. */
+export function tryUnlockGatesWithSpell(game, spellId, opts = {}) {
+  const spell = getSpell(spellId);
+  if (!spell) return [];
+  const tags = getSpellEnvironmentTags(spell);
+  if (!tags.length && !spellHasEnvironmentUse(spell)) return [];
+
+  const messages = [];
+  for (const gate of CONNECTION_GATES) {
+    if (gate.from !== game.region) continue;
+    const match = (gate.unlocks ?? []).some((u) => {
+      const method = typeof u === 'string' ? u : u.method;
+      if (method !== 'cast_spell') return false;
+      const need = u.tags ?? [];
+      return need.some((t) => tags.includes(t));
+    });
+    if (!match) continue;
+    const result = tryClearObstacle(game, gate, { spellId, regionId: game.region, overflow: opts.overflow });
+    if (result?.message) messages.push(result.message);
+    else if (result) messages.push(gate.clearMessage ?? `✦ ${gate.blockedText.split('—')[0].trim()} yields to your magic.`);
+  }
+  syncGateUnlocks(game, { spellId, regionId: game.region });
+  return messages.filter(Boolean);
 }

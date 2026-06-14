@@ -16,6 +16,8 @@ import { getTravelOptions } from "../gameData/regionObstacles.js";
 import { getVisibleFeatures } from "../gameData/puzzleEngine.js";
 import { getAbundanceProgress } from "../gameData/abundanceSpread.js";
 import { recordRegionVisitForQuests } from "../hooks/questHooks.js";
+import { advanceWorldSettling, getRegionReactivitySummary } from "../gameData/worldReactivity.js";
+import { syncGateUnlocks } from "../gameData/regionObstacles.js";
 import NpcModal from "./NpcModal.jsx";
 import FeatureModal from "./FeatureModal.jsx";
 import QuestLog from "./QuestLog.jsx";
@@ -27,6 +29,7 @@ export default function WorldView({ game, onUpdate, onEncounter, onPuzzleCombat,
   const [featureModal, setFeatureModal] = useState(null);
   const [showSheet, setShowSheet] = useState(false);
   const [showInfluence, setShowInfluence] = useState(false);
+  const [showRegionDash, setShowRegionDash] = useState(false);
   const player = game.player;
   const regionPresent = getRegionPresentation(game, game.region);
   const regionTransform = getRegionTransformation(game, game.region);
@@ -37,6 +40,17 @@ export default function WorldView({ game, onUpdate, onEncounter, onPuzzleCombat,
   const xp = getXpProgress(player);
   const derived = getPlayerDerivedStats(player);
   const abundance = getAbundanceProgress(game);
+  const reactivity = getRegionReactivitySummary(game, game.region);
+
+  const applySettling = (g) => {
+    const settled = advanceWorldSettling(g);
+    const gateMsgs = syncGateUnlocks(g, { regionId: g.region });
+    const lines = [...(settled.lines ?? []), ...gateMsgs];
+    if (lines.length) {
+      return { ...g, lastQuestMessage: lines.join('\n\n') };
+    }
+    return g;
+  };
 
   const travel = (regionId) => {
     const method = resolveTravelMethod(game, regionId);
@@ -46,7 +60,7 @@ export default function WorldView({ game, onUpdate, onEncounter, onPuzzleCombat,
     }
     onUpdate((g) => {
       if (method.apCost) spendAP(g, method.apCost);
-      const next = { ...g, region: regionId };
+      const next = applySettling({ ...g, region: regionId });
       if (method.flavor) next.lastQuestMessage = method.flavor;
       const quest = recordRegionVisitForQuests(next, regionId);
       if (quest.questMessages) {
@@ -166,6 +180,16 @@ export default function WorldView({ game, onUpdate, onEncounter, onPuzzleCombat,
             {regionPresent.opportunities.map((o) => o.label).join(' · ')}
           </p>
         )}
+        {reactivity.blockedExits.length > 0 && (
+          <p style={{ fontSize: '0.8rem', color: 'var(--rose)', marginTop: '0.5rem' }}>
+            Blocked routes: {reactivity.blockedExits.map((b) => `→ ${b.toName} (${b.sourceName})`).join(' · ')}
+          </p>
+        )}
+        {reactivity.landmarks.length > 0 && (
+          <p style={{ fontSize: '0.8rem', color: 'var(--text-dim)', marginTop: '0.35rem' }}>
+            Living landmarks: {reactivity.landmarks.map((l) => l.name).join(' · ')}
+          </p>
+        )}
       </div>
 
       {commandMode.active && (
@@ -268,11 +292,13 @@ export default function WorldView({ game, onUpdate, onEncounter, onPuzzleCombat,
         <h2>Actions</h2>
         <div className="btn-grid">
           <button onClick={() => setShowSheet(true)}>Character Sheet</button>
+          <button onClick={() => setShowRegionDash((v) => !v)}>Region Chronicle</button>
           <button onClick={() => setShowInfluence((v) => !v)}>Influence & Power</button>
           <button onClick={onEncounter}>Seek Encounter</button>
           <button onClick={() => onUpdate((g) => {
             longRest(g.player);
-            return { ...g, day: g.day + 1, lastLevelUpMessage: null };
+            const next = applySettling({ ...g, day: g.day + 1, lastLevelUpMessage: null });
+            return next;
           })}>
             Rest & Feast (long rest)
           </button>
@@ -317,6 +343,56 @@ export default function WorldView({ game, onUpdate, onEncounter, onPuzzleCombat,
           onGameRefresh={() => onUpdate((g) => ({ ...g }))}
           onDebugContext={onDebugContext}
         />
+      )}
+
+      {showRegionDash && (
+        <div className="panel" style={{ borderColor: 'var(--rose)' }}>
+          <h2>Region Chronicle — {reactivity.regionName}</h2>
+          <div className="stats-bar" style={{ flexWrap: 'wrap', marginBottom: '0.5rem' }}>
+            <span className="stat">Footprint: <strong>{reactivity.footprint}</strong></span>
+            <span className="stat">Giants: <strong>{reactivity.giantCount}</strong></span>
+            <span className="stat">Settling: <strong>{reactivity.settleState}/2</strong></span>
+            <span className="stat">Transform: <strong>{regionTransform.level.label}</strong></span>
+            {reactivity.factionPurityWeakened && (
+              <span className="stat" style={{ color: 'var(--gold)' }}>Purity weakened</span>
+            )}
+          </div>
+          {reactivity.landmarks.length > 0 ? (
+            <div style={{ fontSize: '0.85rem', marginBottom: '0.5rem' }}>
+              <strong>Landmarks you shaped:</strong>
+              {reactivity.landmarks.map((l) => (
+                <div key={l.id} style={{ marginTop: '0.35rem', color: 'var(--text-dim)' }}>
+                  {l.name} — tier {l.tier}{l.cult ? ' · cult' : ''} · settling {l.settleState}/2
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="prose" style={{ fontSize: '0.85rem' }}>No living landmarks here yet — growth past immobility leaves permanent marks.</p>
+          )}
+          {reactivity.blockedExits.length > 0 ? (
+            <p style={{ fontSize: '0.85rem', color: 'var(--rose)' }}>
+              Blocked exits: {reactivity.blockedExits.map((b) => `${b.toName} (by ${b.sourceName})`).join(', ')}.
+              Routes reopen as the region settles ({reactivity.settleState}/2).
+            </p>
+          ) : (
+            <p style={{ fontSize: '0.85rem', color: 'var(--text-dim)' }}>All roads open — for now.</p>
+          )}
+          {reactivity.ecology?.narrative && (
+            <p style={{ fontSize: '0.85rem', color: 'var(--gold)', marginTop: '0.5rem' }}>
+              {reactivity.ecology.narrative}
+            </p>
+          )}
+          {reactivity.ecology?.giants?.length > 0 && (
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)', marginTop: '0.35rem' }}>
+              Giants: {reactivity.ecology.giants.map((g) => `${g.name} (${g.raisedBy})`).join(' · ')}
+            </div>
+          )}
+          {(game.worldFlags?.livingLedger ?? []).slice(-3).reverse().map((entry) => (
+            <p key={entry.id} style={{ fontSize: '0.8rem', color: 'var(--gold)', marginTop: '0.35rem' }}>
+              Day {entry.day}: {entry.label}
+            </p>
+          ))}
+        </div>
       )}
 
       {showInfluence && (

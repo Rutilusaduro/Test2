@@ -271,3 +271,86 @@ registerPuzzleCopy('puzzle.solve.font_abundance', [
 registerPuzzleCopy('puzzle.solve.font_combat', [
   'The Famine Hag shrieks and withdraws. The font purifies itself in victory\'s wake.',
 ]);
+
+// ─── Task Group 3 — frontier & political obstacles ───────────────────────────
+
+registerPuzzleCopy('puzzle.solve.marches_persuade', [
+  'Honeyed gospel melts border pride. The pass groans open — soldiers suddenly crave pastry.',
+]);
+registerPuzzleCopy('puzzle.solve.marches_greta', [
+  'Greta\'s forged seal and fiercer smile send the captain scrambling. Iron Peak awaits.',
+]);
+registerPuzzleCopy('puzzle.solve.marches_crush', [
+  'Ice shatters under pleasurable pressure. The mountain remembers abundance is stronger than frost.',
+]);
+registerPuzzleCopy('puzzle.solve.marches_shoulder', [
+  'Your divine mass shoulders through the slide — a new road carved in plush triumph.',
+]);
+registerPuzzleCopy('puzzle.solve.marches_combat', [
+  'Victory clears the pass. Lean soldiers stare in awe as you waddle toward the peaks.',
+]);
+
+registerPuzzleCopy('puzzle.solve.peak_greta', [
+  'Greta\'s forge sings. Fresh iron spans the chasm — dwarven pride bows to shared appetite.',
+]);
+registerPuzzleCopy('puzzle.solve.peak_ritual', [
+  'Ritual fire rekindles the bridge-rite. Stone and iron warm as if eager to be crossed.',
+]);
+registerPuzzleCopy('puzzle.solve.peak_span', [
+  'You span the chasm yourself — a living bridge of glorious, breathing abundance.',
+]);
+registerPuzzleCopy('puzzle.solve.peak_overwhelm', [
+  'Divine presence overwhelms rust and doubt. Chains snap; the cradle path breathes again.',
+]);
+
+registerPuzzleCopy('puzzle.solve.coast_charm', [
+  'Enchantment unlaces velvet masks. The seal-guard sighs; Ember\'s road opens with a blush.',
+]);
+registerPuzzleCopy('puzzle.solve.coast_vesperia', [
+  'Vesperia\'s patronage outweighs protocol. Nobles part like curtains before a feast.',
+]);
+registerPuzzleCopy('puzzle.solve.coast_seduce', [
+  'Desire unlocks what seals could not. The coastal road yields, sweet and shameless.',
+]);
+registerPuzzleCopy('puzzle.solve.coast_blessed', [
+  'A transformed coast needs no permission. The seal crumbles under culture made appetite.',
+]);
+
+registerPuzzleCopy('puzzle.solve.ember_feast', [
+  'The court feasts at last — laughter, crumbs, and widening belts. Pride surrenders to pastry.',
+]);
+registerPuzzleCopy('puzzle.solve.ember_banquet', [
+  'Banquet mist perfumes the hall. Starving nobles become devotees of the next course.',
+]);
+registerPuzzleCopy('puzzle.solve.ember_abundance', [
+  'Golden Overflow floods the court. Hunger becomes holy; the duchy kneels to fullness.',
+]);
+registerPuzzleCopy('puzzle.solve.ember_noble', [
+  'A court favorite swells into living proof. Applause replaces austerity.',
+]);
+
+registerPuzzleCopy('puzzle.solve.ember_landmark', [
+  'A titan landmark silences both cult and inquisitor. The Citadel road clears in awe.',
+]);
+registerPuzzleCopy('puzzle.solve.ember_transform', [
+  'A feast-blessed duchy needs no blockade. Factions kneel to shared transformation.',
+]);
+registerPuzzleCopy('puzzle.solve.ember_combat', [
+  'The inquisitor falls. Purity\'s blockade shatters like a fasting vow in a bakery.',
+]);
+registerPuzzleCopy('puzzle.solve.ember_persuade', [
+  'Words sweeter than honey divide zealots from pragmatists. The road opens.',
+]);
+
+registerPuzzleCopy('puzzle.solve.citadel_rite', [
+  'Mass indulgence shakes the grand seal. The cathedral-city tastes your rival gospel.',
+]);
+registerPuzzleCopy('puzzle.solve.citadel_monolith', [
+  'You become immobile grandeur before the seal. Even purity kneels to a living god.',
+]);
+registerPuzzleCopy('puzzle.solve.citadel_cult', [
+  'A worshipped titan is proof the seal cannot deny. Pilgrims overwhelm the hardliners.',
+]);
+registerPuzzleCopy('puzzle.solve.citadel_combat', [
+  'The seal-guardian falls. Holy iron yields to appetite made manifest.',
+]);

@@ -98,6 +98,57 @@ export const REGION_FEATURES = [
     puzzleId: 'temple_hunger_font',
     icon: '⛲',
   },
+
+  // ─── Frontier & political regions (Task Group 3) ───────────────────────────
+
+  {
+    id: 'marches_landslide_pass',
+    regionId: 'northern_marches',
+    name: 'Blocked Mountain Pass',
+    shortDesc: 'Ice and landslide choke the road to Iron Peak — soldiers watch with lean suspicion.',
+    puzzleId: 'marches_blocked_pass',
+    icon: '🏔',
+  },
+  {
+    id: 'peak_collapsed_bridge',
+    regionId: 'iron_peak_hold',
+    name: 'Collapsed Forge-Bridge',
+    shortDesc: 'Rusted dwarven iron spans a chasm toward the sacred cradle.',
+    puzzleId: 'peak_forge_bridge',
+    icon: '🌉',
+  },
+  {
+    id: 'coast_velvet_gate',
+    regionId: 'sapphire_coast',
+    name: 'Velvet Road Seal',
+    shortDesc: 'Masked courtiers block the highway to Ember Duchy.',
+    puzzleId: 'coast_velvet_seal',
+    icon: '🎭',
+  },
+  {
+    id: 'ember_hungry_court',
+    regionId: 'ember_duchy',
+    name: 'Starving Ducal Court',
+    shortDesc: 'Nobles hunger behind pride — the hall waits for a true feast.',
+    puzzleId: 'ember_starving_court',
+    icon: '👑',
+  },
+  {
+    id: 'ember_contested_gate',
+    regionId: 'ember_duchy',
+    name: 'Contested Citadel Road',
+    shortDesc: 'Purity zealots and cultists clash on the road to the Gilded Citadel.',
+    puzzleId: 'ember_contested_approach',
+    icon: '⚔',
+  },
+  {
+    id: 'citadel_purity_door',
+    regionId: 'gilded_citadel',
+    name: 'Purity Grand Seal',
+    shortDesc: 'The cathedral-city\'s last seal rejects indulgence — or demands apotheosis.',
+    puzzleId: 'citadel_purity_seal',
+    icon: '✝',
+  },
 ];
 
 export function getFeature(featureId) {

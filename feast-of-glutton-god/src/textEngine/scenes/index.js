@@ -9,6 +9,7 @@ import './npc/questOffer.js';
 import './overworld/spellCast.js';
 import './world/events.js';
 import './world/transformation.js';
+import './world/landmarkReactions.js';
 import './puzzles/index.js';
 import './combatText.js';
 import './checks/index.js';

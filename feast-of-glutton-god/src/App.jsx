@@ -14,10 +14,13 @@ import { initSpellSlots } from "./gameData/spellSlots.js";
 import { ensureQuestState } from "./gameData/questEngine.js";
 import { ensureInfluenceState } from "./gameData/influence.js";
 import { ensureTransformationState } from "./gameData/worldTransformation.js";
+import { ensureReactivityState } from "./gameData/worldReactivity.js";
 import { ensurePartyUniversalSize } from "./gameData/universalSize.js";
 import { recordCombatEndForQuests } from "./hooks/questHooks.js";
 import { recordPuzzleSolvedForQuests } from "./hooks/puzzleHooks.js";
 import { applySolutionImmediate } from "./gameData/puzzleEngine.js";
+import { recordCombatVictory } from "./gameData/obstacleUnlocks.js";
+import { syncGateUnlocks } from "./gameData/regionObstacles.js";
 import { ensureSpellState, getCharacterSpells } from "./gameData/spellLearning.js";
 import { autoPrepareSpells } from "./gameData/spellPreparation.js";
 import { completePendingLevelUp as completeLevelUpChoice } from "./gameData/levelUpChoices.js";
@@ -58,6 +61,7 @@ export default function App() {
     ensureQuestState(g);
     ensureInfluenceState(g);
     ensureTransformationState(g);
+    ensureReactivityState(g);
     setGame(g);
     setScreen("world");
   }, []);
@@ -69,6 +73,7 @@ export default function App() {
       if (!g.player.sizeCap) g.player.sizeCap = 3;
       ensureInfluenceState(g);
       ensureTransformationState(g);
+      ensureReactivityState(g);
       if (!g.player.raceId) g.player.raceId = 'human';
       if (!g.player.raceName) g.player.raceName = 'Human';
       migratePlayerSpells(g.player);
@@ -143,6 +148,17 @@ export default function App() {
       const quest = recordCombatEndForQuests(next, combat);
       if (quest.questMessages) {
         next.lastQuestMessage = quest.questMessages;
+      }
+
+      if (combat.victory === 'win' || combat.victory === 'converted') {
+        for (const enemy of combat.enemies ?? []) {
+          const enemyId = enemy.typeId ?? enemy.enemyTypeId ?? enemy.id;
+          if (enemyId) recordCombatVictory(next, enemyId);
+        }
+        const gateMsgs = syncGateUnlocks(next, { regionId: next.region });
+        if (gateMsgs.length) {
+          next.lastQuestMessage = [next.lastQuestMessage, ...gateMsgs].filter(Boolean).join('\n\n---\n\n');
+        }
       }
 
       const pending = prev.pendingPuzzleCombat;
