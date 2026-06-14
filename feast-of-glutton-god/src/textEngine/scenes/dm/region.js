@@ -28,6 +28,21 @@ registerPool('dm.region.wary', [
     'Wind off the ice carries rumor of what you did to someone who said no.',
     'Lean scouts watch from ridgelines; the frontier does not forgive forced softness.',
   ]},
+  { when: { hostilityTierMin: 1, region: 'barrow_deeps' }, text: [
+    'Oath-carvings watch from the walls — Veshanne\'s domain remembers every promise the Wheel broke.',
+    'Cold pact-smoke curls at ankle height. The dead are not hostile yet — only measuring.',
+    'Barrow silence presses close. Abundance feels indecent here, and therefore irresistible.',
+  ]},
+  { when: { hostilityTierMin: 1, region: 'gilded_citadel_inner' }, text: [
+    'Divine geometry recoils from your curves — staircases hesitate, altars sweat blessed oil.',
+    'The Inner Sanctum was not built for wrong-genre miracles. It is learning anyway.',
+    'Law made architecture fights your presence. The DM sounds almost reverent.',
+  ]},
+  { when: { hostilityTierMin: 1, region: 'divine_plane_vestibule' }, text: [
+    'The Threshold rearranges itself around you — floor plans reconsidering their loyalty.',
+    'You are technically illegal here. The gods\' hall does not know whether to judge or worship.',
+    'Cosmic draft through impossible windows. Every step echoes in six divine domains at once.',
+  ]},
   { when: { hostilityTierMin: 1 }, text: [
     'The region has turned wary — doors close a little sooner when you knock.',
     'You feel it in glances: not hatred yet, but the continent taking notes.',

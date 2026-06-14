@@ -69,6 +69,16 @@ function canAffordSpell(spell, player, overflowCast) {
   ).ok;
 }
 
+function groupSpellsByLevel(spellList) {
+  const groups = new Map();
+  for (const spell of spellList) {
+    const level = spell.slotLevel ?? 0;
+    if (!groups.has(level)) groups.set(level, []);
+    groups.get(level).push(spell);
+  }
+  return [...groups.entries()].sort((a, b) => a[0] - b[0]);
+}
+
 function spellActionReady(spell, turnSummary) {
   return spell.actionType === "bonus" ? turnSummary?.bonus : turnSummary?.action;
 }
@@ -529,22 +539,31 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onVict
           <input type="checkbox" checked={overflowCast} onChange={(e) => setOverflowCast(e.target.checked)} />
           {" "}Overflow cast (extra slot/AP, more growth)
         </label>
-        <div className="btn-grid">
-          {spells.map((s) => {
-            const canCastResource = canAffordSpell(s, player, overflowCast);
-            const actionReady = spellActionReady(s, turnSummary);
-            return (
-              <button
-                key={s.id}
-                className={pendingSpell?.id === s.id ? "primary" : ""}
-                onClick={() => cast(s)}
-                disabled={!isPlayerTurn(combat) || !canCastResource || !actionReady || sceneBlocked}
-                title={spellCostLabel(s, player, overflowCast)}
-              >
-                {spellCostLabel(s, player, overflowCast)}
-              </button>
-            );
-          })}
+        <div className="combat-spells-scroll">
+          {groupSpellsByLevel(spells).map(([level, tierSpells]) => (
+            <div key={level} className="combat-spell-tier">
+              <h3 className="combat-spell-tier__label">
+                {level === 0 ? "Cantrips" : `Level ${level}`}
+              </h3>
+              <div className="btn-grid combat-spell-tier__grid">
+                {tierSpells.map((s) => {
+                  const canCastResource = canAffordSpell(s, player, overflowCast);
+                  const actionReady = spellActionReady(s, turnSummary);
+                  return (
+                    <button
+                      key={s.id}
+                      className={pendingSpell?.id === s.id ? "primary" : ""}
+                      onClick={() => cast(s)}
+                      disabled={!isPlayerTurn(combat) || !canCastResource || !actionReady || sceneBlocked}
+                      title={spellCostLabel(s, player, overflowCast)}
+                    >
+                      {spellCostLabel(s, player, overflowCast)}
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
         </div>
       </div>
 

@@ -28,6 +28,7 @@ export const UNLOCK_METHOD = {
   CAST_SPELL: 'cast_spell',
   COMBAT: 'combat',
   FLAG_SET: 'flag_set',
+  PLAYER_LEVEL_MIN: 'player_level_min',
   COMMUNAL_FEAST: 'communal_feast',
   SKILL_SUCCESS: 'skill_check',
 };
@@ -129,6 +130,9 @@ export function isUnlockSatisfied(game, rawUnlock, context = {}) {
     case UNLOCK_METHOD.FLAG_SET:
       return Boolean(flags[unlock.flag] ?? game.player?.storyFlags?.[unlock.flag]);
 
+    case UNLOCK_METHOD.PLAYER_LEVEL_MIN:
+      return (game.player?.level ?? 1) >= (unlock.level ?? 1);
+
     case UNLOCK_METHOD.COMMUNAL_FEAST:
       return Boolean(flags[`feast_held_${regionId}`] || flags.communal_feast_done);
 
@@ -207,6 +211,10 @@ export function describeUnlockOptions(unlocks = []) {
         return `Cast ${(n.tags ?? []).join('/')} magic on the obstacle`;
       case UNLOCK_METHOD.COMBAT:
         return `Defeat ${n.enemyId ?? 'the guardian'}`;
+      case UNLOCK_METHOD.PLAYER_LEVEL_MIN:
+        return `Reach level ${n.level}+`;
+      case UNLOCK_METHOD.FLAG_SET:
+        return n.label ?? `Complete: ${n.flag}`;
       case UNLOCK_METHOD.BLESS_REGION:
         return `Bless the region with abundance`;
       default:

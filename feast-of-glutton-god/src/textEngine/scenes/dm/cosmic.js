@@ -53,6 +53,66 @@ registerPool('dm.cosmic.intro', [
     '★ Gods and fear and law collapse into one desperate radiance. This is the boss fight the genre promised.',
     '★ The Measured Wheel makes its last argument in steel and starlight. Win, and the divine plane is yours to devour.',
   ]},
+  { when: { enemyType: 'herald_of_starvation' }, text: [
+    '★ Sylwen\'s Herald descends — famine as sermon, starvation as sacrament. Growth magic wilts in her shadow.',
+    '★ The Lean Ascension made messenger. She does not debate; she scourges.',
+    '★ A mythic herald — not cosmic yet, but the gods are no longer sending mortals alone.',
+  ]},
+  { when: { enemyType: 'void_appetite' }, text: [
+    '★ the Inverted Hunger coils — appetite turned wrong, devouring abundance itself.',
+    '★ Growth aimed at it becomes fuel. Conversion is a joke it does not understand.',
+    '★ Mythic opposition: hunger that eats hunger. The DM sounds unsettled.',
+  ]},
+  { when: { enemyType: 'cathedral_golem' }, text: [
+    '★ Aurelan\'s Cathedral Golem grinds forward — law made stone, charm sliding off like rain.',
+    '★ Divine geometry with fists. Enchantment will not soften this one.',
+    '★ A mythic construct — the Citadel\'s answer when faith needs a body.',
+  ]},
+  { when: { enemyType: 'divine_inquisitor_supreme' }, text: [
+    '★ The Supreme Inquisitor arrives — the Wheel\'s combined will in one armored verdict.',
+    '★ Doctrinal Fury waits behind her eyes. At half health, mercy leaves the room.',
+    '★ Mythic Church apex — conversion-resistant, growth-reversal hungry.',
+  ]},
+  { when: { enemyType: 'korthak_titan' }, text: [
+    '★ Korthak\'s Titan charges — frontier war-giant, honest fury, deeply confused by your curves.',
+    '★ Legendary scale without cosmic immunity. Defeat him right, and honor might convert.',
+    '★ A mythic boss who could become ally — if you feed him after the blow.',
+  ]},
+  { when: { enemyType: 'avatar_aurelan' }, text: [
+    '★ Aurelan Incarnate — law-god partial avatar, crown burning, scales tipping toward extinction.',
+    '★ Divine law rotates through your abilities like a lock clicking. This is apotheosis-tier violence.',
+    '★ Cosmic Aurelan — legendary resistances, legendary actions, no trivializing.',
+  ]},
+  { when: { enemyType: 'sylwen_revenant' }, text: [
+    '★ Sylwen in Grief — harvest-goddess inverted, abundance weaponized into denial.',
+    '★ Her grief is an aura. Half your growth dies in it — unless you break her heart open.',
+    '★ Cosmic Sylwen — a conversion ending may wait inside the wailing.',
+  ]},
+  { when: { enemyType: 'veshanne_unbound' }, text: [
+    '★ Veshanne Unbound — death and fate given a body that knows your ending.',
+    '★ One strike each fight will not miss. The barrow-dark is absolute.',
+    '★ Cosmic Veshanne — she has read your story and intends to close the book.',
+  ]},
+  { when: { enemyType: 'bloom_sovereign' }, text: [
+    '★ the Bloom Sovereign rises — wrong abundance, rival goddess, mirror-hunger made sovereign.',
+    '★ She steals your growth and mirrors it at full power. Your patron\'s antithesis walks.',
+    '★ Cosmic rival — conversion-immune, legendary, hungry for your genre itself.',
+  ]},
+  { when: { enemyType: 'wheel_incarnate' }, text: [
+    '★ The Wheel Incarnate — six domains compressed into one desperate god-shape.',
+    '★ Each turn a different divine law activates. This is the pre-final boss the pantheon prayed would never be needed.',
+    '★ Cosmic culmination — legendary resistances stacked, growth nearly futile, story at maximum heat.',
+  ]},
+  { when: { threatTier: 'mythic', escalationTierMin: 2 }, text: [
+    '★ Mythic opposition — gods send avatars\' heralds now. Growth resists; tactics matter.',
+    '★ The earnest world\'s ceiling cracks upward. This foe is not fodder.',
+    '★ Act III energy without full cosmic immunity — dangerous, hungry, real.',
+  ]},
+  { when: { threatTier: 'mythic' }, text: [
+    '★ Mythic-tier violence — conversion difficult, growth resisted, favor costly.',
+    '★ The Wheel escalates. The DM stops smirking.',
+    '★ A herald-class threat — not cosmic, but no longer mortal.',
+  ]},
   { when: { threatTier: 'cosmic', escalationTierMin: 3 }, text: [
     '★ Cosmic opposition — the earnest world\'s ceiling. Growth resists; favor drains; the DM sounds awed and afraid.',
     '★ Divine-tier violence. The Wheel fights back with real mechanics now, not village panic.',

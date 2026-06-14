@@ -240,7 +240,7 @@ export const MAIN_QUESTS = [
     giverNpcId: 'harvest_priestess',
 
     prerequisites: {
-      minPlayerLevel: 3,
+      minPlayerLevel: 5,
       minDivineAttention: 15,
       flags: ['main_act1_complete'],
       questsCompleted: [],
@@ -392,7 +392,7 @@ export const MAIN_QUESTS = [
         ],
         onComplete: {
           rewards: { ap: 35, xp: 180, xpSource: 'major_story' },
-          worldFlags: { lean_saint_defeated: true, mortal_tools_failed: true },
+          worldFlags: { lean_saint_defeated: true, mortal_tools_failed: true, unlock_barrow_deeps: true },
           textKey: 'quest.main.overflowing_temple.stage.lean_saint.complete',
         },
       },
@@ -408,7 +408,7 @@ export const MAIN_QUESTS = [
           xp: 550,
           xpSource: 'major_story',
           unlockRegions: ['ancient_temple', 'gorgara_cradle'],
-          worldFlags: { temple_sanctuary_mercy: true, main_act2_complete: true },
+          worldFlags: { temple_sanctuary_mercy: true, main_act2_complete: true, unlock_citadel_inner: true },
           playerFlags: { cleric_plenty_unlocked: true, warlock_overflow_unlocked: true },
         },
         textKey: 'quest.main.overflowing_temple.ending.mercy',
@@ -421,7 +421,7 @@ export const MAIN_QUESTS = [
           ap: 50,
           xp: 520,
           xpSource: 'major_story',
-          worldFlags: { temple_sanctuary_dominance: true, main_act2_complete: true },
+          worldFlags: { temple_sanctuary_dominance: true, main_act2_complete: true, unlock_citadel_inner: true },
           playerFlags: { cleric_plenty_unlocked: true, warlock_overflow_unlocked: true },
         },
         textKey: 'quest.main.overflowing_temple.ending.dominance',
@@ -433,7 +433,7 @@ export const MAIN_QUESTS = [
       xp: 450,
       xpSource: 'major_story',
       unlockRegions: ['ancient_temple'],
-      worldFlags: { main_act2_complete: true },
+      worldFlags: { main_act2_complete: true, unlock_citadel_inner: true },
       playerFlags: { cleric_plenty_unlocked: true, warlock_overflow_unlocked: true },
       textKey: 'quest.main.overflowing_temple.complete.default',
     },
@@ -453,7 +453,7 @@ export const MAIN_QUESTS = [
     hiddenUntilFlags: ['act3_gates_unlocked'],
 
     prerequisites: {
-      minPlayerLevel: 8,
+      minPlayerLevel: 12,
       minDivineAttention: 75,
       questsCompleted: ['main_overflowing_temple'],
       flags: ['main_act2_complete', 'lean_saint_defeated'],

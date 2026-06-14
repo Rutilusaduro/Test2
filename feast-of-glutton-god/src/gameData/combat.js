@@ -6,9 +6,10 @@ import {
   createEnemy,
   getEnemyThreatTier,
   getEnemyTypeDef,
-  getCosmicGrowthResist,
+  getEnemyGrowthResist,
   isConversionImmune,
   isCosmicThreat,
+  isMythicThreat,
 } from "./enemies.js";
 import { ensureFavor, spendFavor } from "./favor.js";
 import {
@@ -50,9 +51,10 @@ function prepareCombatUnit(unit, team, index) {
 
 export function createCombatState(player, party, enemyTypeId, regionId) {
   const enemies = [];
-  const cosmicSolo = enemyTypeId && isCosmicThreat(enemyTypeId)
-    && getEnemyTypeDef(enemyTypeId)?.role === "boss";
-  const count = cosmicSolo || enemyTypeId === "famine_hag" ? 1 : 1 + Math.floor(Math.random() * 2);
+  const def = enemyTypeId ? getEnemyTypeDef(enemyTypeId) : null;
+  const eliteSolo = def && (isCosmicThreat(enemyTypeId) || isMythicThreat(enemyTypeId))
+    && def.role === "boss";
+  const count = eliteSolo || enemyTypeId === "famine_hag" ? 1 : 1 + Math.floor(Math.random() * 2);
   for (let i = 0; i < count; i++) {
     const e = enemyTypeId ? createEnemy(enemyTypeId) : createEnemy("harvest_harpy");
     e.typeId = enemyTypeId || e.id;
@@ -263,8 +265,8 @@ function maybeAwardFatteningXp(combat, caster, target, growth) {
 export function applyGrowth(unit, stages = 1, opts = {}) {
   const respectCosmic = opts.respectCosmicResist ?? Boolean(unit?.isEnemy);
   let effectiveStages = stages;
-  if (respectCosmic && isCosmicThreat(unit) && stages > 0) {
-    const resist = getCosmicGrowthResist(unit);
+  if (respectCosmic && (isCosmicThreat(unit) || isMythicThreat(unit)) && stages > 0) {
+    const resist = getEnemyGrowthResist(unit);
     effectiveStages = Math.max(0, Math.floor(stages * (1 - resist)));
     if (effectiveStages < stages && effectiveStages === 0 && stages > 0) {
       effectiveStages = 1;
@@ -318,7 +320,7 @@ export { getAvailableBonusActions };
 
 export function canTrivializeTarget(player, enemy) {
   if (!player || !enemy || enemy.hp <= 0 || enemy.converted) return false;
-  if (getEnemyThreatTier(enemy) === "cosmic") return false;
+  if (getEnemyThreatTier(enemy) === "cosmic" || getEnemyThreatTier(enemy) === "mythic") return false;
   const playerStage = getStage(player.lbs).id;
   const enemyStage = getStage(enemy.lbs).id;
   return playerStage >= TRIVIALIZE_MIN_PLAYER_STAGE

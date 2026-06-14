@@ -1,6 +1,11 @@
 import { MAX_STAGE_ID } from "./stages.js";
 
 const MUNDANE = { threatTier: "mundane" };
+const MYTHIC = {
+  threatTier: "mythic",
+  conversion: 0.3,
+  growthResist: 0.5,
+};
 const COSMIC = {
   threatTier: "cosmic",
   conversion: 0.05,
@@ -231,6 +236,262 @@ export const ENEMY_TYPES = {
     ],
     ...COSMIC,
   },
+  ascetic_monk: {
+    id: "ascetic_monk",
+    name: "Ascetic of the Measured Hand",
+    bodyType: "straight",
+    startLbs: 105,
+    hp: 20,
+    mp: 12,
+    movement: 4,
+    role: "disruptor",
+    conversion: 0.75,
+    growthResist: 0.4,
+    desc: "A monastery devotee who fasts as devotion. Disrupts growth magic with denial auras.",
+    ...MUNDANE,
+  },
+  lean_pilgrim: {
+    id: "lean_pilgrim",
+    name: "Penitent Pilgrim of Sylwen",
+    bodyType: "straight",
+    startLbs: 98,
+    hp: 14,
+    mp: 8,
+    movement: 5,
+    role: "swarmer",
+    conversion: 0.9,
+    desc: "Traveling penitent who sees your work as an affront to Sylwen's measured harvest.",
+    ...MUNDANE,
+  },
+  measure_priest: {
+    id: "measure_priest",
+    name: "Hedge-Priest of the Measure",
+    bodyType: "athletic",
+    startLbs: 120,
+    hp: 24,
+    mp: 18,
+    movement: 3,
+    role: "controller",
+    conversion: 0.7,
+    specialAbility: "growth_suppress",
+    desc: "Local orthodox priest who can temporarily suppress a target's growth aura for 2 rounds.",
+    ...MUNDANE,
+  },
+  jealous_noble: {
+    id: "jealous_noble",
+    name: "Offended Noblewoman",
+    bodyType: "athletic",
+    startLbs: 118,
+    hp: 16,
+    mp: 10,
+    movement: 3,
+    role: "social",
+    conversion: 0.95,
+    socialAttack: "embarrassment",
+    desc: "A Tarn-connected merchant-noble who summons guards and uses social attacks.",
+    ...MUNDANE,
+  },
+  famine_cultist: {
+    id: "famine_cultist",
+    name: "Acolyte of the Lean Saint",
+    bodyType: "straight",
+    startLbs: 92,
+    hp: 18,
+    mp: 14,
+    movement: 4,
+    role: "debuffer",
+    conversion: 0.8,
+    specialAbility: "hunger_reversal",
+    desc: "Antithesis-worshipper. On hit: applies hunger reversal — growth briefly unwinds.",
+    ...MUNDANE,
+  },
+  herald_of_starvation: {
+    id: "herald_of_starvation",
+    name: "Herald of the Lean Ascension",
+    bodyType: "straight",
+    startLbs: 110,
+    hp: 48,
+    mp: 22,
+    movement: 3,
+    role: "elite",
+    desc: "A divine messenger of Sylwen's Scourge, amplified by the Church's desperation.",
+    cosmicAbility: "famine_aura",
+    growthResist: 0.55,
+    phases: [{ id: "scourge_shriek", hpPct: 0.5, label: "Scourge Shriek" }],
+    ...MYTHIC,
+  },
+  void_appetite: {
+    id: "void_appetite",
+    name: "the Inverted Hunger",
+    bodyType: "straight",
+    startLbs: 100,
+    hp: 44,
+    mp: 20,
+    movement: 4,
+    role: "disruptor",
+    desc: "A hunger creature twisted wrong — it consumes growth itself, reversing abundance on contact.",
+    cosmicAbility: "growth_devour",
+    growthResist: 0.7,
+    conversionImmune: true,
+    ...MYTHIC,
+  },
+  cathedral_golem: {
+    id: "cathedral_golem",
+    name: "Cathedral Golem of Aurelan",
+    bodyType: "athletic",
+    startLbs: 180,
+    hp: 65,
+    mp: 10,
+    movement: 2,
+    role: "tank",
+    desc: "Stone law-construct of the Gilded Citadel. Charm and enchantment slide off its geometry.",
+    cosmicAbility: "law_ward",
+    growthResist: 0.6,
+    conversionImmune: true,
+    phases: [{ id: "law_shard", hpPct: 0.4, label: "Law Shard" }],
+    ...MYTHIC,
+  },
+  divine_inquisitor_supreme: {
+    id: "divine_inquisitor_supreme",
+    name: "Supreme Inquisitor of the Measured Hand",
+    bodyType: "athletic",
+    startLbs: 130,
+    hp: 60,
+    mp: 28,
+    movement: 3,
+    role: "elite",
+    desc: "Directly empowered by the Wheel's combined will. At half health enters Doctrinal Fury.",
+    cosmicAbility: "doctrinal_fury",
+    growthResist: 0.65,
+    phases: [{ id: "doctrinal_fury", hpPct: 0.5, label: "Doctrinal Fury" }],
+    ...MYTHIC,
+  },
+  korthak_titan: {
+    id: "korthak_titan",
+    name: "Titan of Korthak's Frontier",
+    bodyType: "athletic",
+    startLbs: 170,
+    hp: 72,
+    mp: 12,
+    movement: 3,
+    role: "boss",
+    conversion: 0.35,
+    desc: "Legendary war-giant sent from the frontier holds — honest, massive, terrifying, and deeply confused by you.",
+    cosmicAbility: "valor_avalanche",
+    growthResist: 0.55,
+    phases: [
+      { id: "frontier_resolve", hpPct: 0.6, label: "Frontier Resolve" },
+      { id: "broken_oath", hpPct: 0.25, label: "Broken Oath" },
+    ],
+    ...MYTHIC,
+  },
+  avatar_aurelan: {
+    id: "avatar_aurelan",
+    name: "Aurelan Incarnate",
+    bodyType: "athletic",
+    startLbs: 145,
+    hp: 95,
+    mp: 40,
+    movement: 3,
+    role: "boss",
+    desc: "Aurelan manifesting as a partial avatar — law made flesh, crown burning, scales tipping toward extinction.",
+    cosmicAbility: "divine_law",
+    legendaryActions: ["scales_of_judgment", "crown_of_order", "law_made_manifest"],
+    legendaryResistances: 3,
+    growthResist: 0.88,
+    conversionImmune: true,
+    phases: [
+      { id: "measured_wrath", hpPct: 0.66, label: "Measured Wrath" },
+      { id: "crown_shatter", hpPct: 0.33, label: "Crown Shatter" },
+    ],
+    ...COSMIC,
+  },
+  sylwen_revenant: {
+    id: "sylwen_revenant",
+    name: "Sylwen in Grief",
+    bodyType: "pear",
+    startLbs: 140,
+    hp: 88,
+    mp: 42,
+    movement: 2,
+    role: "boss",
+    desc: "The harvest goddess in grief — her aspect of abundance inverted into a weapon of denial.",
+    cosmicAbility: "harvest_grief",
+    legendaryActions: ["barren_shriek", "harvest_inversion", "thorned_plenty"],
+    legendaryResistances: 3,
+    growthResist: 0.82,
+    conversion: 0.05,
+    phases: [
+      { id: "wailing_harvest", hpPct: 0.6, label: "Wailing Harvest" },
+      { id: "grief_breaks", hpPct: 0.2, label: "Grief Breaks" },
+    ],
+    ...COSMIC,
+  },
+  veshanne_unbound: {
+    id: "veshanne_unbound",
+    name: "Veshanne Unbound",
+    bodyType: "straight",
+    startLbs: 125,
+    hp: 80,
+    mp: 48,
+    movement: 1,
+    role: "boss",
+    desc: "Death goddess unleashing fate itself — she knows exactly how your story ends and is trying to make it so.",
+    cosmicAbility: "fated_strike",
+    legendaryActions: ["barrow_wail", "fate_revision", "unwritten_end"],
+    legendaryResistances: 2,
+    growthResist: 0.78,
+    conversionImmune: true,
+    phases: [
+      { id: "barrow_dark", hpPct: 0.5, label: "Barrow Dark" },
+      { id: "fate_rewritten", hpPct: 0.25, label: "Fate Rewritten" },
+    ],
+    ...COSMIC,
+  },
+  bloom_sovereign: {
+    id: "bloom_sovereign",
+    name: "the Bloom Sovereign",
+    bodyType: "voluptuous",
+    startLbs: 165,
+    hp: 100,
+    mp: 44,
+    movement: 2,
+    role: "boss",
+    desc: "The rival goddess / antithesis — abundance-turned-consuming, the wrong version of your patron's dream.",
+    cosmicAbility: "bloom_devour",
+    legendaryActions: ["rival_bloom", "appetite_redirect", "sovereign_hunger"],
+    legendaryResistances: 3,
+    growthResist: 0.75,
+    conversionImmune: true,
+    phases: [
+      { id: "mirror_bloom", hpPct: 0.7, label: "Mirror Bloom" },
+      { id: "sovereign_revealed", hpPct: 0.4, label: "Sovereign Revealed" },
+      { id: "final_appetite", hpPct: 0.1, label: "Final Appetite" },
+    ],
+    ...COSMIC,
+  },
+  wheel_incarnate: {
+    id: "wheel_incarnate",
+    name: "The Wheel Incarnate",
+    bodyType: "athletic",
+    startLbs: 155,
+    hp: 120,
+    mp: 50,
+    movement: 1,
+    role: "boss",
+    desc: "All six domains compressed into a single form — the culmination of the pantheon's opposition.",
+    cosmicAbility: "six_domains",
+    legendaryActions: ["domain_shift", "wheel_crush", "pantheon_roar"],
+    legendaryResistances: 5,
+    growthResist: 0.92,
+    conversionImmune: true,
+    phases: [
+      { id: "domains_align", hpPct: 0.75, label: "Domains Align" },
+      { id: "wheel_cracks", hpPct: 0.5, label: "The Wheel Cracks" },
+      { id: "desperate_unity", hpPct: 0.25, label: "Desperate Unity" },
+    ],
+    ...COSMIC,
+  },
 };
 
 export const COSMIC_ENEMY_IDS = Object.keys(ENEMY_TYPES).filter(
@@ -267,10 +528,26 @@ export function isCosmicThreat(enemyOrTypeId) {
   return getEnemyThreatTier(enemyOrTypeId) === "cosmic";
 }
 
-export function getCosmicGrowthResist(enemyOrTypeId) {
+export function isMythicThreat(enemyOrTypeId) {
+  return getEnemyThreatTier(enemyOrTypeId) === "mythic";
+}
+
+export function isEliteThreat(enemyOrTypeId) {
+  const tier = getEnemyThreatTier(enemyOrTypeId);
+  return tier === "mythic" || tier === "cosmic";
+}
+
+export function getEnemyGrowthResist(enemyOrTypeId) {
   const def = getEnemyTypeDef(enemyOrTypeId);
-  if (!def || def.threatTier !== "cosmic") return 0;
-  return def.growthResist ?? 0.65;
+  if (!def) return 0;
+  const tier = def.threatTier ?? "mundane";
+  if (tier === "mundane") return def.growthResist ?? 0;
+  if (tier === "mythic" || tier === "cosmic") return def.growthResist ?? (tier === "cosmic" ? 0.65 : 0.5);
+  return def.growthResist ?? 0;
+}
+
+export function getCosmicGrowthResist(enemyOrTypeId) {
+  return getEnemyGrowthResist(enemyOrTypeId);
 }
 
 export function isConversionImmune(enemyOrTypeId) {
@@ -301,21 +578,35 @@ export function createEnemy(typeId) {
 
 export function pickEncounter(regionId, game = null) {
   const escalation = game?.worldFlags?.escalationTier ?? 0;
+  const playerLevel = game?.player?.level ?? 1;
   const pools = {
-    harvest_hearth: ["harvest_harpy", "gluttonous_goblin"],
-    market_square: ["rival_adventurer", "gluttonous_goblin"],
-    fertile_heartlands: ["vinebound_dryad", "harvest_harpy"],
+    harvest_hearth: ["harvest_harpy", "gluttonous_goblin", "lean_pilgrim"],
+    market_square: ["rival_adventurer", "gluttonous_goblin", "jealous_noble", "famine_cultist"],
+    fertile_heartlands: ["vinebound_dryad", "harvest_harpy", "measure_priest"],
     gorgara_cradle: escalation >= 3
       ? ["purity_inquisitor", "champion_lumen", "wheel_avatar"]
-      : ["temple_guardian", "purity_inquisitor"],
+      : ["temple_guardian", "purity_inquisitor", "ascetic_monk"],
     ancient_temple: escalation >= 2
       ? ["purity_inquisitor", "famine_hag", "champion_sylwen"]
-      : ["temple_guardian", "purity_inquisitor", "famine_hag"],
+      : ["temple_guardian", "purity_inquisitor", "famine_cultist"],
     gilded_citadel: escalation >= 2
-      ? ["champion_aurelan", "champion_lumen", "purity_inquisitor"]
-      : ["purity_inquisitor", "rival_adventurer"],
-    ember_duchy: ["purity_inquisitor", "champion_korthak"],
-    northern_marches: ["champion_korthak", "rival_adventurer"],
+      ? ["champion_aurelan", "champion_lumen", "purity_inquisitor", "cathedral_golem"]
+      : ["purity_inquisitor", "rival_adventurer", "ascetic_monk"],
+    ember_duchy: ["purity_inquisitor", "champion_korthak", "jealous_noble"],
+    northern_marches: ["champion_korthak", "rival_adventurer", "lean_pilgrim"],
+    sapphire_coast: ["rival_adventurer", "vinebound_dryad", "jealous_noble"],
+    iron_peak_hold: ["temple_guardian", "gluttonous_goblin", "ascetic_monk"],
+    barrow_deeps: playerLevel >= 14
+      ? ["void_appetite", "veshanne_unbound", "cathedral_golem"]
+      : ["void_appetite", "cathedral_golem", "herald_of_starvation"],
+    gilded_citadel_inner: playerLevel >= 15
+      ? ["divine_inquisitor_supreme", "avatar_aurelan", "cathedral_golem"]
+      : ["divine_inquisitor_supreme", "cathedral_golem", "champion_aurelan"],
+    divine_plane_vestibule: escalation >= 4
+      ? ["wheel_incarnate", "avatar_aurelan", "bloom_sovereign"]
+      : escalation >= 3
+        ? ["sylwen_revenant", "divine_inquisitor_supreme", "herald_of_starvation"]
+        : ["divine_inquisitor_supreme", "herald_of_starvation", "void_appetite"],
   };
   const pool = pools[regionId] || ["harvest_harpy"];
   const id = pool[Math.floor(Math.random() * pool.length)];

@@ -93,6 +93,51 @@ export const CONNECTION_GATES = [
     ],
     clearMessage: '✦ Iron and faith yield — Shrine of the Thin Veil draws near.',
   },
+  {
+    id: 'gate_temple_barrow',
+    from: 'ancient_temple',
+    to: 'barrow_deeps',
+    puzzleId: 'barrow_deep_oath',
+    solvedFlag: 'puzzle_barrow_deep_solved',
+    blockedText: 'Oath-carved stone seals the descent into the Barrow Deeps — Veshanne\'s domain does not welcome the uninvited.',
+    unlocks: [
+      { method: 'puzzle_solved', puzzleId: 'barrow_deep_oath' },
+      { method: 'flag_set', flag: 'lean_saint_defeated', label: 'the Lean Saint\'s defeat echoes below' },
+      { method: 'player_level_min', level: 11, label: 'Mythic stature commands the dead' },
+      { method: 'cast_spell', tags: ['ritual', 'abundance'], label: 'Ritual of descent' },
+    ],
+    clearMessage: '✦ The barrow exhales — oath-stone yields to appetite older than the Wheel.',
+  },
+  {
+    id: 'gate_citadel_inner',
+    from: 'gilded_citadel',
+    to: 'gilded_citadel_inner',
+    puzzleId: 'citadel_inner_seal',
+    solvedFlag: 'puzzle_citadel_inner_solved',
+    blockedText: 'Blessed geometry seals the Inner Sanctum — only those who have broken Act II\'s fever may approach the Wheel\'s heart.',
+    unlocks: [
+      { method: 'puzzle_solved', puzzleId: 'citadel_inner_seal' },
+      { method: 'flag_set', flag: 'main_act2_complete', label: 'Act II complete' },
+      { method: 'player_level_min', level: 13, label: 'Regional power proven' },
+      { method: 'combat', enemyId: 'champion_aurelan', label: 'Break Aurelan\'s seal-guard' },
+    ],
+    clearMessage: '✦ The inner sanctum unseals — divine law made architecture, and you are already rewriting it.',
+  },
+  {
+    id: 'gate_cradle_vestibule',
+    from: 'gorgara_cradle',
+    to: 'divine_plane_vestibule',
+    puzzleId: 'vestibule_threshold',
+    solvedFlag: 'puzzle_vestibule_solved',
+    blockedText: 'The thin veil tears toward something impossible — the gods\' own threshold. Only apotheosis heat may pass.',
+    unlocks: [
+      { method: 'puzzle_solved', puzzleId: 'vestibule_threshold' },
+      { method: 'flag_set', flag: 'apotheosis_threshold', label: 'Apotheosis threshold reached' },
+      { method: 'player_level_min', level: 17, label: 'Near-divine stature' },
+      { method: 'cast_spell', tags: ['apotheosis', 'ritual'], label: 'Apotheosis rite' },
+    ],
+    clearMessage: '✦ Reality folds — you step onto the Threshold of the Measured Wheel.',
+  },
 ];
 
 export function syncGateUnlocks(game, context = {}) {

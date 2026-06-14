@@ -715,6 +715,29 @@ button.primary:hover:not(:disabled) {
   margin-bottom: 0.5rem;
 }
 
+.combat-spells-scroll {
+  max-height: min(280px, 40vh);
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
+.combat-spell-tier {
+  margin-bottom: 0.75rem;
+}
+
+.combat-spell-tier__label {
+  margin: 0 0 0.35rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  opacity: 0.85;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.combat-spell-tier__grid {
+  margin-bottom: 0;
+}
+
 /* ─── Mobile ────────────────────────────────────────────────────────────── */
 
 @media (max-width: 768px) {

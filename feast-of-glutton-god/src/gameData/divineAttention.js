@@ -11,6 +11,8 @@ export const DIVINE_ATTENTION_TIERS = [
   { id: 1, min: 20, label: 'Flicker on the Wheel', escalationTier: 1, desc: 'Lantern-oracles dream of appetite that should not fit.' },
   { id: 2, min: 45, label: 'Divine Unease', escalationTier: 2, desc: 'Omens multiply; the Church takes careful notes.' },
   { id: 3, min: 75, label: 'Pantheon Alarm', escalationTier: 3, desc: 'The gods know something is wrong with the story.' },
+  { id: 4, min: 95, label: 'Cosmic Dread', escalationTier: 4, desc: 'Avatars stir; the Wheel considers extinction protocols.' },
+  { id: 5, min: 115, label: 'Apotheosis Threshold', escalationTier: 5, desc: 'You are no longer an anomaly — you are a rival cosmology.' },
 ];
 
 export const DIVINE_ATTENTION_AWARDS = {
@@ -46,6 +48,11 @@ export const PORTENT_THRESHOLDS = {
     id: 'divine_council',
     label: 'Divine Council Convened',
     worldFlags: { divine_council: true, act3_gates_unlocked: true },
+  },
+  100: {
+    id: 'apotheosis_threshold',
+    label: 'Apotheosis Threshold',
+    worldFlags: { apotheosis_threshold: true, unlock_divine_vestibule: true },
   },
 };
 

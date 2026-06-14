@@ -432,3 +432,53 @@ registerQuestCopy('quest.side.redemption.stage.earn.complete', [
 registerQuestCopy('quest.side.redemption.complete', [
   'Amends accepted. Larders unlock, patrols thin, and the region remembers that your gift can be tender again.',
 ]);
+
+// ─── Side: Sapphire Indulgence (Tier 2, level 5+) ───────────────────────────
+
+registerQuestCopy('quest.side.sapphire.title', ['The Indulgent Countess']);
+registerQuestCopy('quest.side.sapphire.desc', [
+  'Countess Vesperia enforces orthodoxy in public and craves excess behind velvet masks. The Sapphire Coast could become your herald — or your scandal.',
+]);
+registerQuestCopy('quest.side.sapphire.stage.court.desc', [
+  'Infiltrate the coastal court. Listen for hunger dressed as propriety.',
+]);
+registerQuestCopy('quest.side.sapphire.stage.court.complete', [
+  'Vesperia\'s laugh catches wrong — too bright, too hungry. She has been waiting for someone who will not judge.',
+]);
+registerQuestCopy('quest.side.sapphire.stage.secret.desc', [
+  'Feed her in secret. Let curiosity become craving behind closed doors.',
+]);
+registerQuestCopy('quest.side.sapphire.stage.secret.complete', [
+  'Crumbs on silk. A countess who moans and does not apologize. The coast will never be the same.',
+]);
+registerQuestCopy('quest.side.sapphire.stage.ball.desc', [
+  'Transform the Grand Tide Ball into gospel — public, glorious, impossible to deny.',
+]);
+registerQuestCopy('quest.side.sapphire.stage.ball.complete', [
+  'The ball ends in applause and scandal. Vesperia glows at center court — your coastal herald, whether she admits it or not.',
+]);
+registerQuestCopy('quest.side.sapphire.complete', [
+  'The Indulgent Countess arc closes. Sapphire Coast politics now bend toward abundance.',
+]);
+
+// ─── Side: Barrow Voice (Tier 3, level 11+) ───────────────────────────────
+
+registerQuestCopy('quest.side.barrow.title', ['What the Dead Know']);
+registerQuestCopy('quest.side.barrow.desc', [
+  'Veshanne\'s barrow-oracle remembers what the Wheel forgot — including why the Fat Goddess was excluded at the founding.',
+]);
+registerQuestCopy('quest.side.barrow.stage.descent.desc', [
+  'Descend into oath-carved dark. The inverted hunger waits below.',
+]);
+registerQuestCopy('quest.side.barrow.stage.descent.complete', [
+  'The deeps exhale cold truth. Something older than orthodoxy watches you pass.',
+]);
+registerQuestCopy('quest.side.barrow.stage.oracle.desc', [
+  'Break the golem-seal. Hear what the dead have always known about your patron.',
+]);
+registerQuestCopy('quest.side.barrow.stage.oracle.complete', [
+  'The oracle speaks: the Fat Goddess was deliberately unseated when the Wheel was forged. Your apotheosis is not accident — it is return.',
+]);
+registerQuestCopy('quest.side.barrow.complete', [
+  'What the Dead Know — complete. Act III endings will remember this truth.',
+]);
