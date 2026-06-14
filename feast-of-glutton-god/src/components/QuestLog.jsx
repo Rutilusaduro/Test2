@@ -13,6 +13,7 @@ import {
   getQuestStageDescription,
 } from '../textEngine/scenes/quests/index.js';
 import { QUEST_TAG } from '../gameData/quests/constants.js';
+import { narrateEvent } from '../gameData/narrator.js';
 
 const TAG_LABELS = {
   [QUEST_TAG.ABUNDANCE]: 'Abundance',
@@ -30,7 +31,7 @@ export default function QuestLog({ game, regionId, onUpdate }) {
     onUpdate((g) => {
       const result = tryStartQuest(g, questId);
       if (result.ok) {
-        g.lastQuestMessage = result.message;
+        narrateEvent(g, result.message, 'quest');
       }
       return { ...g };
     });
@@ -83,14 +84,8 @@ export default function QuestLog({ game, regionId, onUpdate }) {
   );
 
   return (
-    <div className="panel">
+    <div className="panel panel--log">
       <h2>Quest Log</h2>
-
-      {game.lastQuestMessage && (
-        <div className="prose" style={{ marginBottom: '1rem', borderLeft: '2px solid var(--gold)', paddingLeft: '0.75rem' }}>
-          {game.lastQuestMessage}
-        </div>
-      )}
 
       {main.length > 0 && (
         <>

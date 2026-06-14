@@ -1,3 +1,4 @@
+import './npc/unmet.js';
 import './npc/observe.js';
 import './npc/feed.js';
 import './npc/talk.js';
@@ -17,7 +18,9 @@ import './growthEvent/index.js';
 import './growth/index.js';
 import './quests/index.js';
 import './leveling/index.js';
+import './dm/index.js';
 
+export { renderUnmetDescriptor } from './npc/unmet.js';
 export { renderObserve, POSES } from './npc/observe.js';
 export { renderFeed, FEED_TEMPLATE } from './npc/feed.js';
 export { renderTalk, TALK_TEMPLATE } from './npc/talk.js';

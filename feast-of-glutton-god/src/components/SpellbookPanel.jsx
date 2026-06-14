@@ -15,8 +15,9 @@ import { getSpell } from '../gameData/spells.js';
 import { isGrowthThemedSpell } from '../gameData/spellLearning.js';
 
 import { recordSpellOnFeatureForQuests } from '../hooks/puzzleHooks.js';
+import SpellSlotPips from './SpellSlotPips.jsx';
 
-export default function SpellbookPanel({ game, npcs, features = [], onCastResult, onGameUpdate, onFeatureCast }) {
+export default function SpellbookPanel({ game, npcs, features = [], onCastResult, onGameUpdate, onFeatureCast, onClose }) {
   const [selectedSpell, setSelectedSpell] = useState(null);
   const [targetNpc, setTargetNpc] = useState(null);
   const [targetFeature, setTargetFeature] = useState(null);
@@ -28,7 +29,6 @@ export default function SpellbookPanel({ game, npcs, features = [], onCastResult
   const player = game.player;
   const spells = getOverworldCastableSpells(player);
   const prepStatus = getPreparationStatus(player);
-  const slots = player.spellSlots?.current || [];
   const isWizard = usesSpellPreparation(player.classId);
   const spellbookIds = isWizard ? getSpellbookLeveledIds(player) : [];
 
@@ -132,7 +132,7 @@ export default function SpellbookPanel({ game, npcs, features = [], onCastResult
 
   if (!spells.length && !isWizard) {
     return (
-      <div className="panel">
+      <div className="panel panel--spellbook">
         <h2>Spellbook</h2>
         <p className="prose" style={{ fontSize: '0.9rem' }}>No overworld spells known yet — level up to learn abundance magic.</p>
       </div>
@@ -140,7 +140,7 @@ export default function SpellbookPanel({ game, npcs, features = [], onCastResult
   }
 
   return (
-    <div className="panel">
+    <div className="panel panel--spellbook">
       <h2>Spellbook — Spread Abundance</h2>
       {isWizard && (
         <div style={{ marginBottom: '0.75rem' }}>
@@ -243,16 +243,10 @@ export default function SpellbookPanel({ game, npcs, features = [], onCastResult
         </>
       )}
 
-      <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)', marginTop: '0.5rem' }}>
-        Slots: {[1, 2, 3, 4, 5].map((l) => {
-          const n = slots[l - 1] ?? 0;
-          const max = player.spellSlots?.max?.[l - 1] ?? 0;
-          return max > 0 ? `${l}:${n}/${max} ` : null;
-        }).filter(Boolean).join('·') || 'Cantrips only'}
-      </div>
+      <SpellSlotPips player={player} />
 
       {result && (
-        <div className="panel prose" style={{ marginTop: '1rem', borderColor: 'var(--rose)' }}>
+        <div className="panel prose spell-result" style={{ marginTop: '1rem', borderColor: 'var(--rose)' }}>
           {result}
         </div>
       )}

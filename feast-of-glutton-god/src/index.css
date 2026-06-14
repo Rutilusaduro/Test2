@@ -141,14 +141,15 @@ button.primary:hover:not(:disabled) {
 }
 
 .combat-cell {
-  width: 36px;
-  height: 36px;
+  width: var(--cell, 36px);
+  height: var(--cell, 36px);
   background: var(--bg-deep);
   display: flex;
   align-items: center;
   justify-content: center;
   font-size: 0.65rem;
   cursor: pointer;
+  position: relative;
 }
 
 .combat-cell.ally { background: #1a3020; }
@@ -333,4 +334,408 @@ button.primary:hover:not(:disabled) {
 @keyframes fade-in {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: translateY(0); }
+}
+
+/* ─── Panel variants & UI zones ─────────────────────────────────────────── */
+
+:root {
+  --elevation-1: 0 2px 8px rgba(0, 0, 0, 0.25);
+  --elevation-2: 0 4px 16px rgba(0, 0, 0, 0.35);
+}
+
+.panel--narration {
+  border-left: 3px solid var(--gold);
+  box-shadow: var(--elevation-1);
+}
+
+.panel--people {
+  border-left: 3px solid var(--rose);
+  box-shadow: var(--elevation-1);
+}
+
+.panel--actions {
+  border-left: 3px solid var(--border);
+}
+
+.panel--log {
+  border-left: 3px solid var(--text-dim);
+}
+
+.panel--spellbook {
+  border-left: 3px solid #6a5a8a;
+  box-shadow: var(--elevation-1);
+}
+
+/* ─── DM banner ─────────────────────────────────────────────────────────── */
+
+.dm-banner {
+  background: linear-gradient(135deg, rgba(26, 16, 32, 0.95), rgba(36, 21, 48, 0.98));
+  border: 1px solid var(--gold);
+  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1rem;
+  box-shadow: var(--elevation-2);
+}
+
+.dm-banner--compact {
+  padding: 0.65rem 1rem;
+  font-size: 0.9rem;
+}
+
+.dm-banner__scene {
+  color: var(--text);
+  font-style: italic;
+  margin: 0;
+}
+
+.dm-banner__event {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  margin-top: 0.75rem;
+  padding: 0.65rem 0.85rem;
+  background: rgba(196, 91, 122, 0.12);
+  border: 1px solid var(--rose);
+  border-radius: 6px;
+  font-size: 0.95rem;
+}
+
+.dm-banner__event p {
+  flex: 1;
+  margin: 0;
+}
+
+.dm-banner__dismiss {
+  padding: 0.15rem 0.45rem;
+  font-size: 0.75rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+/* ─── NPC cards ─────────────────────────────────────────────────────────── */
+
+.npc-grid {
+  grid-template-columns: 1fr;
+}
+
+.npc-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  text-align: left;
+  padding: 0.75rem 1rem;
+}
+
+.npc-card--unmet {
+  opacity: 0.92;
+  border-style: dashed;
+}
+
+.npc-card__glyph {
+  font-size: 1.25rem;
+  color: var(--gold);
+  width: 1.5rem;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.npc-card__body {
+  flex: 1;
+  min-width: 0;
+}
+
+.npc-card__meta {
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  margin-top: 0.25rem;
+}
+
+.npc-card__meta--unmet {
+  font-style: italic;
+  line-height: 1.4;
+}
+
+.npc-card__unmet-label {
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.modal-footer-hint {
+  width: 100%;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  font-style: italic;
+  margin: 0.25rem 0 0;
+}
+
+/* ─── Spell slot pips ───────────────────────────────────────────────────── */
+
+.spell-pips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  margin-top: 0.5rem;
+}
+
+.spell-pips--compact {
+  gap: 0.35rem 0.75rem;
+  margin-top: 0;
+}
+
+.spell-pips__row {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.8rem;
+}
+
+.spell-pips__row--pact .pip--filled {
+  color: #b07aff;
+}
+
+.spell-pips__label {
+  color: var(--text-dim);
+  min-width: 1.5rem;
+}
+
+.pip {
+  font-size: 0.7rem;
+  line-height: 1;
+}
+
+.pip--filled {
+  color: var(--gold-bright);
+}
+
+.pip--empty {
+  color: var(--border);
+}
+
+.spell-pips__cantrips {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+/* ─── Combat UX ─────────────────────────────────────────────────────────── */
+
+.combat-view {
+  padding-bottom: 5.5rem;
+}
+
+.combat-economy {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem 1.25rem;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.action-pips {
+  display: flex;
+  gap: 0.75rem;
+}
+
+.action-pip {
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  font-size: 0.85rem;
+  color: var(--text-dim);
+}
+
+.action-pip--ready .action-pip__dot {
+  color: var(--gold-bright);
+}
+
+.action-pip--spent .action-pip__dot {
+  color: var(--border);
+}
+
+.action-pip--flash {
+  animation: pip-flash 0.6s ease-out;
+}
+
+@keyframes pip-flash {
+  0% { color: var(--rose); transform: scale(1.2); }
+  100% { color: var(--text-dim); transform: scale(1); }
+}
+
+.movement-bar {
+  flex: 1;
+  min-width: 120px;
+  max-width: 220px;
+  height: 1.25rem;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 4px;
+  border: 1px solid var(--border);
+  position: relative;
+  overflow: hidden;
+}
+
+.movement-bar__fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--rose-deep), var(--gold));
+  transition: width 0.2s;
+}
+
+.movement-bar__label {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  color: var(--text);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+}
+
+.combat-cell__hp {
+  position: absolute;
+  bottom: 2px;
+  left: 10%;
+  height: 3px;
+  background: var(--rose);
+  border-radius: 1px;
+  max-width: 80%;
+}
+
+.enemy-inspector {
+  border-color: var(--rose);
+  margin-bottom: 0.75rem;
+}
+
+.enemy-inspector__hp {
+  height: 8px;
+  background: rgba(0, 0, 0, 0.35);
+  border-radius: 4px;
+  margin: 0.5rem 0 0.75rem;
+  overflow: hidden;
+}
+
+.enemy-inspector__hp-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--rose-deep), var(--rose));
+  transition: width 0.25s;
+}
+
+.combat-action-bar {
+  position: sticky;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--bg-panel);
+  border-top: 1px solid var(--gold);
+  padding: 0.65rem 1rem;
+  margin: 0 -1rem -1rem;
+  box-shadow: 0 -4px 16px rgba(0, 0, 0, 0.4);
+  z-index: 10;
+}
+
+.combat-action-bar__confirm {
+  font-size: 0.8rem;
+  color: var(--gold);
+  margin-bottom: 0.5rem;
+  text-align: center;
+}
+
+.combat-action-bar__buttons {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+}
+
+.combat-action-bar__buttons button {
+  min-height: 44px;
+  min-width: 72px;
+  padding: 0.5rem 0.75rem;
+}
+
+.combat-log-toggle {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: none;
+  color: var(--gold);
+  font-size: 0.95rem;
+  padding: 0;
+}
+
+.combat-log-latest {
+  display: block;
+  font-size: 0.8rem;
+  color: var(--text-dim);
+  font-style: italic;
+  margin-top: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.combat-stats {
+  align-items: center;
+}
+
+.combat-spells-panel {
+  margin-bottom: 0.5rem;
+}
+
+/* ─── Mobile ────────────────────────────────────────────────────────────── */
+
+@media (max-width: 768px) {
+  .app {
+    padding: 0.75rem;
+  }
+
+  .header h1 {
+    font-size: 1.35rem;
+  }
+
+  .stats-bar {
+    font-size: 0.75rem;
+    gap: 0.4rem;
+  }
+
+  .btn-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .combat-grid {
+    --cell: min(36px, calc((100vw - 2rem) / var(--grid-cols, 10)));
+    width: 100%;
+    max-width: 100%;
+    margin: 0.5rem auto;
+  }
+
+  .combat-view {
+    padding-bottom: 6.5rem;
+  }
+
+  .combat-action-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    margin: 0;
+    padding: 0.75rem;
+  }
+
+  .combat-action-bar__buttons button {
+    flex: 1 1 calc(33% - 0.5rem);
+    font-size: 0.85rem;
+  }
+
+  .panel {
+    padding: 1rem;
+  }
+
+  .prose {
+    font-size: 0.95rem;
+  }
+
+  .dm-banner__scene {
+    font-size: 0.9rem;
+  }
 }

@@ -5,7 +5,8 @@ import WorldView from "./components/WorldView.jsx";
 import CombatView from "./components/CombatView.jsx";
 import LevelUpModal from "./components/LevelUpModal.jsx";
 import GameDebugShell from "./components/GameDebugShell.jsx";
-import { createNewGame, addAbundancePoints, syncPlayerFromCombat } from "./gameData/player.js";
+import { createNewGame, addAbundancePoints, syncPlayerFromCombat, ensureDmState } from "./gameData/player.js";
+import { clearTransient, narrateEvent } from "./gameData/narrator.js";
 import { saveGame, loadGame } from "./gameData/save.js";
 import { createCombatState, getCombatRewards } from "./gameData/combat.js";
 import { pickEncounter } from "./gameData/enemies.js";
@@ -46,7 +47,9 @@ function applyLevelUpResults(game, levelUps) {
   if (!levelUps?.length) return game;
   const last = levelUps[levelUps.length - 1];
   game.lastLevelUpResult = last;
-  game.lastLevelUpMessage = levelUps.map((lu) => lu.narrative || `Level ${lu.level}! ${lu.flavor}`).join("\n\n---\n\n");
+  const message = levelUps.map((lu) => lu.narrative || `Level ${lu.level}! ${lu.flavor}`).join("\n\n---\n\n");
+  game.lastLevelUpMessage = message;
+  narrateEvent(game, message, 'levelup');
   return game;
 }
 
@@ -62,6 +65,7 @@ export default function App() {
     ensureInfluenceState(g);
     ensureTransformationState(g);
     ensureReactivityState(g);
+    ensureDmState(g);
     setGame(g);
     setScreen("world");
   }, []);
@@ -79,6 +83,7 @@ export default function App() {
       migratePlayerSpells(g.player);
       ensureQuestState(g);
       ensurePartyUniversalSize(g);
+      ensureDmState(g);
       setGame(g);
       setScreen("world");
     }
@@ -98,10 +103,12 @@ export default function App() {
       const result = completeLevelUpChoice(next.player, payload);
       if (result?.learned?.length) {
         const names = result.learned.map((s) => s.name).join(', ');
-        next.lastQuestMessage = (next.lastQuestMessage || '') + `\n\nLearned: ${names}`;
+        narrateEvent(next, `Learned: ${names}`, 'levelup');
       }
       if (result?.asi) {
-        next.lastLevelUpMessage = (next.lastLevelUpMessage || '') + `\n\n${result.asi.label} +2`;
+        const asiMsg = `${result.asi.label} +2`;
+        next.lastLevelUpMessage = (next.lastLevelUpMessage || '') + `\n\n${asiMsg}`;
+        narrateEvent(next, asiMsg, 'levelup');
       }
       const pending = next.player.levelUpsPending?.[0];
       if (pending) {
@@ -116,6 +123,7 @@ export default function App() {
 
   const startCombat = useCallback((enemyTypeId) => {
     setGame((prev) => {
+      clearTransient(prev);
       const combat = createCombatState(prev.player, prev.party, enemyTypeId, prev.region);
       const next = { ...prev, combat };
       saveGame(next);
@@ -126,6 +134,7 @@ export default function App() {
 
   const startPuzzleCombat = useCallback((pending) => {
     setGame((prev) => {
+      clearTransient(prev);
       const combat = createCombatState(prev.player, prev.party, pending.enemyId, prev.region);
       const next = {
         ...prev,
@@ -147,7 +156,7 @@ export default function App() {
       applyLevelUpResults(next, levelUps);
       const quest = recordCombatEndForQuests(next, combat);
       if (quest.questMessages) {
-        next.lastQuestMessage = quest.questMessages;
+        narrateEvent(next, quest.questMessages, 'quest');
       }
 
       if (combat.victory === 'win' || combat.victory === 'converted') {
@@ -157,7 +166,7 @@ export default function App() {
         }
         const gateMsgs = syncGateUnlocks(next, { regionId: next.region });
         if (gateMsgs.length) {
-          next.lastQuestMessage = [next.lastQuestMessage, ...gateMsgs].filter(Boolean).join('\n\n---\n\n');
+          narrateEvent(next, gateMsgs.join('\n\n---\n\n'), 'growth');
         }
       }
 
@@ -169,18 +178,15 @@ export default function App() {
           solutionId: pending.solutionId,
         });
         const puzzleNote = solveResult.text || 'The obstacle yields to your victory.';
-        next.lastQuestMessage = [next.lastQuestMessage, puzzleNote, puzzleQuest.questMessages]
-          .filter(Boolean)
-          .join('\n\n---\n\n');
+        narrateEvent(next, [puzzleNote, puzzleQuest.questMessages].filter(Boolean).join('\n\n---\n\n'), 'quest');
         next.pendingPuzzleCombat = null;
       } else if (pending) {
         next.pendingPuzzleCombat = null;
-        next.lastQuestMessage = [next.lastQuestMessage, 'The obstacle remains — but you live to try another delicious approach.']
-          .filter(Boolean)
-          .join('\n\n---\n\n');
+        narrateEvent(next, 'The obstacle remains — but you live to try another delicious approach.', 'quest');
       }
 
       next.combat = null;
+      clearTransient(next);
       saveGame(next);
       return next;
     });
