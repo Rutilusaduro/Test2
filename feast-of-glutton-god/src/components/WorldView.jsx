@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { getRegion, CONTINENT_NAME } from "../gameData/regions.js";
-import { getRegionPresentation, getRegionTransformation } from "../gameData/worldTransformation.js";
+import { getRegionPresentation, getRegionTransformation, recordRegionVisit } from "../gameData/worldTransformation.js";
 import { getCommandMode, resolveTravelMethod } from "../gameData/commandMode.js";
 import { getStageMechanics, getMobilityLabel } from "../gameData/stageMechanics.js";
 import { getInfluenceProgress, INFLUENCE_META, INFLUENCE_TRACKS } from "../gameData/influence.js";
@@ -98,6 +98,7 @@ export default function WorldView({ game, onUpdate, onEncounter, onHostilityEnco
       if (method.apCost) spendAP(g, method.apCost);
       const fromRegion = g.region;
       const next = applySettling({ ...g, region: regionId });
+      recordRegionVisit(next, regionId);
       narrate(next, 'arrival', { regionId });
       if (method.flavor) narrateEvent(next, method.flavor, 'quest');
       const quest = recordRegionVisitForQuests(next, regionId);
@@ -118,6 +119,7 @@ export default function WorldView({ game, onUpdate, onEncounter, onHostilityEnco
 
   useEffect(() => {
     onUpdate((g) => {
+      recordRegionVisit(g, g.region);
       narrate(g, 'arrival', { regionId: g.region });
       const quest = recordRegionVisitForQuests(g, g.region);
       if (quest.questMessages) {

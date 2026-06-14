@@ -1,5 +1,5 @@
 import { getRegion } from './regions.js';
-import { getRegionTransformation } from './worldTransformation.js';
+import { getRegionTransformation, getNarrativeDepth } from './worldTransformation.js';
 import { getTravelOptions } from './regionObstacles.js';
 import { getNpcsInRegion } from './npcs.js';
 import { getNpcState, ensureDmState } from './player.js';
@@ -40,6 +40,7 @@ export function narrate(game, kind, params = {}) {
       regionName: region?.name ?? regionId,
       firstVisit,
       regionTransformLevel: transform.level.id,
+      transformDepth: getNarrativeDepth(game, regionId),
     });
     const genreLine = renderGenreBeat(game, 'frame', {
       regionId,

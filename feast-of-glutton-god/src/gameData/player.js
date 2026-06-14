@@ -4,6 +4,7 @@ import { createCompanionData, COMPANIONS } from "./companions.js";
 import { ensurePartyUniversalSize } from "./universalSize.js";
 import { initSpellSlots } from "./spellSlots.js";
 import { getMaxAbundancePoints, getArmorClass } from "./stats.js";
+import { getRegionApMultiplier } from "./worldTransformation.js";
 import { getSizeCapForLevel, initializeStartingSpells } from "./leveling.js";
 import { CLASS_SKILL_PROFICIENCIES } from "./skills.js";
 import { applyRaceStatBonuses, getRace } from "./races.js";
@@ -178,8 +179,10 @@ export function getPlayerStage(player) {
 }
 
 export function addAbundancePoints(game, amount) {
+  const mult = getRegionApMultiplier(game, game.region);
+  const effective = Math.round(amount * mult);
   const max = getMaxAbundancePoints(game.player);
-  game.player.ap = Math.min(max, (game.player.ap || 0) + amount);
+  game.player.ap = Math.min(max, (game.player.ap || 0) + effective);
   return game;
 }
 

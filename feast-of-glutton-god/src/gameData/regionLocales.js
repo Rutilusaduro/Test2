@@ -62,6 +62,24 @@ export const REGION_LOCALES = {
     structure: 'marble',
     density: 'vast',
   },
+  barrow_deeps: {
+    primary: 'barrow_tunnel',
+    tags: ['underground', 'oath_stone', 'pact_smoke', 'narrow_tunnel'],
+    structure: 'stone',
+    density: 'claustrophobic',
+  },
+  gilded_citadel_inner: {
+    primary: 'inner_sanctum',
+    tags: ['cathedral', 'divine_geometry', 'high_altar', 'marble'],
+    structure: 'marble',
+    density: 'sacred',
+  },
+  divine_plane_vestibule: {
+    primary: 'planar_threshold',
+    tags: ['planar', 'impossible_architecture', 'cosmic_hall', 'geometry'],
+    structure: 'marble',
+    density: 'vast',
+  },
 };
 
 export function getLocaleForRegion(regionId) {

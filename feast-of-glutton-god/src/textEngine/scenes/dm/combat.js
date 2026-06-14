@@ -8,7 +8,7 @@ import '../../modules.js';
 import { getStage } from '../../../gameData/stages.js';
 import { getRegion } from '../../../gameData/regions.js';
 import { getLocaleKey } from '../../../gameData/regionLocales.js';
-import { getRegionTransformation } from '../../../gameData/worldTransformation.js';
+import { getRegionTransformation, getNarrativeDepth } from '../../../gameData/worldTransformation.js';
 import { ENEMY_TYPES, isCosmicThreat } from '../../../gameData/enemies.js';
 import { renderCosmicIntro, renderCosmicOutro } from './cosmic.js';
 import { APPEARANCE_BY_TYPE } from './enemyAppearance.js';
@@ -31,11 +31,13 @@ function buildIntroGlobals(game, combat, primary, enemyCount) {
   const region = combat.regionId ?? game.region;
   const regionInfo = getRegion(region);
   const transform = getRegionTransformation(game, region);
+  const narrativeDepth = getNarrativeDepth(game, region);
   return {
     region,
     locale: getLocaleKey(region),
     regionName: regionInfo?.name,
-    regionTransformation: transform.level.level,
+    regionTransformation: transform.effectiveLevel,
+    transformDepth: narrativeDepth,
     enemyType: primary?.type ?? primary?.typeId,
     enemySizeBand: getEnemySizeBand(primary?.startLbs ?? primary?.lbs),
     enemyCount,
@@ -49,6 +51,7 @@ function buildOutroGlobals(game, wrapup, enemy, outcomeKind) {
   const region = wrapup.region ?? game.region;
   const regionInfo = getRegion(region);
   const transform = getRegionTransformation(game, region);
+  const narrativeDepth = getNarrativeDepth(game, region);
   const victoryType = wrapup.victory === 'lose' ? 'defeat'
     : wrapup.victory === 'converted' ? 'converted'
     : wrapup.victory === 'flee' ? 'flee'
@@ -57,7 +60,8 @@ function buildOutroGlobals(game, wrapup, enemy, outcomeKind) {
     region,
     locale: getLocaleKey(region),
     regionName: regionInfo?.name,
-    regionTransformation: transform.level.level,
+    regionTransformation: transform.effectiveLevel,
+    transformDepth: narrativeDepth,
     enemyType: enemy?.type,
     enemySizeBand: getEnemySizeBand(enemy?.lbs ?? enemy?.startLbs),
     enemyCount: wrapup.enemies?.length ?? 1,

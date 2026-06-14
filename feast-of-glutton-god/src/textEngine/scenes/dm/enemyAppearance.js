@@ -211,4 +211,11 @@ export const APPEARANCE_BY_TYPE = {
     'coastal countess of the long night — straight, severe beauty softening at the sight of your abundance, lips parted',
     'undead elegance advancing — cold skin already warming where your gospel touches, thighs clenched, craving disguised as disdain',
   ],
+  living_feast_spirit: [
+    'living feast spirit coalescing — honey-light dripping from translucent curves, arms open, giggling worship of fullness',
+    'celestial abundance given giggling form — belly already plush, nipples peaked through shimmering skin, begging to swell',
+    'feast-spirit drifting between pillars — rotund silhouette of answered prayer, scent of pastry and divine consent',
+    'translucent curves shimmering with banquet-light — celebrant enemy who wants only to be fed fuller in worship',
+    'abundance made friendly and indecent — spirit flesh jiggling with every delighted breath, hunger without malice',
+  ],
 };

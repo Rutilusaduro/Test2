@@ -1,5 +1,6 @@
 import { MAX_STAGE_ID } from "./stages.js";
 import { getEnemyGrowthKind } from "./enemyGrowthKinds.js";
+import { getNarrativeDepth } from "./worldTransformation.js";
 
 const MUNDANE = { threatTier: "mundane" };
 const MYTHIC = {
@@ -524,6 +525,20 @@ export const ENEMY_TYPES = {
     phases: [{ id: "crimson_thirst", hpPct: 0.45, label: "Crimson Thirst" }],
     ...MYTHIC,
   },
+  living_feast_spirit: {
+    id: "living_feast_spirit",
+    name: "Living Feast Spirit",
+    bodyType: "rotund",
+    startLbs: 155,
+    hp: 20,
+    mp: 12,
+    movement: 3,
+    role: "celebrant",
+    conversion: 0.98,
+    desc: "Celestial abundance given giggling form — translucent curves dripping honey-light, arms open, begging to be fed fuller in worship.",
+    growthResist: 0.1,
+    ...MUNDANE,
+  },
 };
 
 export const COSMIC_ENEMY_IDS = Object.keys(ENEMY_TYPES).filter(
@@ -613,21 +628,44 @@ export function createEnemy(typeId) {
 export function pickEncounter(regionId, game = null) {
   const escalation = game?.worldFlags?.escalationTier ?? 0;
   const playerLevel = game?.player?.level ?? 1;
+  const narrativeDepth = game ? getNarrativeDepth(game, regionId) : 0;
+
+  let gorgaraCradle = escalation >= 3
+    ? ["purity_inquisitor", "champion_lumen", "wheel_avatar"]
+    : escalation >= 1
+      ? ["temple_guardian", "purity_inquisitor", "velvet_succubus"]
+      : ["temple_guardian", "purity_inquisitor", "ascetic_monk"];
+  if (narrativeDepth >= 5) {
+    gorgaraCradle = ["living_feast_spirit", "lean_pilgrim", "temple_guardian"];
+  } else if (narrativeDepth >= 4) {
+    gorgaraCradle = ["lean_pilgrim", "living_feast_spirit", "velvet_succubus", ...gorgaraCradle];
+  }
+
+  let ancientTemple = escalation >= 2
+    ? ["purity_inquisitor", "famine_hag", "champion_sylwen", "crimson_vampire"]
+    : ["temple_guardian", "purity_inquisitor", "famine_cultist"];
+  if (narrativeDepth >= 5) {
+    ancientTemple = ["living_feast_spirit", "lean_pilgrim", "void_appetite", "cathedral_golem"];
+  } else if (narrativeDepth >= 4) {
+    ancientTemple = ["vinebound_dryad", "lean_pilgrim", "famine_cultist", "living_feast_spirit"];
+  }
+
+  let gildedCitadel = escalation >= 2
+    ? ["champion_aurelan", "champion_lumen", "purity_inquisitor", "cathedral_golem"]
+    : ["purity_inquisitor", "rival_adventurer", "ascetic_monk"];
+  if (narrativeDepth >= 5) {
+    gildedCitadel = ["famine_cultist", "divine_inquisitor_supreme", "cathedral_golem", "lean_pilgrim"];
+  } else if (narrativeDepth >= 4) {
+    gildedCitadel = ["divine_inquisitor_supreme", "cathedral_golem", "champion_aurelan"];
+  }
+
   const pools = {
     harvest_hearth: ["harvest_harpy", "gluttonous_goblin", "lean_pilgrim"],
     market_square: ["rival_adventurer", "gluttonous_goblin", "jealous_noble", "famine_cultist"],
     fertile_heartlands: ["vinebound_dryad", "harvest_harpy", "measure_priest"],
-    gorgara_cradle: escalation >= 3
-      ? ["purity_inquisitor", "champion_lumen", "wheel_avatar"]
-      : escalation >= 1
-        ? ["temple_guardian", "purity_inquisitor", "velvet_succubus"]
-        : ["temple_guardian", "purity_inquisitor", "ascetic_monk"],
-    ancient_temple: escalation >= 2
-      ? ["purity_inquisitor", "famine_hag", "champion_sylwen", "crimson_vampire"]
-      : ["temple_guardian", "purity_inquisitor", "famine_cultist"],
-    gilded_citadel: escalation >= 2
-      ? ["champion_aurelan", "champion_lumen", "purity_inquisitor", "cathedral_golem"]
-      : ["purity_inquisitor", "rival_adventurer", "ascetic_monk"],
+    gorgara_cradle: gorgaraCradle,
+    ancient_temple: ancientTemple,
+    gilded_citadel: gildedCitadel,
     ember_duchy: ["purity_inquisitor", "champion_korthak", "jealous_noble"],
     northern_marches: ["champion_korthak", "rival_adventurer", "lean_pilgrim"],
     sapphire_coast: ["rival_adventurer", "vinebound_dryad", "jealous_noble", "crimson_vampire"],

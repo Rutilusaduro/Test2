@@ -106,6 +106,17 @@ export const ENEMY_SPECIES_GROWTH_CHUNKS = [
       "Hunger-reversal magic fails as {subject.name}'s belly surges outward, cult tattoos distorting on soft skin.",
     ],
   },
+  // ── FEAST SPIRIT — celestial abundance ──
+  {
+    growthKind: 'spirit',
+    texts: [
+      "{subject.name}'s translucent curves ripple with honey-light — feast-spirit flesh swelling as if the goddess herself poured seconds.",
+      "Celestial abundance thickens {subject.first}'s belly; she giggles, arms open, begging worship through visible, jiggling inches.",
+      "{subject.name}'s shimmering skin grows opaquer with plushness — spirit matter learning the joy of weight.",
+      "Banquet-light pools in {subject.first}'s hips and breasts; she moans like dessert given voice and delighted consent.",
+      "{subject.name} swells with answered prayer — every new pound a hymn the Wheel never wrote.",
+    ],
+  },
   // ── NOBLE ──
   {
     growthKind: 'noble',

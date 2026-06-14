@@ -25,6 +25,7 @@ export const ENEMY_GROWTH_KIND = {
   wheel_incarnate: 'divine_wheel',
   ascetic_monk: 'ascetic',
   lean_pilgrim: 'ascetic',
+  living_feast_spirit: 'spirit',
   measure_priest: 'ascetic',
   jealous_noble: 'noble',
   famine_cultist: 'cultist',

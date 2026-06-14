@@ -22,6 +22,7 @@ import { renderPuzzleText } from '../textEngine/scenes/puzzles/index.js';
 import { getCombinedPuzzleBonuses } from './worldAuras.js';
 import { CONNECTION_GATES, syncGateUnlocks } from './regionObstacles.js';
 import { tryClearObstacle } from './obstacleUnlocks.js';
+import { recordGorgaraManifestCast } from './worldTransformation.js';
 import {
   getSpellGrowthFavorCost,
   canSpendFavor,
@@ -165,11 +166,14 @@ export function castSpellOnNpc(game, npc, spellId, opts = {}) {
   const spreadNote = spread.gained ? `\n\n✦ Abundance spreads (+${spread.gained} world influence)` : '';
   const eventNote = spread.worldEvent?.triggered ? `\n\n${spread.worldEvent.message}` : '';
   const perk = getStagePerk(player);
+  const manifestNote = recordGorgaraManifestCast(game, spellId)
+    ? '\n\n✦ The Fat Goddess manifests in the cradle — the Thin Veil will never be thin again.'
+    : '';
 
   return {
     ok: true,
     npc: target,
-    text: `${prose}\n\n${growthText}${spreadNote}${eventNote}`.trim(),
+    text: `${prose}\n\n${growthText}${spreadNote}${eventNote}${manifestNote}`.trim(),
     effects,
     spread,
     casterPerk: perk.label,
@@ -233,10 +237,13 @@ export function castSpellOnFeature(game, featureId, spellId, opts = {}) {
   if (gateMessages.length) {
     text += `\n\n${gateMessages.join('\n\n')}`;
   }
+  const manifestNote = recordGorgaraManifestCast(game, spellId)
+    ? '\n\n✦ The Fat Goddess manifests in the cradle — the Thin Veil will never be thin again.'
+    : '';
 
   return {
     ok: true,
-    text: `${text}${spreadNote}`.trim(),
+    text: `${text}${spreadNote}${manifestNote}`.trim(),
     feature,
     puzzleSolve,
     spread,
