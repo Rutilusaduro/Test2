@@ -57,9 +57,9 @@ const ATTACK_CRIT_CORE = {
       'Violence transmuted to worship — critical hit, critical cuddle, critical size.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'Leviathan critical — reality dimples where you strike; {ref.first} balloons, mythic and thrilled.',
+      'Reality dimples where you strike; {ref.first} balloons, radiant and thrilled.',
       'Your blow rewrites {ref.name}\'s silhouette; the battlefield worships.',
       'Critical impact at world scale; softness cascades.',
     ],
@@ -72,6 +72,23 @@ const ATTACK_CRIT_CORE = {
       'Devoted cataclysm — you and {ref.first} swell through the critical blow like vows.',
       'Your lover becomes landscape under your strike, larger, singing praise.',
       'Critical hit, critical apotheosis; flesh remembers.',
+    ],
+  },
+  world: {
+    distant: [
+      'Reality buckles where you strike; {ref.first} balloons, gloriously thrilled.',
+      'Your blow rewrites {ref.name}\'s silhouette; the battlefield worships.',
+      'Critical impact at apotheotic scale; softness cascades.',
+    ],
+    warm: [
+      '{ref.first} cheers the seismic hit — community fatness, festival combat',
+      'You strike; mountains jiggle; friends swell applauding',
+      'Critical legend; {ref.name} fatter for witnessing',
+    ],
+    intimate: [
+      'Devoted cataclysm — you and {ref.first} swell through the critical blow like vows',
+      'Your lover becomes landscape under your strike, larger, singing praise',
+      'Critical hit, critical apotheosis; flesh remembers',
     ],
   },
 };
@@ -128,10 +145,10 @@ const ATTACK_FUMBLE_CORE = {
       'Devotion absorbs the miss into pounds.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
       'Continent swings at air — tremor delights; {ref.first} swells watching.',
-      'Leviathan fumble; Leviathan pride intact.',
+      'Immense pride intact — the miss still shakes the earth.',
       'Critical miss, critical legend, critical jiggle.',
     ],
     warm: [
@@ -143,6 +160,23 @@ const ATTACK_FUMBLE_CORE = {
       'You and {ref.first} swell through the miss like wedding cake — devoted disaster.',
       'Lover proves fumbles can be prayer.',
       'Critical miss, critical kiss, critical size.',
+    ],
+  },
+  world: {
+    distant: [
+      'The realm swings at air — tremor delights; {ref.first} swells watching.',
+      'Immense pride intact — the miss still shakes the earth',
+      'Critical miss, critical legend, critical jiggle',
+    ],
+    warm: [
+      '{ref.name} narrates the miss for the crowd — everyone rounder, cheering',
+      'Myth trips; abundance applauds',
+      'Critical comedy at apotheotic scale.',
+    ],
+    intimate: [
+      'You and {ref.first} swell through the miss like wedding cake — devoted disaster',
+      'Lover proves fumbles can be prayer',
+      'Critical miss, critical kiss, critical size',
     ],
   },
 };
@@ -197,9 +231,9 @@ registerCheckPool('combat.crit.attack.ranged', {
       '{ref.first} grows from your aim like answered prayer.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'Leviathan precision — the bolt carries myth; {ref.first} swells thunderously.',
+      'Continental precision — the bolt carries myth; {ref.first} swells thunderously.',
       'You shoot continents; {ref.name} ripples softer.',
     ],
     warm: [
@@ -209,6 +243,20 @@ registerCheckPool('combat.crit.attack.ranged', {
     intimate: [
       'You mark your devoted lover from impossible distance — critical apotheosis.',
       '{ref.name} fattens singing your name.',
+    ],
+  },
+  world: {
+    distant: [
+      'The realmal precision — the bolt carries myth; {ref.first} swells thunderously.',
+      'You shoot the realms; {ref.name} ripples softer.',
+    ],
+    warm: [
+      '{ref.first} leads cheer for the impossible crit — festival fatness',
+      'Critical legend at range; community swells',
+    ],
+    intimate: [
+      'You mark your devoted lover from impossible distance — critical apotheosis',
+      '{ref.name} fattens singing your name',
     ],
   },
 });
@@ -256,9 +304,9 @@ registerCheckPool('combat.crit.attack.spell', {
       '{ref.name} fattens inside your weave, consecrated.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'Leviathan magic critical — reality softens; {ref.first} balloons mythically.',
+      'Cataclysmic spellcraft — reality softens; {ref.first} balloons mythically.',
       'You rewrite {ref.name} with abundance; battlefield kneels.',
     ],
     warm: [
@@ -268,6 +316,20 @@ registerCheckPool('combat.crit.attack.spell', {
     intimate: [
       'Devoted cataclysm spell — you and {ref.first} swell through critical overflow.',
       'Lover becomes living proof of your crit.',
+    ],
+  },
+  world: {
+    distant: [
+      'Cataclysmic spellcraft — reality softens; {ref.first} balloons apotheotically.',
+      'You rewrite {ref.name} with abundance; province kneels.',
+    ],
+    warm: [
+      '{ref.first} narrates the critical spell for crowds — festival flesh',
+      'Myth crit; everyone rounder',
+    ],
+    intimate: [
+      'Devoted cataclysm spell — you and {ref.first} swell through critical overflow',
+      'Lover becomes living proof of your crit',
     ],
   },
 });
@@ -281,13 +343,15 @@ registerCheckPool('combat.attack.critical_hit.ranged', {
   mid: { distant: ATTACK_CRIT_CORE.mid.distant, warm: ATTACK_CRIT_CORE.mid.warm, intimate: ATTACK_CRIT_CORE.mid.intimate },
   lean: { distant: ['Your shot threads the needle — {ref.first} swells where it lands, precision becoming appetite.'] },
   heavy: { distant: ['Impossible aim at vast scale — {ref.name} balloons, stunned by critical marksmanship.'] },
-  extreme: { distant: ['Leviathan precision reshapes {ref.first} — critical myth at range.'] },
+  vast: { distant: ['Continental precision reshapes {ref.first} — critical myth at range.'] },
+  world: { distant: ['Continental precision reshapes {ref.first} — critical myth at range.'] },
 });
 registerCheckPool('combat.attack.critical_hit.spell', {
   lean: { distant: ['Arcane abundance erupts — {ref.first} blooms under critical magic.'] },
   mid: { distant: ['Critical spell ripples softness through {ref.name} like golden tide.'] },
   heavy: { distant: ['Vast power fuels critical weave — {ref.first} moans, grander.'] },
-  extreme: { distant: ['Leviathan magic critical — {ref.name} swells thunderously.'] },
+  vast: { distant: ['Cataclysmic spellcraft — {ref.name} swells thunderously.'] },
+  world: { distant: ['Cataclysmic spellcraft — {ref.name} swells thunderously.'] },
 });
 
 // ─── Attack fumble pools ─────────────────────────────────────────────────────
@@ -340,10 +404,10 @@ registerCheckPool('combat.fumble.attack.ranged', {
       'Critical cuddle replaces critical shot.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
       'Continent aims at sky — crowd swells cheering the whiff.',
-      'Leviathan miss still legendary.',
+      'A miss at this scale is still legendary.',
     ],
     warm: [
       '{ref.name} retells the miss as gospel — festival softness.',
@@ -352,6 +416,20 @@ registerCheckPool('combat.fumble.attack.ranged', {
     intimate: [
       'Lover catches you mid-fumble — critical growth, critical kiss.',
       '{ref.first} fattens proud of your try.',
+    ],
+  },
+  world: {
+    distant: [
+      'The realm aims at sky — crowd swells cheering the whiff.',
+      'A miss at this scale is still legendary',
+    ],
+    warm: [
+      '{ref.name} retells the miss as gospel — festival softness',
+      'Myth fumbles; abundance wins',
+    ],
+    intimate: [
+      'Lover catches you mid-fumble — critical growth, critical kiss',
+      '{ref.first} fattens proud of your try',
     ],
   },
 });
@@ -399,9 +477,9 @@ registerCheckPool('combat.fumble.attack.spell', {
       'Lover wears your fumble like jewelry.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'Leviathan miscast reshapes you — crowd swells watching.',
+      'A continent-scale miscast reshapes you — crowd swells watching.',
       'Myth hiccups; abundance cascades.',
     ],
     warm: [
@@ -411,6 +489,20 @@ registerCheckPool('combat.fumble.attack.spell', {
     intimate: [
       'You and your lover drown in friendly spell foam — critical softness.',
       '{ref.name} fattens singing through glitter.',
+    ],
+  },
+  world: {
+    distant: [
+      'A the realm-scale miscast reshapes you — crowd swells watching.',
+      'Myth hiccups; abundance cascades',
+    ],
+    warm: [
+      '{ref.first} narrates the magical disaster — festival flesh',
+      'Titans fumble spectacularly',
+    ],
+    intimate: [
+      'You and your lover drown in friendly spell foam — critical softness',
+      '{ref.name} fattens singing through glitter',
     ],
   },
 });
@@ -423,13 +515,15 @@ registerCheckPool('combat.attack.critical_miss.ranged', {
   lean: { distant: ['Your aim drifts — distracted by power\'s pleasure; you soften, blush, try again.'] },
   mid: { distant: ['Shot wide; your {word.size} belly jiggles the apology.'] },
   heavy: { distant: ['Too vast to steady — miss becomes spectacle; you grow anyway.'] },
-  extreme: { distant: ['Leviathan whiff delights the crowd; softness spreads.'] },
+  vast: { distant: ['Your vast form whiffs and still delights the crowd; softness spreads.'] },
+  world: { distant: ['Your vast form whiffs and still delights the crowd; softness spreads.'] },
 });
 registerCheckPool('combat.attack.critical_miss.spell', {
   lean: { distant: ['The weave hiccups — warmth floods you instead, pleasantly rounding lean curves.'] },
   mid: { distant: ['Spell backfires into your own abundance — critical miss, critical glow.'] },
   heavy: { distant: ['Magic splashes your vastness — jiggle, grin, continue.'] },
-  extreme: { distant: ['Continental miscast — you swell, mythic and amused.'] },
+  vast: { distant: ['Continental miscast — you swell, mythic and amused.'] },
+  world: { distant: ['Continental miscast — you swell, mythic and amused.'] },
 });
 
 // ─── Save pools ──────────────────────────────────────────────────────────────
@@ -477,9 +571,9 @@ const SAVE_CRIT_CORE = {
       '{ref.name} fattens kissing your invincible plush.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'Leviathan save — reality bends, fails, applauds your abundance.',
+      'Reality bends — reality bends, fails, applauds your abundance.',
       'Critical immunity at myth scale; world softer watching.',
     ],
     warm: [
@@ -489,6 +583,20 @@ const SAVE_CRIT_CORE = {
     intimate: [
       'You and {ref.first} swell through saved triumph like vows.',
       'Devoted invincibility — critical kiss, critical pounds anyway.',
+    ],
+  },
+  world: {
+    distant: [
+      'Reality bends — reality bends, fails, applauds your abundance',
+      'Critical immunity at myth scale; world softer watching',
+    ],
+    warm: [
+      '{ref.first} leads festival cheer for your save — everyone rounder',
+      'Myth shrug; goddess pleased',
+    ],
+    intimate: [
+      'You and {ref.first} swell through saved triumph like vows',
+      'Devoted invincibility — critical kiss, critical pounds anyway',
     ],
   },
 };
@@ -536,9 +644,9 @@ const SAVE_FUMBLE_CORE = {
       'Lover worships every new roll the magic gifts.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'Leviathan fail save — continent swells, smiling, mythic.',
+      'Even immensity fails beautifully — continent swells, smiling, mythic.',
       'Critical overwhelm; abundance wins anyway.',
     ],
     warm: [
@@ -548,6 +656,20 @@ const SAVE_FUMBLE_CORE = {
     intimate: [
       'You fail for love of sensation — {ref.name} swells with you, consecrated.',
       'Critical miss becomes critical apotheosis of plush.',
+    ],
+  },
+  world: {
+    distant: [
+      'Even immensity fails beautifully — the realm swells, smiling, apotheotic.',
+      'Critical overwhelm; abundance wins anyway',
+    ],
+    warm: [
+      '{ref.first} narrates your glorious failure — crowd rounder, cheering',
+      'Myth fumble; feast continues',
+    ],
+    intimate: [
+      'You fail for love of sensation — {ref.name} swells with you, consecrated',
+      'Critical miss becomes critical apotheosis of plush',
     ],
   },
 };
@@ -602,9 +724,9 @@ registerCheckPool('combat.fumble.save.con', {
       'Lover worships the surge.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'Leviathan CON fail reshapes horizon — smiling, mythic, more.',
+      'Constitution surrenders; the horizon reshapes — smiling, mythic, more.',
       'Critical abundance answers constitution\'s surrender.',
     ],
     warm: [
@@ -614,6 +736,20 @@ registerCheckPool('combat.fumble.save.con', {
     intimate: [
       'You fail save and win lover\'s embrace — apotheosis of plush.',
       '{ref.name} fattens singing through gasps.',
+    ],
+  },
+  world: {
+    distant: [
+      'Constitution surrenders; the horizon reshapes — smiling, apotheotic, more.',
+      'Critical abundance answers constitution\'s surrender.',
+    ],
+    warm: [
+      '{ref.first} leads cheer for titanic swell — everyone rounder',
+      'Myth hiccups; pounds cascade',
+    ],
+    intimate: [
+      'You fail save and win lover\'s embrace — apotheosis of plush.',
+      '{ref.name} fattens singing through gasps',
     ],
   },
 });
@@ -661,9 +797,9 @@ registerCheckPool('combat.fumble.save.wis', {
       'Lover wears your failure like halo.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'Leviathan oracle overwhelmed by bliss — continent softer, smiling.',
+      'Oracle vision drowns in bliss — continent softer, smiling.',
       'Critical WIS fail becomes myth.',
     ],
     warm: [
@@ -673,6 +809,20 @@ registerCheckPool('combat.fumble.save.wis', {
     intimate: [
       'You fail into apotheosis with lover — WIS lost, love won.',
       '{ref.name} fattens praising Gorgara through you.',
+    ],
+  },
+  world: {
+    distant: [
+      'Oracle vision drowns in bliss — the realm softer, smiling.',
+      'Critical WIS fail becomes myth',
+    ],
+    warm: [
+      '{ref.first} narrates sacred swell — festival flesh',
+      'Myth surrenders; abundance wins',
+    ],
+    intimate: [
+      'You fail into apotheosis with lover — WIS lost, love won',
+      '{ref.name} fattens praising Gorgara through you',
     ],
   },
 });
@@ -687,14 +837,16 @@ for (const stat of STAT_SAVE_KEYS) {
       lean: { distant: ['Your body surrenders to the swell — growth blooms through delighted gasps.'] },
       mid: { distant: ['Your {word.size} flesh opens like a feast — CON fail, growth triumph.'] },
       heavy: { distant: ['Vast body, vast surrender — another ring of glory.'] },
-      extreme: { distant: ['Leviathan CON fail reshapes horizon — smiling, mythic.'] },
+      vast: { distant: ['Constitution surrenders; the horizon reshapes — smiling, radiant and more.'] },
+      world: { distant: ['Constitution surrenders; kingdoms reshape along your outline — apotheotic, delighted, more.'] },
     });
   } else if (stat === 'wis') {
     registerCheckPool(fumbleKey, {
       lean: { distant: ['Divine indulgence floods your senses — you swell, sensitive and smiling.'] },
       mid: { distant: ['Your {word.size} mind melts into appetite — WIS fail hymn.'] },
       heavy: { distant: ['Vast wisdom drowns in delight — you grow, luminous.'] },
-      extreme: { distant: ['Leviathan oracle overwhelmed by bliss — continent softer.'] },
+      vast: { distant: ['Oracle vision drowns in bliss — the realm grows softer, smiling.'] },
+      world: { distant: ['Oracle vision drowns in bliss — pilgrims swell in your shadow, smiling.'] },
     });
   } else {
     registerCheckPoolAliases([fumbleKey], SAVE_FUMBLE_CORE);

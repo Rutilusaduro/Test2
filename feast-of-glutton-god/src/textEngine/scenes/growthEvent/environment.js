@@ -30,21 +30,13 @@ registerPool('ge.furnitureEvent', [
     'There\'s nothing in the room built to hold her anymore, and the floor will have to do.',
     'Furniture stopped being an option for her a while ago; she lowers herself carefully to the reinforced floor.',
   ] },
-  // locale: stream gaming chair (Destiny et al.)
-  { when: { locale: 'stream_setup', endStageMin: 4, endStageMax: 7 }, weight: 3, text: [
-    'The gaming chair shrieks under her, armrests bowing outward, hydraulics whining in defeat.',
-    'Her stream chair bottoms out with a hydraulic hiss and refuses to rise again.',
+  // locale: feast hall (harvest contest)
+  { when: { locale: 'feast_hall', endStageMin: 5 }, weight: 2, text: [
+    'The contest bench groans, then buckles, and the hall erupts in delighted shouting.',
   ] },
-  { when: { locale: 'stream_setup', endStageMin: 8 }, weight: 3, text: [
-    'The gaming chair finally explodes under her on camera — the clip will outlive the channel.',
-  ] },
-  // locale: dining hall (contest)
-  { when: { locale: 'dining_hall', endStageMin: 5 }, weight: 2, text: [
-    'The contest bench groans, then buckles, and the crowd loses its mind.',
-  ] },
-  // locale: kitchen (cultivator)
-  { when: { locale: 'kitchen', endStageMin: 5 }, weight: 2, text: [
-    'The prep stool gives out under her, and Reneé just slides over a reinforced one without comment.',
+  // locale: village kitchen (inn / nurturing)
+  { when: { locale: 'village_kitchen', endStageMin: 5 }, weight: 2, text: [
+    'The prep stool gives out under her; Elara slides a reinforced one into place without breaking stride.',
   ] },
   // bodyType flavor at break bands
   { when: { bodyType: 'pear', endStageMin: 6 }, weight: 2, text: [
@@ -92,9 +84,6 @@ registerPool('ge.spaceEvent', [
   ] },
   { when: { endStageMin: 9 }, weight: 2, text: [
     'The room itself feels smaller around her now — walls closer, doorways theoretical.',
-  ] },
-  { when: { locale: 'stream_setup', endStageMin: 7 }, weight: 2, text: [
-    'She has to angle herself to keep her whole frame in the camera, and gives up halfway.',
   ] },
   // ── Feast of the Glutton God locales ───────────────────────────
   { when: { locale: 'village_inn', endStageMin: 5, endStageMax: 7 }, weight: 3, text: [

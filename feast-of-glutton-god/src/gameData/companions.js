@@ -1,3 +1,5 @@
+import { MAX_STAGE_ID } from "./stages.js";
+
 export const COMPANIONS = [
   {
     id: "mira",
@@ -84,8 +86,6 @@ export const COMPANIONS = [
     ability: "Feast Matron — creates healing feast camps in combat",
   },
 ];
-
-import { MAX_STAGE_ID } from "./stages.js";
 
 export function createCompanionData(template) {
   return {

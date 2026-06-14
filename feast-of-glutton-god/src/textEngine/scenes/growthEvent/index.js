@@ -70,7 +70,7 @@ registerPool('ge.reaction', [
 
 registerPool('ge.settle', [
   { when: {}, text: [
-    '{ge.settleLine}{join:ge.permanentNote|prefix: }{join:ge.taliaCameo|prefix: }{join:ge.deviceWindDown|prefix: }',
+    '{ge.settleLine}{join:ge.permanentNote|prefix: }{join:ge.scholarAside|prefix: }{join:ge.ritualFade|prefix: }',
   ] },
 ]);
 

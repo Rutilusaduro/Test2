@@ -101,9 +101,9 @@ registerQuestCopy('quest.main.overflowing_temple.complete.default', [
   'The Overflowing Temple stands transformed. Denial is memory; abundance is eternal.',
 ]);
 
-// ─── Main: The Leviathan's Coronation (Act III) ───────────────────────────────
+// ─── Main: Coronation of Abundance (Act III) ─────────────────────────────────
 
-registerQuestCopy('quest.main.coronation.title', ["The Leviathan's Coronation"]);
+registerQuestCopy('quest.main.coronation.title', ["Coronation of Abundance"]);
 registerQuestCopy('quest.main.coronation.desc', [
   'At Gorgara\'s Cradle, Thalia whispers of a final rite — crown your abundance and awaken the goddess fully.',
   'The world has been softened. Now it must be transformed. Your body, your gospel, your feast become legend.',

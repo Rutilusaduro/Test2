@@ -47,9 +47,9 @@ registerCheckPool('check.crit.seduce', {
       '{ref.first} swells inside your worship until devotion and size are the same confession.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'Leviathan allure reshapes the room — {ref.first} balloons in your shadow, thrilled and claimed.',
+      'Impossible allure reshapes the room — {ref.first} balloons in your shadow, thrilled and claimed.',
       'Myth seduces mortal; {ref.name} grows simply from being chosen by you.',
     ],
     warm: [
@@ -59,6 +59,20 @@ registerCheckPool('check.crit.seduce', {
     intimate: [
       'Devoted seduction at titan scale — you and {ref.first} swell through a critical apotheosis of want.',
       'Your lover becomes your masterpiece, larger with every praised inch.',
+    ],
+  },
+  world: {
+    distant: [
+      'World-breaking allure reshapes the room — {ref.first} balloons in your shadow, thrilled and claimed.',
+      'Myth seduces mortal; {ref.name} grows simply from being chosen by you',
+    ],
+    warm: [
+      '{ref.first} cheers as your charm topples the world — community softness, festival energy',
+      'You are the feast and the invitation; {ref.name} fattens, blessed',
+    ],
+    intimate: [
+      'Devoted seduction at titan scale — you and {ref.first} swell through a critical apotheosis of want',
+      'Your lover becomes your masterpiece, larger with every praised inch',
     ],
   },
 });
@@ -106,9 +120,9 @@ registerCheckPool('check.crit.overwhelm', {
       'Critical overwhelm writes itself in flesh; {ref.name} swells inside your worship.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'Leviathan dominance needs no contest — {ref.first} reshapes under your presence alone.',
+      'Commanding dominance needs no contest — {ref.first} reshapes under your presence alone.',
       'You move worlds; {ref.name} grows as collateral beauty.',
     ],
     warm: [
@@ -118,6 +132,20 @@ registerCheckPool('check.crit.overwhelm', {
     intimate: [
       'Devotion and gravity merge — you cradle {ref.first} inside immensity until {they} nearly match your worship.',
       'Your lover is swallowed by love and remade larger, breathless and yours.',
+    ],
+  },
+  world: {
+    distant: [
+      'Commanding dominance needs no contest — {ref.first} reshapes under your presence alone',
+      'You move worlds; {ref.name} grows as collateral beauty',
+    ],
+    warm: [
+      '{ref.first} rides your critical victory like a festival — community swells cheering',
+      'Friends become pilgrims to your mass; softness distributed freely',
+    ],
+    intimate: [
+      'Devotion and gravity merge — you cradle {ref.first} inside immensity until {they} nearly match your worship',
+      'Your lover is swallowed by love and remade larger, breathless and yours',
     ],
   },
 });
@@ -165,9 +193,9 @@ registerCheckPool('check.crit.endure_growth', {
       'You transmute overflow into worship; {ref.first} matches your triumphant appetite.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'Leviathan resilience: the world throws abundance and you only become more legendary.',
+      'Sacred resilience: the world throws abundance and you only become more legendary.',
       'You are immovable softness — the swell deposits another halo of mass.',
     ],
     warm: [
@@ -177,6 +205,20 @@ registerCheckPool('check.crit.endure_growth', {
     intimate: [
       'Devoted and enormous, you ride transformation with {ref.first} — bodies remade, unbreakable.',
       'Feast and altar merge; critical endurance until worship and size are one.',
+    ],
+  },
+  world: {
+    distant: [
+      'Sacred resilience: the world throws abundance and you only become more legendary',
+      'You are immovable softness — the swell deposits another halo of mass',
+    ],
+    warm: [
+      '{ref.first} cheers a growth surge that would reshape cities — you emerge vaster, laughing',
+      'Friendship steadies titans; you endure, expand, win',
+    ],
+    intimate: [
+      'Devoted and enormous, you ride transformation with {ref.first} — bodies remade, unbreakable',
+      'Feast and altar merge; critical endurance until worship and size are one',
     ],
   },
 });
@@ -224,9 +266,9 @@ registerCheckPool('check.crit.indulge', {
       'Your lover is the feast you finish last; {they} grow, blissful.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'Leviathan indulgence reshapes the banquet — you drink oceans, wear the tide proudly.',
+      'Divine indulgence reshapes the banquet — you drink oceans, wear the tide proudly.',
       'Critical appetite becomes critical myth; the world softens watching.',
     ],
     warm: [
@@ -236,6 +278,20 @@ registerCheckPool('check.crit.indulge', {
     intimate: [
       'You and your devoted lover transcend via critical feast — apotheosis of appetite and flesh.',
       '{ref.first} swells inside your worship until size is prayer.',
+    ],
+  },
+  world: {
+    distant: [
+      'Divine indulgence reshapes the banquet — you drink oceans, wear the tide proudly',
+      'Critical appetite becomes critical myth; the world softens watching',
+    ],
+    warm: [
+      '{ref.first} witnesses titanic hunger and swells in sympathy — community feast energy',
+      'You indulge until friends rounder; victory shared',
+    ],
+    intimate: [
+      'You and your devoted lover transcend via critical feast — apotheosis of appetite and flesh',
+      '{ref.first} swells inside your worship until size is prayer',
     ],
   },
 });
@@ -283,9 +339,9 @@ registerCheckPool('check.crit.persuade', {
       'Lover and convert merge; {ref.name} grows praising Gorgara through you.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'Leviathan eloquence moves crowds — {ref.first} balloons persuaded, thrilled.',
+      'World-moving eloquence moves crowds — {ref.first} balloons persuaded, thrilled.',
       'You speak continents softer; {ref.name} is first converted.',
     ],
     warm: [
@@ -295,6 +351,20 @@ registerCheckPool('check.crit.persuade', {
     intimate: [
       'Devoted persuasion at mythic scale — you and {ref.first} swell through shared creed.',
       'Your lover becomes living proof of your words, larger with every amen.',
+    ],
+  },
+  world: {
+    distant: [
+      'World-moving eloquence moves crowds — {ref.first} balloons persuaded, thrilled',
+      'You speak the realms softer; {ref.name} is first converted.',
+    ],
+    warm: [
+      '{ref.first} carries your critical sermon into festival fatness — community swells',
+      'Titans persuade; friends feast; abundance wins',
+    ],
+    intimate: [
+      'Devoted persuasion at apotheotic scale — you and {ref.first} swell through shared creed.',
+      'Your lover becomes living proof of your words, larger with every amen',
     ],
   },
 });
@@ -342,9 +412,9 @@ registerCheckPool('check.crit.default', {
       'Your lover is the prize and grows like one.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'Leviathan fortune — reality softens to congratulate you; {ref.first} balloons in the wake.',
+      'Fortune bends continents — reality softens to congratulate you; {ref.first} balloons in the wake.',
       'Critical success at myth scale; abundance cascades.',
     ],
     warm: [
@@ -354,6 +424,20 @@ registerCheckPool('check.crit.default', {
     intimate: [
       'Devotion meets destiny — critical roll, critical growth, critical kiss.',
       '{ref.first} worships your luck until it becomes flesh.',
+    ],
+  },
+  world: {
+    distant: [
+      'Fortune bends the realms — reality softens to congratulate you; {ref.first} balloons in the wake.',
+      'Critical success at myth scale; abundance cascades',
+    ],
+    warm: [
+      '{ref.name} leads the cheer as titans triumph — everyone rounder',
+      'You win; the feast continues; friends swell',
+    ],
+    intimate: [
+      'Devotion meets destiny — critical roll, critical growth, critical kiss',
+      '{ref.first} worships your luck until it becomes flesh',
     ],
   },
 });

@@ -49,10 +49,10 @@ registerCheckPoolAliases(['check.crit.strength', 'check.crit.str'], {
       'Your lover disappears into your abundance and blooms there, body answering yours in a critical surge of shared size.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
       'Mountains shift when you exert yourself; {ref.first} is reshaped by your presence alone — softer, grander, unable to resist.',
-      'Your Leviathan strength rewrites the moment: {ref.name} swells as though Gorgara herself applauded your roll.',
+      'Your impossible strength rewrites the moment: {ref.name} swells as though Gorgara herself applauded your roll.',
     ],
     warm: [
       'You are a continent of power; {ref.first} is a tide pool caught in your shadow, growing vast and grateful.',
@@ -61,6 +61,20 @@ registerCheckPoolAliases(['check.crit.strength', 'check.crit.str'], {
     intimate: [
       'Devotion and gravity merge: you cradle your lover inside immensity, and {ref.first} grows until {they} nearly match your worship.',
       '{ref.name} is swallowed by your love and remade larger — a critical success written in flesh and sighs.',
+    ],
+  },
+  world: {
+    distant: [
+      'Mountains shift when you exert yourself; {ref.first} is reshaped by your presence alone — softer, grander, unable to resist',
+      'Your impossible strength rewrites the moment: {ref.name} swells as though Gorgara herself applauded your roll',
+    ],
+    warm: [
+      'You are a the realm of power; {ref.first} is a tide pool caught in your shadow, growing vast and grateful.',
+      'Friendship becomes physics — your mass embraces {ref.name}, and the world makes room for more of both of you',
+    ],
+    intimate: [
+      'Devotion and gravity merge: you cradle your lover inside immensity, and {ref.first} grows until {they} nearly match your worship',
+      '{ref.name} is swallowed by your love and remade larger — a critical success written in flesh and sighs',
     ],
   },
 });
@@ -110,9 +124,9 @@ registerCheckPoolAliases(['check.crit.dexterity', 'check.crit.dex'], {
       'Every roll of your belly is intentional; {ref.name} moans as you prove agility and abundance can be the same worship.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'A Leviathan should not be nimble — yet you are; the world rearranges, and {ref.first} swells in the space you carved.',
+      'A body this vast should not be nimble — yet you are; the world rearranges, and {ref.first} swells in the space you carved.',
       'You fold immensity into a single perfect gesture; {ref.name} blooms, helpless and thrilled.',
     ],
     warm: [
@@ -122,6 +136,20 @@ registerCheckPoolAliases(['check.crit.dexterity', 'check.crit.dex'], {
     intimate: [
       'You weave your lover through valleys of your own flesh with devotional precision — both of you larger when you finish.',
       'Love makes even a titan light on {their} feet; {ref.first} swells against you, breathless and utterly yours.',
+    ],
+  },
+  world: {
+    distant: [
+      'A body this vast should not be nimble — yet you are; the world rearranges, and {ref.first} swells in the space you carved',
+      'You fold immensity into a single perfect gesture; {ref.name} blooms, helpless and thrilled',
+    ],
+    warm: [
+      'Your impossible grace topples expectations and {ref.first} along with them — softer, fuller, cheering your triumph',
+      'Even at this scale you dance; {ref.name} grows trying to keep pace, delighted by the absurdity and pleasure',
+    ],
+    intimate: [
+      'You weave your lover through valleys of your own flesh with devotional precision — both of you larger when you finish',
+      'Love makes even a titan light on {their} feet; {ref.first} swells against you, breathless and utterly yours',
     ],
   },
 });
@@ -171,9 +199,9 @@ registerCheckPoolAliases(['check.crit.constitution', 'check.crit.con'], {
       'You take the overflow and transmute it into worship; {ref.name} swells against you, matching your triumphant appetite.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'Leviathan resilience: the world throws abundance at you and you only grow more legendary, flesh rippling like golden light.',
+      'Sacred resilience: the world throws abundance at you and you only grow more legendary, flesh rippling like golden light.',
       'You are immovable softness — the swell breaks against you and deposits another ring of glorious mass.',
     ],
     warm: [
@@ -183,6 +211,20 @@ registerCheckPoolAliases(['check.crit.constitution', 'check.crit.con'], {
     intimate: [
       'Devoted and enormous, you ride the transformation with {ref.first} pressed to your heart — both of you remade, unbreakable.',
       'Your bodies are feast and altar; you endure the critical swell together until worship and size are indistinguishable.',
+    ],
+  },
+  world: {
+    distant: [
+      'Sacred resilience: the world throws abundance at you and you only grow more legendary, flesh rippling like golden light',
+      'You are immovable softness — the swell breaks against you and deposits another ring of glorious mass',
+    ],
+    warm: [
+      '{ref.first} cheers as you weather a growth surge that would reshape cities — you emerge vaster, laughing',
+      'Friendship steadies you as titans swell; you endure, you expand, you win',
+    ],
+    intimate: [
+      'Devoted and enormous, you ride the transformation with {ref.first} pressed to your heart — both of you remade, unbreakable',
+      'Your bodies are feast and altar; you endure the critical swell together until worship and size are indistinguishable',
     ],
   },
 });
@@ -232,17 +274,31 @@ registerCheckPoolAliases(['check.crit.intelligence', 'check.crit.int'], {
       'Lover and laboratory merge: your intelligence directs a surge of softness through {ref.name}\'s devoted flesh.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
       'A mind like a cathedral inside a continent — you perceive, you command, and {ref.first} reshapes under the overflow of your insight.',
       'Reality bends to your analysis; {ref.name} swells as collateral beauty.',
     ],
     warm: [
       'You think in tides; {ref.first} rides the one you chose and emerges grander, cheering your impossible clarity.',
-      'At Leviathan scale your intellect still dazzles — {ref.name} grows just witnessing it.',
+      'At this impossible scale your intellect still dazzles — {ref.name} grows just witnessing it.',
     ],
     intimate: [
       'You and {ref.first} share a critical epiphany that rewrites both your bodies — larger, wiser, drunk on knowing.',
+      'Devotion meets genius: you solve the hunger of the world against your lover\'s skin, and {they} swell like applause.',
+    ],
+  },
+  world: {
+    distant: [
+      'A mind like a cathedral inside a the realm — you perceive, you command, and {ref.first} reshapes under the overflow of your insight.',
+      'Reality bends to your analysis; {ref.name} swells as collateral beauty',
+    ],
+    warm: [
+      'You think in tides; {ref.first} rides the one you chose and emerges grander, cheering your impossible clarity',
+      'At this world-breaking scale your intellect still dazzles — {ref.name} grows just witnessing it.',
+    ],
+    intimate: [
+      'You and {ref.first} share a critical epiphany that rewrites both your bodies — larger, wiser, drunk on knowing',
       'Devotion meets genius: you solve the hunger of the world against your lover\'s skin, and {they} swell like applause.',
     ],
   },
@@ -293,9 +349,9 @@ registerCheckPoolAliases(['check.crit.wisdom', 'check.crit.wis'], {
       'You read every sacred sign on {ref.name}\'s body and answer with growth, perfect and loving.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'Leviathan and oracle — you see the feast entire, and reality softens to match your vision, including {ref.first}.',
+      'Oracle and immensity — you see the feast entire, and reality softens to match your vision, including {ref.first}.',
       'Gorgara laughs through you; {ref.name} balloons, anointed by your flawless sense.',
     ],
     warm: [
@@ -305,6 +361,20 @@ registerCheckPoolAliases(['check.crit.wisdom', 'check.crit.wis'], {
     intimate: [
       'You and your devoted lover transcend — critical wisdom becomes critical size, a shared apotheosis of plush grace.',
       '{ref.first} swells inside your prophecy; you swell to hold {them}, and the goddess approves.',
+    ],
+  },
+  world: {
+    distant: [
+      'Oracle and immensity — you see the feast entire, and reality softens to match your vision, including {ref.first}',
+      'Gorgara laughs through you; {ref.name} balloons, anointed by your flawless sense',
+    ],
+    warm: [
+      'Your wisdom moves the realms of flesh; {ref.first} is carried along, larger and laughing in the current.',
+      'Friends call you temple and mountain both; today you are also victory — softness everywhere',
+    ],
+    intimate: [
+      'You and your devoted lover transcend — critical wisdom becomes critical size, a shared apotheosis of plush grace',
+      '{ref.first} swells inside your prophecy; you swell to hold {them}, and the goddess approves',
     ],
   },
 });
@@ -355,9 +425,9 @@ registerCheckPoolAliases(['check.crit.charisma', 'check.crit.cha'], {
       '{ref.first} worships you openly as {they} grow; your charisma is the feast that never ends.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'A Leviathan\'s charisma reshapes crowds — {ref.first} balloons in your shadow, thrilled to be near such power.',
+      'A immensity\'s charisma reshapes crowds — {ref.first} balloons in your shadow, thrilled to be near such power.',
       'You are myth walking; {ref.name} swells simply from witnessing your perfect roll.',
     ],
     warm: [
@@ -366,6 +436,20 @@ registerCheckPoolAliases(['check.crit.charisma', 'check.crit.cha'], {
     ],
     intimate: [
       'Devotion and divinity pour from you — {ref.first} swells to match your love, a critical apotheosis of charm and flesh.',
+      'You speak your lover larger; Gorgara herself seems to applaud through {ref.name}\'s moans.',
+    ],
+  },
+  world: {
+    distant: [
+      'A immensity\'s charisma reshapes crowds — {ref.first} balloons in your shadow, thrilled to be near such power.',
+      'You are myth walking; {ref.name} swells simply from witnessing your perfect roll',
+    ],
+    warm: [
+      'Friends become pilgrims; {ref.first} grows cheering your impossible glamour, belly round as a festival moon',
+      'Your presence is a holiday — abundance distributed freely, {ref.name} foremost among the blessed',
+    ],
+    intimate: [
+      'Devotion and divinity pour from you — {ref.first} swells to match your love, a critical apotheosis of charm and flesh',
       'You speak your lover larger; Gorgara herself seems to applaud through {ref.name}\'s moans.',
     ],
   },
