@@ -60,11 +60,16 @@ export default function LevelUpModal({ pending, levelUpResult, onComplete }) {
           </>
         )}
 
-        {type === 'spell_choice' && (
+        {(type === 'spell_choice' || type === 'multiclass_spell_choice') && (
           <>
-            {narrative && (
+            {narrative && type === 'spell_choice' && (
               <div className="panel prose" style={{ marginBottom: '1rem', borderColor: 'var(--gold)' }}>
                 {narrative}
+              </div>
+            )}
+            {type === 'multiclass_spell_choice' && (
+              <div className="panel prose" style={{ marginBottom: '1rem', borderColor: 'var(--rose)' }}>
+                ★ Pact of Shared Hunger — one spell from another class, forever yours.
               </div>
             )}
             <p className="prose" style={{ fontSize: '0.95rem', marginBottom: '0.75rem' }}>

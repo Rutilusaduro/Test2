@@ -3,7 +3,7 @@
  */
 import { STAT_KEYS, STAT_LABELS } from './stats.js';
 import { getClass } from './classes.js';
-import { applySpellChoices } from './spellLearning.js';
+import { applySpellChoices, learnMulticlassSpell, spellSummary } from './spellLearning.js';
 
 export const ASI_LEVELS = [4, 8, 12, 16, 19];
 
@@ -74,6 +74,12 @@ export function completePendingLevelUp(character, payload = {}) {
 
   if (pending.type === 'spell_choice') {
     result.learned = applySpellChoices(character, payload.spellIds || []);
+  } else if (pending.type === 'multiclass_spell_choice') {
+    const spellId = payload.spellIds?.[0] ?? payload.spellId;
+    if (spellId && learnMulticlassSpell(character, spellId)) {
+      result.learned = [spellSummary(spellId, true)];
+      result.multiclassSpell = spellId;
+    }
   } else if (pending.type === 'asi_choice') {
     result.asi = applyAsiChoice(character, payload.stat);
     if (result.asi) {

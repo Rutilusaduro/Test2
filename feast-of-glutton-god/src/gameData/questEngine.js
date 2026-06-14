@@ -8,6 +8,7 @@ import { awardAbundanceSpreadWithEvents } from './worldEvents.js';
 import { getCorruptionTier } from './corruption.js';
 import { getStage, advanceStage } from './stages.js';
 import { applyGrowthWithPresentation } from './growthPresentation.js';
+import { awardPartyDevotion } from './companionDevotion.js';
 import { addAbundancePoints } from './player.js';
 import { addExperience, XP_SOURCES } from './leveling.js';
 import { getNpcState, applyNpcState } from './player.js';
@@ -331,6 +332,9 @@ function applyRewardBundle(game, bundle = {}) {
   if (bundle.ap) {
     addAbundancePoints(game, bundle.ap);
     messages.push(`+${bundle.ap} AP`);
+  }
+  if (bundle.devotion) {
+    messages.push(...awardPartyDevotion(game, bundle.devotion, 'quest'));
   }
   if (bundle.xp) {
     const source = bundle.xpSource && XP_SOURCES[bundle.xpSource] ? bundle.xpSource : 'general';

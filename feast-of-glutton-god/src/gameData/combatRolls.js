@@ -21,6 +21,7 @@ import {
   BONUS_TYPES,
 } from './skillChecks.js';
 import { resolveSavingThrow } from './skillChecks.js';
+import { applyLegendarySaveResistance } from './legendaryResistances.js';
 import {
   ATTACK_CRIT_EFFECTS,
   ATTACK_FUMBLE_EFFECTS,
@@ -503,8 +504,10 @@ export function resolveCombatSave(defender, stat, dc, options = {}) {
     label: label ?? `${stat.toUpperCase()} Save`,
   });
 
-  const critSuccess = result.critical === 'success';
-  const critFail = result.critical === 'failure';
+  const resisted = applyLegendarySaveResistance(defender, result);
+
+  const critSuccess = resisted.critical === 'success';
+  const critFail = resisted.critical === 'failure';
 
   const saveEffects = critSuccess
     ? SAVE_CRIT_SUCCESS_EFFECTS.default
@@ -513,7 +516,7 @@ export function resolveCombatSave(defender, stat, dc, options = {}) {
       : null;
 
   return {
-    ...result,
+    ...resisted,
     type: 'saving_throw',
     saveStat: stat,
     saveImmune: critSuccess,
@@ -524,10 +527,12 @@ export function resolveCombatSave(defender, stat, dc, options = {}) {
       ? 'critical_success'
       : critFail
         ? 'critical_failure'
-        : result.success
+        : resisted.success
           ? 'success'
           : 'failure',
-    textKey: `combat.save.${critSuccess ? 'crit' : critFail ? 'fumble' : result.success ? 'pass' : 'fail'}.${stat}`,
+    textKey: resisted.legendaryResistanceUsed
+      ? `combat.save.legendary_resist.${stat}`
+      : `combat.save.${critSuccess ? 'crit' : critFail ? 'fumble' : resisted.success ? 'pass' : 'fail'}.${stat}`,
   };
 }
 

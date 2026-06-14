@@ -9,6 +9,11 @@
  * Overflow: heightened versions cost +1 slot level or extra AP.
  */
 import { getSpellcastingStat, getEffectiveStatMod, proficiencyBonus } from "./stats.js";
+import {
+  canChannelDivineResonance,
+  canResonanceUpcast,
+  spendResonanceForUpcast,
+} from "./divineResonance.js";
 
 export const MAX_SPELL_LEVEL = 9;
 
@@ -249,6 +254,14 @@ export function resolveCastCost(character, spell, opts = {}) {
     if (spent.ok) return { ok: true, method: "slot", ...spent };
   }
 
+  if (
+    canChannelDivineResonance(character)
+    && canResonanceUpcast(character, effectiveLevel)
+    && spendResonanceForUpcast(character, effectiveLevel)
+  ) {
+    return { ok: true, method: "resonance", slotLevelUsed: effectiveLevel, upcast: true };
+  }
+
   if (apCost > 0 && (character.ap ?? 0) >= apCost) {
     character.ap -= apCost;
     return { ok: true, method: "ap", apSpent: apCost };
@@ -276,6 +289,10 @@ export function previewCastCost(character, spell, opts = {}) {
 
   if (hasSpellSlot(character, effectiveLevel)) {
     return { ok: true, method: "slot" };
+  }
+
+  if (canChannelDivineResonance(character) && canResonanceUpcast(character, effectiveLevel)) {
+    return { ok: true, method: "resonance" };
   }
 
   if (apCost > 0 && (character.ap ?? 0) >= apCost) {

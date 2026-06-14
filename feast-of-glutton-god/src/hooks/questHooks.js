@@ -10,6 +10,7 @@ import { QUEST_TYPE } from '../gameData/quests/constants.js';
 import { narrateEvent } from '../gameData/narrator.js';
 import { renderRegionHostilityBeat } from '../textEngine/scenes/dm/region.js';
 import { clearCrackdown } from '../gameData/regionHostility.js';
+import { awardCompanionDevotion } from '../gameData/companionDevotion.js';
 
 /**
  * Record an NPC interaction for quest objective progress.
@@ -31,6 +32,10 @@ export function recordNpcInteractionForQuests(game, { npcId, interaction, npc, m
 
 export function recordNpcGrowthForQuests(game, { npcId, startStage, endStage, stagesGained }) {
   ensureQuestState(game);
+  const companion = (game.party ?? []).find((c) => c.id === npcId);
+  if (companion && stagesGained > 0) {
+    awardCompanionDevotion(companion, Math.min(5, stagesGained * 2), 'growth');
+  }
   const { lines, growthSnippets } = notifyQuestEvent(game, {
     type: 'npc_growth',
     npcId,

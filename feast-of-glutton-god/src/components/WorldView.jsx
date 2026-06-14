@@ -221,6 +221,9 @@ export default function WorldView({ game, onUpdate, onEncounter, onHostilityEnco
         </span>
         <span className="stat">AC <strong>{derived.ac}</strong></span>
         <span className="stat">AP: <strong>{player.ap}</strong>/{derived.maxAp}</span>
+        {(player.level ?? 1) >= 15 && (
+          <span className="stat">Resonance: <strong>{player.divineResonance ?? 0}</strong>/20</span>
+        )}
         <span className="stat" title="the Fat Goddess's daily favor for overworld growth magic">
           Favor: <strong>{player.favor}/{player.favorMax}</strong>
         </span>

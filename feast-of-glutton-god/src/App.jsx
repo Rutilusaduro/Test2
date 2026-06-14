@@ -162,7 +162,7 @@ export default function App() {
       ensureTransformationState(g);
       ensureReactivityState(g);
       ensureDivineAttentionState(g);
-      if (!g.player.raceId) g.player.raceId = 'human';
+      if (g.player.divineResonance == null) g.player.divineResonance = 0;
       if (!g.player.raceName) g.player.raceName = 'Human';
       migratePlayerSpells(g.player);
       ensureQuestState(g);

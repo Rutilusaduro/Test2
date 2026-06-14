@@ -54,6 +54,11 @@ export const PORTENT_THRESHOLDS = {
     label: 'Apotheosis Threshold',
     worldFlags: { apotheosis_threshold: true, unlock_divine_vestibule: true },
   },
+  115: {
+    id: 'goddess_present',
+    label: 'Goddess Present',
+    worldFlags: { goddess_present: true },
+  },
 };
 
 export function ensureDivineAttentionState(game) {

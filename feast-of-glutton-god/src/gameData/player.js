@@ -5,6 +5,7 @@ import { ensurePartyUniversalSize } from "./universalSize.js";
 import { initSpellSlots } from "./spellSlots.js";
 import { getMaxAbundancePoints, getArmorClass } from "./stats.js";
 import { getRegionApMultiplier } from "./worldTransformation.js";
+import { channelExcessApToResonance } from "./divineResonance.js";
 import { getSizeCapForLevel, initializeStartingSpells } from "./leveling.js";
 import { CLASS_SKILL_PROFICIENCIES } from "./skills.js";
 import { applyRaceStatBonuses, getRace } from "./races.js";
@@ -71,6 +72,8 @@ export function createPlayer(name, classId, options = {}) {
     features: [],
     spells: [],
     levelUpsPending: [],
+    divineResonance: 0,
+    multiclassSpell: null,
     tempFlags: {},
     restFlags: { hungerForMoreUsed: false, indulgeUsed: false },
   };
@@ -183,6 +186,7 @@ export function addAbundancePoints(game, amount) {
   const effective = Math.round(amount * mult);
   const max = getMaxAbundancePoints(game.player);
   game.player.ap = Math.min(max, (game.player.ap || 0) + effective);
+  channelExcessApToResonance(game.player, game);
   return game;
 }
 

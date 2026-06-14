@@ -14,6 +14,9 @@ import {
   MILESTONE_GROWTH_SPELLS,
 } from './spellProgression.js';
 
+const MULTICLASS_SOURCE_CLASSES = ['wizard', 'cleric', 'bard', 'warlock'];
+const MULTICLASS_MAX_SLOT = 7;
+
 const GROWTH_SCHOOLS = new Set(['abundance', 'transmutation', 'enchantment', 'conjuration']);
 
 export function isGrowthThemedSpell(spell) {
@@ -146,7 +149,7 @@ function filterLearnable(spellIds, character, maxLevel) {
 
 /** Cross-class growth spells for Bard Magical Secrets. */
 export function getMagicalSecretsPool(character, maxSpellLevel) {
-  const otherClasses = ['wizard', 'cleric', 'warlock', 'bard'].filter((c) => c !== character.classId);
+  const otherClasses = MULTICLASS_SOURCE_CLASSES.filter((c) => c !== character.classId);
   const ids = new Set();
   for (const classId of otherClasses) {
     for (let lvl = 1; lvl <= 20; lvl++) {
@@ -154,6 +157,21 @@ export function getMagicalSecretsPool(character, maxSpellLevel) {
     }
   }
   return filterLearnable([...ids], character, maxSpellLevel);
+}
+
+/** Pact of Shared Hunger — one cross-class spell at level 13. */
+export function buildMulticlassSpellOptions(character) {
+  const maxLevel = Math.min(MULTICLASS_MAX_SLOT, getMaxCastableSpellLevel(character));
+  return getMagicalSecretsPool(character, maxLevel).map((id) => spellSummary(id, true));
+}
+
+export function learnMulticlassSpell(character, spellId) {
+  if (!spellId) return false;
+  if (!learnSpell(character, spellId)) return false;
+  character.multiclassSpell = spellId;
+  character.storyFlags = character.storyFlags || {};
+  character.storyFlags.pact_of_shared_hunger = spellId;
+  return true;
 }
 
 /**

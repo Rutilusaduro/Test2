@@ -22,6 +22,8 @@ import {
 import { autoPrepareSpells } from "./spellPreparation.js";
 import { restoreFavorFromRest } from "./favor.js";
 import { tickRegionHostility } from "./regionHostility.js";
+import { buildMulticlassSpellOptions } from "./spellLearning.js";
+import { resetDivineResonance } from "./divineResonance.js";
 
 export const MAX_LEVEL = 20;
 
@@ -218,6 +220,19 @@ export function applyLevelUp(character, context = {}) {
     });
   }
 
+  if (character.level === 13) {
+    const mcOptions = buildMulticlassSpellOptions(character);
+    if (mcOptions.length) {
+      pending.push({
+        level: 13,
+        type: 'multiclass_spell_choice',
+        pickCount: 1,
+        options: mcOptions,
+        description: 'Pact of Shared Hunger — choose one spell from another class\'s curriculum (slot level ≤ 7).',
+      });
+    }
+  }
+
   if (pending.length) {
     character.levelUpsPending = [...(character.levelUpsPending || []), ...pending];
   }
@@ -264,6 +279,7 @@ export function longRest(character, game = null) {
   }
   if (game) {
     restoreFavorFromRest(character);
+    resetDivineResonance(character);
     tickRegionHostility(game, { longRest: true });
   }
   return character;

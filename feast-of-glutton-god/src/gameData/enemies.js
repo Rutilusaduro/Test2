@@ -621,7 +621,7 @@ export function createEnemy(typeId) {
     isEnemy: true,
     sizeCap: MAX_STAGE_ID,
     phaseFlags: {},
-    legendaryResistances: t.legendaryResistances ?? undefined,
+    legendaryResistancesLeft: t.legendaryResistances ?? 0,
   };
 }
 

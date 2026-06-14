@@ -1,7 +1,7 @@
 /**
  * Overworld spell casting — cast known spells on nearby NPCs and environment features.
  */
-import { getSpell, getSpellForCast, spellHasEnvironmentUse, getSpellEnvironmentTags } from './spells.js';
+import { getSpell, getSpellForCast, spellHasEnvironmentUse, getSpellEnvironmentTags, isRitualSpell, getRitualApCost } from './spells.js';
 import { hasSpellSlot, spendSpellSlot } from './spellSlots.js';
 import { spendAP } from './player.js';
 import { addCorruption } from './corruption.js';
@@ -46,8 +46,25 @@ export function getOverworldEnvironmentSpells(player) {
   return getOverworldCastableSpells(player).filter(spellHasEnvironmentUse);
 }
 
-function resolveOverworldCost(player, spell, overflow) {
+export function getRitualCastableSpells(player) {
+  return getPreparedSpells(player).filter((spell) => {
+    if (!isSpellPrepared(player, spell.id)) return false;
+    if (!isRitualSpell(spell)) return false;
+    if (spell.minSizeStage != null && getStage(player.lbs).id < spell.minSizeStage) return false;
+    return true;
+  });
+}
+
+function resolveOverworldCost(player, spell, overflow, opts = {}) {
   const castData = getSpellForCast(spell, overflow);
+  const ritual = opts.ritual && isRitualSpell(castData);
+  if (ritual) {
+    const ap = getRitualApCost(castData);
+    if ((player.ap || 0) >= ap) {
+      return { ok: true, method: 'ritual', spell: castData, ap };
+    }
+    return { ok: false, reason: 'Not enough AP for ritual cast.' };
+  }
   if (castData.slotLevel === 0) return { ok: true, method: 'cantrip', spell: castData };
   if (hasSpellSlot(player, castData.slotLevel)) {
     return { ok: true, method: 'slot', spell: castData, slotLevel: castData.slotLevel };
@@ -118,7 +135,7 @@ export function castSpellOnNpc(game, npc, spellId, opts = {}) {
     return { ok: false, text: `You must reach size stage ${spell.minSizeStage} to wield ${spell.name}.` };
   }
 
-  const cost = resolveOverworldCost(player, spell, opts.overflow);
+  const cost = resolveOverworldCost(player, spell, opts.overflow, opts);
   if (!cost.ok) return { ok: false, text: cost.reason };
 
   if (player.classId === 'wizard' && !isSpellPrepared(player, spellId)) {
@@ -141,7 +158,7 @@ export function castSpellOnNpc(game, npc, spellId, opts = {}) {
   const effects = applyOverworldSpellEffects(game, target, player, cost.spell);
 
   if (cost.method === 'slot') spendSpellSlot(player, cost.slotLevel);
-  else if (cost.method === 'ap') spendAP(game, cost.ap);
+  else if (cost.method === 'ap' || cost.method === 'ritual') spendAP(game, cost.ap);
 
   if (effects.growth && !effects.growth.favorRefused) {
     const stages = eff.growth || (eff.feed ? 1 : 0);
@@ -169,11 +186,14 @@ export function castSpellOnNpc(game, npc, spellId, opts = {}) {
   const manifestNote = recordGorgaraManifestCast(game, spellId)
     ? '\n\n✦ The Fat Goddess manifests in the cradle — the Thin Veil will never be thin again.'
     : '';
+  const ritualNote = cost.method === 'ritual'
+    ? '\n\n✦ Ritual complete — abundance lingers without spending a spell slot.'
+    : '';
 
   return {
     ok: true,
     npc: target,
-    text: `${prose}\n\n${growthText}${spreadNote}${eventNote}${manifestNote}`.trim(),
+    text: `${prose}\n\n${growthText}${spreadNote}${eventNote}${manifestNote}${ritualNote}`.trim(),
     effects,
     spread,
     casterPerk: perk.label,
@@ -198,7 +218,7 @@ export function castSpellOnFeature(game, featureId, spellId, opts = {}) {
     return { ok: false, text: `You must reach size stage ${spell.minSizeStage} to wield ${spell.name}.` };
   }
 
-  const cost = resolveOverworldCost(player, spell, opts.overflow);
+  const cost = resolveOverworldCost(player, spell, opts.overflow, opts);
   if (!cost.ok) return { ok: false, text: cost.reason };
 
   if (player.classId === 'wizard' && !isSpellPrepared(player, spellId)) {
@@ -206,7 +226,7 @@ export function castSpellOnFeature(game, featureId, spellId, opts = {}) {
   }
 
   if (cost.method === 'slot') spendSpellSlot(player, cost.slotLevel);
-  else if (cost.method === 'ap') spendAP(game, cost.ap);
+  else if (cost.method === 'ap' || cost.method === 'ritual') spendAP(game, cost.ap);
 
   const auraBonus = getCombinedPuzzleBonuses(game, game.region);
   const puzzleSolutions = getSpellSolutionsForFeature(game, featureId, spellId, { overflow: opts.overflow });

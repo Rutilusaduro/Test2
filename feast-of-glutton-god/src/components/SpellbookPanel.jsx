@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getOverworldCastableSpells, castSpellOnNpc, castSpellOnFeature } from '../gameData/overworldSpells.js';
+import { getOverworldCastableSpells, castSpellOnNpc, castSpellOnFeature, getRitualCastableSpells } from '../gameData/overworldSpells.js';
 import { hasSpellSlot } from '../gameData/spellSlots.js';
 import { getStage } from '../gameData/stages.js';
 import { recordNpcGrowthForQuests, recordNpcInteractionForQuests } from '../hooks/questHooks.js';
@@ -11,7 +11,7 @@ import {
   togglePreparedSpell,
   autoPrepareSpells,
 } from '../gameData/spellPreparation.js';
-import { getSpell } from '../gameData/spells.js';
+import { getSpell, isRitualSpell, getRitualApCost } from '../gameData/spells.js';
 import { isGrowthThemedSpell } from '../gameData/spellLearning.js';
 
 import { recordSpellOnFeatureForQuests } from '../hooks/puzzleHooks.js';
@@ -27,12 +27,15 @@ export default function SpellbookPanel({ game, npcs, features = [], onCastResult
   const [mode, setMode] = useState('cast');
 
   const player = game.player;
-  const spells = getOverworldCastableSpells(player);
+  const spells = mode === 'ritual' ? getRitualCastableSpells(player) : getOverworldCastableSpells(player);
   const prepStatus = getPreparationStatus(player);
   const isWizard = usesSpellPreparation(player.classId);
   const spellbookIds = isWizard ? getSpellbookLeveledIds(player) : [];
 
   const canCast = (spell) => {
+    if (mode === 'ritual' && isRitualSpell(spell)) {
+      return (player.ap || 0) >= getRitualApCost(spell);
+    }
     if (spell.slotLevel === 0) return true;
     if (hasSpellSlot(player, spell.slotLevel)) return true;
     const ap = spell.apCost ?? spell.slotLevel * 5;
@@ -44,7 +47,7 @@ export default function SpellbookPanel({ game, npcs, features = [], onCastResult
     const spell = spells.find((s) => s.id === selectedSpell);
     if (!spell || !canCast(spell)) return;
 
-    const res = castSpellOnNpc(game, targetNpc, selectedSpell, { overflow });
+    const res = castSpellOnNpc(game, targetNpc, selectedSpell, { overflow, ritual: mode === 'ritual' });
     if (!res.ok) {
       setResult(res.text);
       return;
@@ -83,7 +86,7 @@ export default function SpellbookPanel({ game, npcs, features = [], onCastResult
     const spell = spells.find((s) => s.id === selectedSpell);
     if (!spell || !canCast(spell)) return;
 
-    const res = castSpellOnFeature(game, targetFeature.id, selectedSpell, { overflow });
+    const res = castSpellOnFeature(game, targetFeature.id, selectedSpell, { overflow, ritual: mode === 'ritual' });
     if (!res.ok) {
       setResult(res.text);
       return;
@@ -130,7 +133,10 @@ export default function SpellbookPanel({ game, npcs, features = [], onCastResult
     onGameUpdate?.((g) => ({ ...g, player: { ...g.player, ...player } }));
   };
 
-  if (!spells.length && !isWizard) {
+  const ritualSpells = getRitualCastableSpells(player);
+  const castSpells = getOverworldCastableSpells(player);
+
+  if (!castSpells.length && !ritualSpells.length && !isWizard) {
     return (
       <div className="panel panel--spellbook">
         <h2>Spellbook</h2>
@@ -149,9 +155,16 @@ export default function SpellbookPanel({ game, npcs, features = [], onCastResult
           </span>
           <div className="btn-grid" style={{ marginTop: '0.5rem' }}>
             <button className={mode === 'cast' ? 'primary' : ''} onClick={() => setMode('cast')}>Cast</button>
+            <button className={mode === 'ritual' ? 'primary' : ''} onClick={() => setMode('ritual')}>Ritual Cast</button>
             <button className={mode === 'prepare' ? 'primary' : ''} onClick={() => setMode('prepare')}>Prepare Spells</button>
             <button onClick={handleAutoPrep}>Auto (growth-first)</button>
           </div>
+        </div>
+      )}
+      {!isWizard && (
+        <div className="btn-grid" style={{ marginBottom: '0.75rem' }}>
+          <button className={mode === 'cast' ? 'primary' : ''} onClick={() => setMode('cast')}>Cast</button>
+          <button className={mode === 'ritual' ? 'primary' : ''} onClick={() => setMode('ritual')}>Ritual Cast</button>
         </div>
       )}
 
@@ -177,7 +190,9 @@ export default function SpellbookPanel({ game, npcs, features = [], onCastResult
       ) : (
         <>
           <p className="prose" style={{ fontSize: '0.85rem', marginBottom: '0.75rem' }}>
-            Cast abundance magic on people or places nearby. Clever spell use can solve mysteries without combat.
+            {mode === 'ritual'
+              ? 'Ritual casting — AP only, no spell slots. Cannot be used in combat.'
+              : 'Cast abundance magic on people or places nearby. Clever spell use can solve mysteries without combat.'}
           </p>
           <div className="btn-grid" style={{ marginBottom: '0.5rem' }}>
             <button className={targetMode === 'npc' ? 'primary' : ''} onClick={() => { setTargetMode('npc'); setTargetFeature(null); }}>Target: People</button>
@@ -200,7 +215,7 @@ export default function SpellbookPanel({ game, npcs, features = [], onCastResult
               >
                 {isGrowthThemedSpell(s) ? '✦ ' : ''}{s.name}
                 <div style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
-                  {s.slotLevel ? `Lv ${s.slotLevel}` : 'Cantrip'}
+                  {mode === 'ritual' ? `Ritual · ${getRitualApCost(s)} AP` : s.slotLevel ? `Lv ${s.slotLevel}` : 'Cantrip'}
                 </div>
               </button>
             ))}

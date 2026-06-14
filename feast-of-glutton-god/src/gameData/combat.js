@@ -35,6 +35,7 @@ import { resolveCastCost, getSpellPowerMultiplier } from "./spellSlots.js";
 import { getSpellForCast } from "./spells.js";
 import { renderCastFeedback } from "../textEngine/scenes/dm/cast.js";
 import { awardFatteningXp } from "./leveling.js";
+import { summarizePartyDevotion, tickDevotionCorruptionAura } from "./companionDevotion.js";
 
 const GRID_SIZE = 10;
 const TRIVIALIZE_MIN_PLAYER_STAGE = 6;
@@ -96,7 +97,13 @@ export function createCombatState(player, party, enemyTypeId, regionId) {
     lastGrowth: null,
     introDismissed: false,
     enemyTypeId: enemyTypeId || preparedEnemies[0]?.typeId,
+    devotionBonuses: summarizePartyDevotion(allies),
+    devotionFreeCastUsed: false,
   };
+
+  if (combat.devotionBonuses.apotheosis) {
+    log.push('★ Companion apotheosis bond thrums — devotion made battle-ready.');
+  }
 
   return skipToPlayerTurn(combat);
 }
@@ -265,6 +272,9 @@ function maybeAwardFatteningXp(combat, caster, target, growth) {
 export function applyGrowth(unit, stages = 1, opts = {}) {
   const respectCosmic = opts.respectCosmicResist ?? Boolean(unit?.isEnemy);
   let effectiveStages = stages;
+  if (unit?.isPlayer && opts.combat?.devotionBonuses?.growthBonus > 0 && stages > 0) {
+    effectiveStages += opts.combat.devotionBonuses.growthBonus;
+  }
   if (respectCosmic && (isCosmicThreat(unit) || isMythicThreat(unit)) && stages > 0) {
     const resist = getEnemyGrowthResist(unit);
     effectiveStages = Math.max(0, Math.floor(stages * (1 - resist)));
@@ -385,8 +395,15 @@ export function castSpell(combat, caster, spell, target, opts = {}) {
   const entry = getActiveEntry(combat.turnState);
   const castSpellData = getSpellForCast(spell, opts.overflow);
   const economyType = castSpellData.actionType === "bonus" ? ACTION_TYPES.BONUS : ACTION_TYPES.ACTION;
+  const isGrowthSpell = Boolean(castSpellData.effect?.growth || castSpellData.effect?.feed);
+  const devotionFreeCast = Boolean(
+    caster.isPlayer
+    && isGrowthSpell
+    && combat.devotionBonuses?.freeGrowthCast
+    && !combat.devotionFreeCastUsed,
+  );
 
-  if (entry && !canUseAction(combat.turnState, entry.id, economyType)) {
+  if (entry && !devotionFreeCast && !canUseAction(combat.turnState, entry.id, economyType)) {
     const blockKind = economyType === ACTION_TYPES.BONUS ? "nobonus" : "noaction";
     combat.log.push(renderCastFeedback(blockKind, caster, castSpellData));
     return combat;
@@ -404,13 +421,18 @@ export function castSpell(combat, caster, spell, target, opts = {}) {
   let actionSpent = false;
   const spendCastAction = () => {
     if (entry && !actionSpent) {
-      spendAction(combat.turnState, entry.id, economyType);
+      if (devotionFreeCast) {
+        combat.devotionFreeCastUsed = true;
+        combat.log.push('★ Companion devotion surges — your growth spell costs no action!');
+      } else {
+        spendAction(combat.turnState, entry.id, economyType);
+      }
       actionSpent = true;
     }
   };
 
   const applyGrowthFn = (unit, stages) => {
-    const g = applyGrowth(unit, stages);
+    const g = applyGrowth(unit, stages, { combat, respectCosmicResist: Boolean(unit?.isEnemy) });
     onUnitGrew(combat.turnState, unit, g);
     combat.lastGrowth = { unit, ...g };
     maybeAwardFatteningXp(combat, caster, unit, g);
@@ -437,6 +459,10 @@ export function castSpell(combat, caster, spell, target, opts = {}) {
           applyGrowthFn,
         });
         combat.log.push(formatSaveSummary(result.save));
+        if (result.save.legendaryResistanceUsed) {
+          const left = t.legendaryResistancesLeft ?? 0;
+          combat.log.push(`★ ${t.name} spends legendary resistance (${left} left).`);
+        }
         if (result.applied?.hpDamage > 0) {
           combat.log.push(`${t.name} takes ${result.applied.hpDamage} HP from ${castSpellData.name}.`);
           if (result.applied.growthStages > 0) {
@@ -568,14 +594,6 @@ function legendaryDamage(total, damageType = DAMAGE_TYPES.PHYSICAL) {
 }
 
 function executeLegendaryAction(combat, enemy, player, actionId) {
-  const def = getEnemyTypeDef(enemy);
-  const resist = enemy.legendaryResistances ?? def?.legendaryResistances ?? 0;
-  if (resist > 0 && Math.random() < 0.35) {
-    enemy.legendaryResistances = resist - 1;
-    combat.log.push(`★ ${enemy.name} resists your abundance (${resist - 1} legendary resistances left).`);
-    return;
-  }
-
   switch (actionId) {
     case 'scales_of_judgment':
       ensureFavor(player);
@@ -709,6 +727,12 @@ export function advanceTurn(combat) {
       combat.log.push(...combat.turnState.log);
       combat.turnState.log = [];
     }
+  }
+
+  const playerEntry = getActiveEntry(combat.turnState);
+  if (playerEntry?.unit?.isPlayer && !combat.victory) {
+    const auraLines = tickDevotionCorruptionAura(combat, playerEntry.unit);
+    if (auraLines.length) combat.log.push(...auraLines);
   }
 
   return combat;

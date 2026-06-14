@@ -102,6 +102,7 @@ export const BONUS_SPELLS = {
     id: 'feast_of_the_goddess', name: 'Feast of the Goddess', slotLevel: 2, school: 'abundance',
     desc: 'A magical banquet that swells all who partake.',
     effect: { growth: 1, feed: 2, aoe: true, corruption: 4 },
+    ritual: true,
     environment: { fertile: true, ritual: true },
   },
   form_of_abundance: {
@@ -223,7 +224,36 @@ export const BONUS_SPELLS = {
     id: 'banquet_mist', name: 'Banquet Mist', slotLevel: 3, school: 'conjuration',
     desc: 'Perfumed fog of impossible feasts — all who breathe it grow drunk on fullness.',
     effect: { growth: 1, aoe: true, corruption: 5, feed: 1 },
+    ritual: true,
     environment: { fertile: true, soften: true, ritual: true, slick: true },
+  },
+  gorge_field: {
+    id: 'gorge_field', name: 'Gorge Field', slotLevel: 4, school: 'abundance', apCost: 18,
+    desc: 'Ritual abundance saturates the land — crops swell, bellies follow, the region remembers feast.',
+    effect: { growth: 2, aoe: true, corruption: 6 },
+    ritual: true,
+    environment: { fertile: true, ritual: true, swell: true },
+  },
+  gorgara_commune: {
+    id: 'gorgara_commune', name: 'Commune with the Fat Goddess', slotLevel: 5, school: 'abundance', apCost: 22,
+    desc: 'Ritual prayer at the thin places — your patron answers with warmth, counsel, and hunger.',
+    effect: { heal: 25, corruption: 4, buff: 'spellpower' },
+    ritual: true,
+    environment: { ritual: true, abundance: true, apotheosis: true },
+  },
+  hearth_blessing: {
+    id: 'hearth_blessing', name: 'Hearth Blessing', slotLevel: 3, school: 'abundance', apCost: 14,
+    desc: 'Bless a home or shrine so every meal served there swells the faithful with gentle, sacred pounds.',
+    effect: { growth: 1, feed: 2, heal: 10, corruption: 3 },
+    ritual: true,
+    environment: { fertile: true, ritual: true, soften: true },
+  },
+  the_feast_without_end: {
+    id: 'the_feast_without_end', name: 'The Feast Without End', slotLevel: 6, school: 'conjuration', apCost: 26,
+    desc: 'A ritual table that never empties — abundance loops until the Wheel begs mercy.',
+    effect: { growth: 2, feed: 3, aoe: true, party: true, heal: 15 },
+    ritual: true,
+    environment: { fertile: true, ritual: true, swell: true },
   },
   divine_plump: {
     id: 'divine_plump', name: 'Divine Plump', slotLevel: 6, school: 'abundance', apCost: 28,
@@ -397,7 +427,19 @@ export function getSpellForCast(spell, overflow = false) {
 
 export function getSpellEnvironmentTags(spell) {
   const env = spell?.environment ?? {};
-  return Object.keys(env).filter((k) => env[k]);
+  const tags = Object.keys(env).filter((k) => env[k]);
+  if (spell?.ritual && !tags.includes('ritual')) tags.push('ritual');
+  return tags;
+}
+
+export function isRitualSpell(spell) {
+  if (!spell) return false;
+  return Boolean(spell.ritual || spell.environment?.ritual);
+}
+
+export function getRitualApCost(spell) {
+  if (!spell) return 0;
+  return spell.apCost ?? Math.max(8, (spell.slotLevel || 1) * 6);
 }
 
 export function spellHasEnvironmentUse(spell) {

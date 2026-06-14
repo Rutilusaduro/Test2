@@ -122,7 +122,13 @@ export function getEffectiveTransformLevel(game, regionId) {
   const points = getRegionTransformationPoints(game, regionId);
   const { current } = getTransformationLevel(points);
   const narrative = getNarrativeDepth(game, regionId);
-  return Math.max(current.level, narrative);
+  let effective = Math.max(current.level, narrative);
+
+  if (game?.worldFlags?.goddess_present && game?.dm?.visitedRegions?.[regionId]) {
+    effective = Math.max(effective, 5);
+  }
+
+  return effective;
 }
 
 export function getRegionTransformation(game, regionId) {
