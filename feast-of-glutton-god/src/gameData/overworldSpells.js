@@ -22,6 +22,12 @@ import { renderPuzzleText } from '../textEngine/scenes/puzzles/index.js';
 import { getCombinedPuzzleBonuses } from './worldAuras.js';
 import { CONNECTION_GATES, syncGateUnlocks } from './regionObstacles.js';
 import { tryClearObstacle } from './obstacleUnlocks.js';
+import {
+  getSpellGrowthFavorCost,
+  canSpendFavor,
+  spendFavor,
+  getFavorRefusalText,
+} from './favor.js';
 
 export function getOverworldCastableSpells(player) {
   return getPreparedSpells(player).filter((spell) => {
@@ -118,11 +124,30 @@ export function castSpellOnNpc(game, npc, spellId, opts = {}) {
     return { ok: false, text: `${spell.name} is not prepared. Prepare it after your next rest.` };
   }
 
+  const eff = spell.effect || {};
+  if (eff.growth) {
+    const favorCost = getSpellGrowthFavorCost(eff.growth);
+    if (!canSpendFavor(player, favorCost)) {
+      return { ok: false, text: getFavorRefusalText(player, game, 'growth') };
+    }
+  } else if (eff.feed && !eff.growth) {
+    if (!canSpendFavor(player, 1)) {
+      return { ok: false, text: getFavorRefusalText(player, game, 'growth') };
+    }
+  }
+
   const target = { ...npc };
   const effects = applyOverworldSpellEffects(game, target, player, cost.spell);
 
   if (cost.method === 'slot') spendSpellSlot(player, cost.slotLevel);
   else if (cost.method === 'ap') spendAP(game, cost.ap);
+
+  if (effects.growth && !effects.growth.favorRefused) {
+    const stages = eff.growth || (eff.feed ? 1 : 0);
+    if (stages > 0 && (effects.growth.stagesJumped > 0 || !effects.growth.refused)) {
+      spendFavor(player, getSpellGrowthFavorCost(stages));
+    }
+  }
 
   const prose = renderOverworldSpellCast(target, player, {
     spell: cost.spell,

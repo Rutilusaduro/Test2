@@ -19,6 +19,8 @@ import { awardFatteningXp } from './leveling.js';
 import { syncGateUnlocks } from './regionObstacles.js';
 import { renderForcedGrowth } from '../textEngine/scenes/npc/consentGrowth.js';
 import { renderSatiationRefusal } from '../textEngine/scenes/npc/satiation.js';
+import { recordGrowthStagesGranted } from './favor.js';
+import { flushHostilityPending } from '../hooks/questHooks.js';
 
 /**
  * Apply growth to an NPC/companion with consent + satiation rules.
@@ -68,6 +70,7 @@ export function applyNpcGrowth(npc, game, baseStages, method = 'feed', opts = {}
 
   if (consent.overreach > 0) {
     applyForcedGrowthPenalties(game, npc, consent, game?.region);
+    flushHostilityPending(game);
     const forcedText = renderForcedGrowth(npc, game?.player, {
       method,
       severity: consent.severity,
@@ -77,6 +80,10 @@ export function applyNpcGrowth(npc, game, baseStages, method = 'feed', opts = {}
     presentation.text = [forcedText, presentation.text].filter(Boolean).join('\n\n');
   } else if (presentation.stagesJumped > 0) {
     addGainDesire(npc, 2 + presentation.stagesJumped);
+  }
+
+  if (presentation.stagesJumped > 0 && game?.player) {
+    recordGrowthStagesGranted(game.player, presentation.stagesJumped);
   }
 
   const gateMsgs = syncGateUnlocks(game, { regionId: game?.region });

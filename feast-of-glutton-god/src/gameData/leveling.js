@@ -20,6 +20,8 @@ import {
   getRoleplayOptions,
 } from "./levelUpChoices.js";
 import { autoPrepareSpells } from "./spellPreparation.js";
+import { restoreFavorFromRest } from "./favor.js";
+import { tickRegionHostility } from "./regionHostility.js";
 
 export const MAX_LEVEL = 12;
 
@@ -225,14 +227,21 @@ export function awardCombatXp(player, combat) {
   return addExperience(player, xp, "combat", { growthLevelUp });
 }
 
-/** Long rest — full HP, slots, some AP */
-export function longRest(character) {
+/** Long rest — full HP, slots, some AP, favor top-up */
+export function longRest(character, game = null) {
   character.hp = character.maxHp;
   recoverAllSpellSlots(character);
   autoPrepareSpells(character);
   const maxAp = getMaxAbundancePoints(character);
   character.ap = Math.min(maxAp, (character.ap || 0) + 15);
-  if (character.restFlags) character.restFlags.hungerForMoreUsed = false;
+  if (character.restFlags) {
+    character.restFlags.hungerForMoreUsed = false;
+    character.restFlags.indulgeUsed = false;
+  }
+  if (game) {
+    restoreFavorFromRest(character);
+    tickRegionHostility(game, { longRest: true });
+  }
   return character;
 }
 

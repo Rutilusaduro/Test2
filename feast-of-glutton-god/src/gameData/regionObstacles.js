@@ -7,6 +7,7 @@ import {
   isImpassableToSmall,
   isSmallTraveler,
 } from './worldReactivity.js';
+import { rollHostilityTravelEncounter } from './regionHostility.js';
 import {
   isAnyUnlockSatisfied,
   tryClearObstacle,

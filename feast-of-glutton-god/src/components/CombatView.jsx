@@ -14,6 +14,7 @@ import { renderGrowthScene } from "../textEngine/scenes/growthEvent/index.js";
 import { addBugNote, captureGameContext } from "../hooks/bugLog.js";
 import SpellSlotPips from "./SpellSlotPips.jsx";
 import DmBanner from "./DmBanner.jsx";
+import { ensureFavor } from "../gameData/favor.js";
 import {
   deriveSpellTargeting,
   getSpellRangeTiles,
@@ -71,6 +72,7 @@ function spellActionReady(spell, turnSummary) {
 
 export default function CombatView({ game, combat, onUpdateCombat, onEnd, onVictory, introBlocking, onDebugContext }) {
   const player = combat.allies.find((a) => a.isPlayer) || game.player;
+  ensureFavor(player);
   const [mode, setMode] = useState("move");
   const [growthText, setGrowthText] = useState("");
   const [overflowCast, setOverflowCast] = useState(false);
@@ -437,6 +439,7 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onVict
         <span className="stat">Lv <strong>{player.level}</strong></span>
         <SpellSlotPips player={player} compact />
         <span className="stat">AP <strong>{player.ap}</strong></span>
+        <span className="stat">Favor <strong>{player.favor}/{player.favorMax}</strong></span>
       </div>
 
       {selectedEnemy && selectedEnemy.hp > 0 && !selectedEnemy.converted && (

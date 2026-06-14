@@ -6,7 +6,7 @@ import CombatView from "./components/CombatView.jsx";
 import CombatScenePopup from "./components/CombatScenePopup.jsx";
 import LevelUpModal from "./components/LevelUpModal.jsx";
 import GameDebugShell from "./components/GameDebugShell.jsx";
-import { createNewGame, addAbundancePoints, syncPlayerFromCombat, ensureDmState } from "./gameData/player.js";
+import { createNewGame, addAbundancePoints, syncPlayerFromCombat, ensureDmState, ensureScarcityState } from "./gameData/player.js";
 import { clearTransient, narrateEvent } from "./gameData/narrator.js";
 import { saveGame, loadGame } from "./gameData/save.js";
 import { createCombatState, getCombatRewards } from "./gameData/combat.js";
@@ -115,6 +115,7 @@ export default function App() {
     ensureTransformationState(g);
     ensureReactivityState(g);
     ensureDmState(g);
+    ensureScarcityState(g);
     setGame(g);
     setScreen("world");
   }, []);
@@ -133,6 +134,7 @@ export default function App() {
       ensureQuestState(g);
       ensurePartyUniversalSize(g);
       ensureDmState(g);
+      ensureScarcityState(g);
       if (!g.settings) g.settings = { skipCombatScenes: false };
       setGame(g);
       setScreen("world");
@@ -273,6 +275,7 @@ export default function App() {
         game={game}
         onUpdate={updateGame}
         onEncounter={randomEncounter}
+        onHostilityEncounter={startCombat}
         onPuzzleCombat={startPuzzleCombat}
         onSave={() => saveGame(game)}
         onDebugContext={updateDebugContext}
