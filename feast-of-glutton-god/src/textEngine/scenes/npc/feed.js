@@ -21,9 +21,17 @@ registerPool('npc.feed.opening', [
 ]);
 
 registerPool('npc.feed.reaction', [
-  { when: { corruption: 0 }, text: [
+  { when: { relationship: [0, 1], corruption: 0 }, text: [
     '"I… shouldn\'t," she murmurs, but her mouth is already full.',
     'She eats with guilty pleasure, unable to stop.',
+  ]},
+  { when: { relationship: 2, corruption: 0 }, text: [
+    'She trusts you enough to savor without shame — cheeks flushing as she chews.',
+    '"You always know what I need," she sighs between bites.',
+  ]},
+  { when: { relationship: [3, 4, 5], corruption: 0 }, text: [
+    'She eats from your hand like a lover, eyes locked on yours.',
+    '"Feed me," she whispers — not a request, but a gift she gives you.',
   ]},
   { when: { corruption: 1 }, text: [
     '"It feels so good," she whispers, voice husky with pleasure.',

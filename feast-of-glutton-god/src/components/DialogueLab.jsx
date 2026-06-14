@@ -12,6 +12,7 @@ import { renderTalk } from "../textEngine/scenes/npc/talk.js";
 import { renderFlirt } from "../textEngine/scenes/npc/flirt.js";
 import { renderBless } from "../textEngine/scenes/npc/bless.js";
 import { renderFeast } from "../textEngine/scenes/npc/feast.js";
+import { renderIntimate } from "../textEngine/scenes/npc/intimate.js";
 import { renderGrowthScene } from "../textEngine/scenes/growthEvent/index.js";
 import { renderCombatBeat } from "../textEngine/scenes/combatText.js";
 import { resolveGrowthZone } from "../textEngine/growthLexicon.js";
@@ -83,6 +84,10 @@ const SECTIONS = {
     params: STATE_PARAMS,
     fn: (s, opts) => renderFeast(s, MOCK_PLAYER, { trace: opts.trace }),
   },
+  "npc.intimate": {
+    params: STATE_PARAMS,
+    fn: (s, opts) => renderIntimate(s, MOCK_PLAYER, { location: "harvest_hearth", trace: opts.trace }),
+  },
   "growthEvent": {
     params: [...STATE_PARAMS, "growthZone"],
     fn: (s, opts) => {
@@ -115,7 +120,7 @@ const PARAM_DEFS = [
   { key: "girl", label: "Character", options: DEBUG_CHARACTERS.map((c) => String(c.id)), optionLabel: (v) => DEBUG_CHARACTERS.find((c) => String(c.id) === v)?.name || v },
   { key: "stage", label: "Stage", options: WEIGHT_STAGES.map((w) => String(w.id)), optionLabel: (v) => `${v} · ${WEIGHT_STAGES[Number(v)].label}` },
   { key: "corruption", label: "Corruption", options: ["0", "1", "2"], optionLabel: (v) => ({ 0: "0 · Resistant", 1: "1 · Curious", 2: "2 · Enthusiastic" })[v] },
-  { key: "relationship", label: "Relationship", options: ["0", "1", "2", "3", "4", "5"], optionLabel: (v) => ({ 0: "Stranger", 1: "Acquaintance", 2: "Friend", 3: "Close", 4: "Lover", 5: "Devoted" })[v] },
+  { key: "relationship", label: "Relationship", options: ["0", "1", "2", "3", "4", "5"], optionLabel: (v) => ({ 0: "Neutral", 1: "Friendly", 2: "Close", 3: "Intimate", 4: "Craving", 5: "Devoted" })[v] },
   { key: "mood", label: "Mood", options: MOODS },
   { key: "pose", label: "Pose", options: POSES },
   { key: "feedType", label: "Feed type", options: FEED_TYPES },

@@ -3,7 +3,7 @@
  */
 import { getQuestDefinition, getAllQuests } from './quests/registry.js';
 import { QUEST_TYPE, OBJECTIVE_TYPE, QUEST_SCORE, QUEST_NPC_ALIASES } from './quests/constants.js';
-import { getTier } from './relationships.js';
+import { getTier, awardRelationship, getTierUpMessage } from './relationships.js';
 import { getCorruptionTier } from './corruption.js';
 import { getStage, advanceStage } from './stages.js';
 import { addAbundancePoints } from './player.js';
@@ -388,6 +388,23 @@ function applyRewardBundle(game, bundle = {}) {
   for (const cid of bundle.unlockCompanionIds ?? []) {
     game.player.storyFlags[`companion_unlock_${cid}`] = true;
     messages.push(`Companion available: ${cid.replace(/_/g, ' ')}`);
+  }
+  const relRewards = bundle.npcRelationships
+    ? bundle.npcRelationships
+    : bundle.npcRelationship
+      ? [bundle.npcRelationship]
+      : [];
+  for (const rel of relRewards) {
+    if (!rel?.npcId) continue;
+    const template = findNpc(rel.npcId, game);
+    const npc = template ? getNpcState(game, template) : getNpcState(game, { id: rel.npcId });
+    const result = awardRelationship(npc, rel.source || 'quest_personal', rel.amount);
+    applyNpcState(game, npc.id, npc);
+    if (npc.isCompanion) {
+      game.party = (game.party ?? []).map((c) => (c.id === npc.id ? { ...npc } : c));
+    }
+    messages.push(`+${result.gained} bond with ${npc.name}`);
+    if (result.tierUp) messages.push(getTierUpMessage(npc, result));
   }
   return messages;
 }

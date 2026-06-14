@@ -4,7 +4,7 @@ import {
   doFeast, doSpecial, doIntimate, doCorrupt, doRecruit,
 } from "../hooks/npcInteractions.js";
 import { getStage } from "../gameData/stages.js";
-import { getTier } from "../gameData/relationships.js";
+import { getTier, getRelationshipProgress } from "../gameData/relationships.js";
 import { getCorruptionTier } from "../gameData/corruption.js";
 import SkillCheckRoll from "./SkillCheckRoll.jsx";
 
@@ -18,6 +18,7 @@ export default function NpcModal({ npc, player, game, onClose, onUpdate, onGameR
 
   const stage = getStage(npc.lbs);
   const rel = getTier(npc.relationship || 0);
+  const relProgress = getRelationshipProgress(npc.relationship || 0);
   const cor = getCorruptionTier(npc.corruption || 0);
   const menu = getInteractionMenu(npc, player);
 
@@ -114,10 +115,29 @@ export default function NpcModal({ npc, player, game, onClose, onUpdate, onGameR
         <h2>{npc.name}</h2>
         <div className="stats-bar">
           <span className="stat">{stage.label} ({Math.round(npc.lbs)} lbs)</span>
-          <span className="stat">{rel.label}</span>
+          <span className="stat" title={rel.desc}>{rel.label}</span>
           <span className="stat">{cor.label}</span>
+          {npc.bondFlags?.devoted && <span className="stat" style={{ color: "var(--gold-bright)" }}>★ Devoted</span>}
           {npc.role && <span className="stat">{npc.role}</span>}
         </div>
+
+        {relProgress.next && (
+          <div style={{ marginTop: "0.5rem" }}>
+            <div style={{ fontSize: "0.75rem", color: "var(--text-dim)", marginBottom: "0.25rem" }}>
+              Bond: {relProgress.points} pts — {relProgress.toNext} to {relProgress.next.label}
+            </div>
+            <div style={{ height: 6, background: "rgba(0,0,0,0.3)", borderRadius: 3, overflow: "hidden" }}>
+              <div
+                style={{
+                  width: `${relProgress.pct}%`,
+                  height: "100%",
+                  background: "linear-gradient(90deg, var(--rose), var(--gold))",
+                  transition: "width 0.3s",
+                }}
+              />
+            </div>
+          </div>
+        )}
 
         {activeCheck && (
           <SkillCheckRoll check={activeCheck} onComplete={handleRollComplete} />
@@ -157,9 +177,11 @@ export default function NpcModal({ npc, player, game, onClose, onUpdate, onGameR
               <button
                 key={item.id}
                 disabled={!item.enabled}
+                title={item.hint || undefined}
                 onClick={() => handleAction(item.id)}
               >
                 {item.label}
+                {!item.enabled && item.hint ? ` (${item.hint})` : ""}
               </button>
             ))}
             <button onClick={onClose}>Leave</button>
