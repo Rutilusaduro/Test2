@@ -5,11 +5,12 @@ import { getSpell, getSpellForCast, spellHasEnvironmentUse, getSpellEnvironmentT
 import { hasSpellSlot, spendSpellSlot } from './spellSlots.js';
 import { spendAP } from './player.js';
 import { addCorruption } from './corruption.js';
-import { awardRelationship, getGrowthStageBonus } from './relationships.js';
+import { awardRelationship } from './relationships.js';
 import { getPreparedSpells, isSpellPrepared } from './spellPreparation.js';
 import { awardAbundanceSpreadWithEvents } from './worldEvents.js';
 import { renderOverworldSpellCast } from '../textEngine/scenes/overworld/spellCast.js';
-import { applyGrowthWithPresentation } from './growthPresentation.js';
+import { applyNpcGrowth } from './npcGrowth.js';
+import { awardFatteningXp } from './leveling.js';
 import { getStage } from './stages.js';
 import { getStagePerk } from './stagePerks.js';
 import { getFeature } from './regionFeatures.js';
@@ -21,6 +22,12 @@ import { renderPuzzleText } from '../textEngine/scenes/puzzles/index.js';
 import { getCombinedPuzzleBonuses } from './worldAuras.js';
 import { CONNECTION_GATES, syncGateUnlocks } from './regionObstacles.js';
 import { tryClearObstacle } from './obstacleUnlocks.js';
+import {
+  getSpellGrowthFavorCost,
+  canSpendFavor,
+  spendFavor,
+  getFavorRefusalText,
+} from './favor.js';
 
 export function getOverworldCastableSpells(player) {
   return getPreparedSpells(player).filter((spell) => {
@@ -53,23 +60,36 @@ function resolveOverworldCost(player, spell, overflow) {
 
 function applyOverworldSpellEffects(game, npc, player, spell) {
   const eff = spell.effect || {};
-  const relBonus = getGrowthStageBonus(npc, 'spell');
   const results = { growth: null, relationship: null, corruption: 0 };
 
   if (eff.growth) {
-    const stages = (eff.growth || 0) + relBonus;
-    const presentation = applyGrowthWithPresentation(npc, game, stages, { growthMethod: 'spell' });
-    results.growth = presentation;
-    addCorruption(npc, 3 * stages);
-    results.relationship = awardRelationship(npc, 'spell_bless', 4 + stages);
-    awardAbundanceSpreadWithEvents(game, 'overworld_spell_growth');
+    const stages = eff.growth || 0;
+    const growth = applyNpcGrowth(npc, game, stages, 'spell');
+    results.growth = growth;
+    if (growth.stagesJumped > 0) {
+      results.fattenXp = awardFatteningXp(player, growth.stagesJumped, 'overworld_spell');
+    }
+    if (growth.consentState !== 'forced') {
+      addCorruption(npc, 3 * stages);
+      results.relationship = awardRelationship(npc, 'spell_bless', 4 + stages);
+    }
+    if (growth.stagesJumped > 0) {
+      awardAbundanceSpreadWithEvents(game, 'overworld_spell_growth');
+    }
   }
   if (eff.feed && !eff.growth) {
-    const presentation = applyGrowthWithPresentation(npc, game, 1 + relBonus, { growthMethod: 'feed' });
-    results.growth = presentation;
-    addCorruption(npc, 4);
-    results.relationship = awardRelationship(npc, 'feed');
-    awardAbundanceSpreadWithEvents(game, 'overworld_spell_growth');
+    const growth = applyNpcGrowth(npc, game, 1, 'feed');
+    results.growth = growth;
+    if (growth.stagesJumped > 0) {
+      results.fattenXp = awardFatteningXp(player, growth.stagesJumped, 'overworld_feed');
+    }
+    if (growth.consentState !== 'forced') {
+      addCorruption(npc, 4);
+      results.relationship = awardRelationship(npc, 'feed');
+    }
+    if (growth.stagesJumped > 0) {
+      awardAbundanceSpreadWithEvents(game, 'overworld_spell_growth');
+    }
   }
   if (eff.corruption) addCorruption(npc, eff.corruption);
   if (eff.charm) {
@@ -104,11 +124,30 @@ export function castSpellOnNpc(game, npc, spellId, opts = {}) {
     return { ok: false, text: `${spell.name} is not prepared. Prepare it after your next rest.` };
   }
 
+  const eff = spell.effect || {};
+  if (eff.growth) {
+    const favorCost = getSpellGrowthFavorCost(eff.growth);
+    if (!canSpendFavor(player, favorCost)) {
+      return { ok: false, text: getFavorRefusalText(player, game, 'growth') };
+    }
+  } else if (eff.feed && !eff.growth) {
+    if (!canSpendFavor(player, 1)) {
+      return { ok: false, text: getFavorRefusalText(player, game, 'growth') };
+    }
+  }
+
   const target = { ...npc };
   const effects = applyOverworldSpellEffects(game, target, player, cost.spell);
 
   if (cost.method === 'slot') spendSpellSlot(player, cost.slotLevel);
   else if (cost.method === 'ap') spendAP(game, cost.ap);
+
+  if (effects.growth && !effects.growth.favorRefused) {
+    const stages = eff.growth || (eff.feed ? 1 : 0);
+    if (stages > 0 && (effects.growth.stagesJumped > 0 || !effects.growth.refused)) {
+      spendFavor(player, getSpellGrowthFavorCost(stages));
+    }
+  }
 
   const prose = renderOverworldSpellCast(target, player, {
     spell: cost.spell,

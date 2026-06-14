@@ -11,14 +11,21 @@ import {
 import {
   resolveAttackRoll,
   resolveMeleeDamage,
+  resolveSpellDamage,
+  resolveEffectWithSave,
   applyCombatDamage,
   applyAttackCritEffects,
   formatAttackSummary,
+  formatSaveSummary,
   ATTACK_TYPES,
+  DAMAGE_TYPES,
   getAttackReach,
 } from "./combatRolls.js";
+import { getSpellSaveDC } from "./stats.js";
 import { resolveCastCost, getSpellPowerMultiplier } from "./spellSlots.js";
 import { getSpellForCast } from "./spells.js";
+import { renderCastFeedback } from "../textEngine/scenes/dm/cast.js";
+import { awardFatteningXp } from "./leveling.js";
 
 const GRID_SIZE = 10;
 
@@ -36,6 +43,7 @@ export function createCombatState(player, party, enemyTypeId, regionId) {
   const count = enemyTypeId === "famine_hag" ? 1 : 1 + Math.floor(Math.random() * 2);
   for (let i = 0; i < count; i++) {
     const e = enemyTypeId ? createEnemy(enemyTypeId) : createEnemy("harvest_harpy");
+    e.typeId = enemyTypeId || e.id;
     e.x = GRID_SIZE - 2 - i * 2;
     e.y = 2 + i * 2;
     enemies.push(e);
@@ -45,7 +53,15 @@ export function createCombatState(player, party, enemyTypeId, regionId) {
     prepareCombatUnit({ ...player, x: 1, y: 4, isPlayer: true }, "ally", 0),
     ...party.map((c, i) => prepareCombatUnit({ ...c, x: 1, y: 6 + i * 2, isPlayer: false }, "ally", i + 1)),
   ];
-  const preparedEnemies = enemies.map((e, i) => prepareCombatUnit(e, "enemy", i));
+  const preparedEnemies = enemies.map((e, i) => {
+    const unit = prepareCombatUnit(e, "enemy", i);
+    return {
+      ...unit,
+      type: e.typeId || e.id,
+      startLbs: e.lbs,
+      startStage: getStage(e.lbs).id,
+    };
+  });
 
   const turnState = initCombatTurnState(allies, preparedEnemies);
   beginTurn(turnState, null);
@@ -64,6 +80,8 @@ export function createCombatState(player, party, enemyTypeId, regionId) {
     regionId,
     log,
     lastGrowth: null,
+    introDismissed: false,
+    enemyTypeId: enemyTypeId || preparedEnemies[0]?.typeId,
   };
 
   return skipToPlayerTurn(combat);
@@ -220,6 +238,16 @@ export function attackUnit(combat, attacker, target) {
   return combat;
 }
 
+function maybeAwardFatteningXp(combat, caster, target, growth) {
+  if (!caster?.isPlayer || !growth?.stagesJumped || growth.stagesJumped <= 0) return;
+  if (!target || target.isPlayer || target === caster) return;
+  const { levelUps } = awardFatteningXp(caster, growth.stagesJumped, 'combat_fatten');
+  if (levelUps?.length) {
+    combat.fattenLevelUps = [...(combat.fattenLevelUps || []), ...levelUps];
+    caster.grewThisCombat = true;
+  }
+}
+
 export function applyGrowth(unit, stages = 1) {
   const result = advanceStageUniversal(unit, stages);
   const endStage = getStage(unit.lbs).id;
@@ -251,6 +279,7 @@ export function useBonusAction(combat, unit, actionId, target = null) {
     addCorruption(target, 5);
     combat.lastGrowth = { unit: target, ...growth };
     onUnitGrew(combat.turnState, target, growth);
+    maybeAwardFatteningXp(combat, unit, target, growth);
     combat.log.push(`${unit.name} body-slams ${target.name} with ${getStage(unit.lbs).label} mass!`);
   } else if (actionId === "crushing_aura") {
     for (const e of combat.enemies.filter((en) => en.hp > 0 && !en.converted)) {
@@ -266,9 +295,9 @@ export function useBonusAction(combat, unit, actionId, target = null) {
 
 export { getAvailableBonusActions };
 
-export function feedTarget(combat, feeder, target, amount = 1) {
+export function feedTarget(combat, feeder, target, amount = 1, opts = {}) {
   const entry = getActiveEntry(combat.turnState);
-  if (entry && !canUseAction(combat.turnState, entry.id, ACTION_TYPES.ACTION)) {
+  if (!opts.skipActionSpend && entry && !canUseAction(combat.turnState, entry.id, ACTION_TYPES.ACTION)) {
     combat.log.push("Action already used this turn!");
     return combat;
   }
@@ -276,10 +305,11 @@ export function feedTarget(combat, feeder, target, amount = 1) {
   const growth = applyGrowth(target, amount);
   target.hunger = Math.min(100, (target.hunger || 0) + 25 * amount);
   addCorruption(target, 5 * amount);
+  maybeAwardFatteningXp(combat, feeder, target, growth);
   combat.log.push(`${feeder.name} feeds ${target.name} — she swells with pleasure!`);
   combat.lastGrowth = { unit: target, ...growth };
   if (entry) {
-    spendAction(combat.turnState, entry.id, ACTION_TYPES.ACTION);
+    if (!opts.skipActionSpend) spendAction(combat.turnState, entry.id, ACTION_TYPES.ACTION);
     onUnitGrew(combat.turnState, target, growth);
     if (combat.turnState.log?.length) combat.log.push(...combat.turnState.log.slice(-2));
   }
@@ -289,24 +319,92 @@ export function feedTarget(combat, feeder, target, amount = 1) {
 export function castSpell(combat, caster, spell, target, opts = {}) {
   const entry = getActiveEntry(combat.turnState);
   const castSpellData = getSpellForCast(spell, opts.overflow);
-  const cost = resolveCastCost(caster, castSpellData, opts);
+  const economyType = castSpellData.actionType === "bonus" ? ACTION_TYPES.BONUS : ACTION_TYPES.ACTION;
 
-  if (!cost.ok) {
-    combat.log.push("No spell slots or Abundance Points available!");
+  if (entry && !canUseAction(combat.turnState, entry.id, economyType)) {
+    const blockKind = economyType === ACTION_TYPES.BONUS ? "nobonus" : "noaction";
+    combat.log.push(renderCastFeedback(blockKind, caster, castSpellData));
     return combat;
   }
 
-  if (castSpellData.slotLevel > 0 && entry && !canUseAction(combat.turnState, entry.id, ACTION_TYPES.ACTION)) {
-    combat.log.push("Action already used this turn!");
-    if (cost.method === "slot") {
-      // refund slot — simplified: don't spend if blocked
-    }
+  const cost = resolveCastCost(caster, castSpellData, opts);
+  if (!cost.ok) {
+    combat.log.push(renderCastFeedback("fizzle", caster, castSpellData, { failCause: "no_resource" }));
     return combat;
   }
 
   const power = getSpellPowerMultiplier(caster, cost.slotLevelUsed || castSpellData.slotLevel || 1);
   const eff = { ...castSpellData.effect };
   const scale = (n) => (typeof n === "number" ? Math.max(1, Math.round(n * power)) : n);
+  let actionSpent = false;
+  const spendCastAction = () => {
+    if (entry && !actionSpent) {
+      spendAction(combat.turnState, entry.id, economyType);
+      actionSpent = true;
+    }
+  };
+
+  const applyGrowthFn = (unit, stages) => {
+    const g = applyGrowth(unit, stages);
+    onUnitGrew(combat.turnState, unit, g);
+    combat.lastGrowth = { unit, ...g };
+    maybeAwardFatteningXp(combat, caster, unit, g);
+    return g;
+  };
+
+  if (eff.damage) {
+    const dmgSpec = eff.damage;
+    const damageTargets = opts.targets?.length ? opts.targets : [target].filter(Boolean);
+    const dice = dmgSpec.dice ?? { count: 1, sides: 8 };
+    const damageType = dmgSpec.damageType ?? DAMAGE_TYPES.ABUNDANCE_OVERLOAD;
+
+    for (const t of damageTargets) {
+      if (!t || t.hp <= 0) continue;
+
+      if (dmgSpec.save) {
+        const dc = getSpellSaveDC(caster);
+        const rolled = resolveSpellDamage(caster, { ...dmgSpec, dice, damageType });
+        const result = resolveEffectWithSave(t, dmgSpec, {
+          saveStat: dmgSpec.save,
+          dc,
+          damage: rolled.total,
+          halfOnSuccess: dmgSpec.halfOnSuccess !== false,
+          applyGrowthFn,
+        });
+        combat.log.push(formatSaveSummary(result.save));
+        if (result.applied?.hpDamage > 0) {
+          combat.log.push(`${t.name} takes ${result.applied.hpDamage} HP from ${castSpellData.name}.`);
+          if (result.applied.growthStages > 0) {
+            combat.log.push(`${t.name} swells from the impact!`);
+          }
+        } else {
+          combat.log.push(`${t.name} resists the worst of ${castSpellData.name}.`);
+        }
+      } else if (dmgSpec.spellAttack !== false) {
+        const attack = resolveAttackRoll(caster, t, {
+          attackType: ATTACK_TYPES.SPELL,
+          label: castSpellData.name,
+        });
+        if (attack.hit) {
+          const damage = resolveSpellDamage(caster, { ...dmgSpec, dice, damageType }, {
+            critical: attack.isCriticalHit,
+          });
+          const applied = applyCombatDamage(t, damage, { applyGrowthFn });
+          combat.log.push(formatAttackSummary(attack, damage, applied));
+          if (dmgSpec.corruptionOnHit) addCorruption(t, scale(dmgSpec.corruptionOnHit));
+        } else {
+          combat.log.push(`${castSpellData.name}: ${attack.naturalRoll} + ${attack.modifierTotal} = ${attack.total} vs AC ${attack.ac} — MISS`);
+        }
+      } else {
+        const damage = resolveSpellDamage(caster, { ...dmgSpec, dice, damageType });
+        const applied = applyCombatDamage(t, damage, { applyGrowthFn });
+        combat.log.push(`${t.name} takes ${applied.hpDamage} HP from ${castSpellData.name}.`);
+      }
+
+      if (t.hp <= 0) combat.log.push(`${t.name} falls!`);
+    }
+    checkVictory(combat);
+  }
 
   if (eff.heal && target) {
     target.hp = Math.min(target.maxHp, target.hp + scale(eff.heal));
@@ -314,7 +412,9 @@ export function castSpell(combat, caster, spell, target, opts = {}) {
   }
   if (eff.growth) {
     let targets;
-    if (eff.party && eff.aoe) {
+    if (opts.targets?.length) {
+      targets = opts.targets;
+    } else if (eff.party && eff.aoe) {
       targets = combat.allies.filter((a) => a.hp > 0);
     } else if (eff.aoe) {
       targets = [...combat.enemies, ...combat.allies].filter((t) => t?.hp > 0);
@@ -326,13 +426,16 @@ export function castSpell(combat, caster, spell, target, opts = {}) {
       addCorruption(t, 3 * scale(eff.growth));
       combat.lastGrowth = { unit: t, ...g };
       onUnitGrew(combat.turnState, t, g);
+      maybeAwardFatteningXp(combat, caster, t, g);
     }
     const label = eff.party ? 'your allies' : eff.aoe ? 'the battlefield' : target?.name;
     combat.log.push(`${castSpellData.name} swells ${label} with golden abundance!`);
   }
   if (eff.corruption && target) addCorruption(target, scale(eff.corruption));
   if (eff.feed && target) {
-    feedTarget(combat, caster, target, scale(eff.feed));
+    feedTarget(combat, caster, target, scale(eff.feed), { skipActionSpend: true });
+    spendCastAction();
+    combat.log.push(renderCastFeedback("invoke", caster, castSpellData, { cost }));
     return combat;
   }
   if (eff.charm && target) {
@@ -358,10 +461,8 @@ export function castSpell(combat, caster, spell, target, opts = {}) {
     combat.log.push(`${castSpellData.name} blesses ${caster.name} with ${eff.buff} power.`);
   }
 
-  const costNote = cost.method === "ap" ? ` (${cost.apSpent} AP)` : cost.upcast ? " (upcast)" : "";
-  combat.log.push(`Cast ${castSpellData.name}${costNote}.`);
-
-  if (entry && castSpellData.slotLevel > 0) spendAction(combat.turnState, entry.id, ACTION_TYPES.ACTION);
+  spendCastAction();
+  combat.log.push(renderCastFeedback("invoke", caster, castSpellData, { cost }));
   return combat;
 }
 

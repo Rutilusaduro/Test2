@@ -15,6 +15,16 @@ import { renderFeast } from "../textEngine/scenes/npc/feast.js";
 import { renderIntimate } from "../textEngine/scenes/npc/intimate.js";
 import { renderGrowthScene } from "../textEngine/scenes/growthEvent/index.js";
 import { renderCombatBeat } from "../textEngine/scenes/combatText.js";
+import { renderCombatIntro, renderCombatOutro } from "../textEngine/scenes/dm/combat.js";
+import { renderCastFeedback } from "../textEngine/scenes/dm/cast.js";
+import { renderSatiationRefusal } from "../textEngine/scenes/npc/satiation.js";
+import { renderForcedGrowth, renderWillingRapture } from "../textEngine/scenes/npc/consentGrowth.js";
+import { renderSpecial } from "../textEngine/scenes/npc/special.js";
+import { renderRegionHostilityBeat } from "../textEngine/scenes/dm/region.js";
+import { renderFavorWarning, renderSpecialCooldown } from "../textEngine/scenes/dm/favor.js";
+import { renderIndulge } from "../textEngine/scenes/player/indulge.js";
+import { ENEMY_TYPES } from "../gameData/enemies.js";
+import { REGIONS } from "../gameData/regions.js";
 import { resolveGrowthZone } from "../textEngine/growthLexicon.js";
 import "../textEngine/growthLexicon.js";
 
@@ -25,7 +35,17 @@ const REL_POINTS = { 0: 5, 1: 20, 2: 40, 3: 60, 4: 80, 5: 95 };
 const POSES = ["standing", "sitting", "walking"];
 const FEED_TYPES = ["hand", "magical", "feast"];
 const BLESS_TYPES = ["minor", "major", "targeted"];
-const COMBAT_ACTIONS = ["attack", "feed", "growth", "convert"];
+const COMBAT_VICTORIES = ["win", "converted", "defeat"];
+const SPELL_SCHOOLS = ["abundance", "enchantment", "transmutation", "evocation", "conjuration"];
+const CAST_TYPES = ["action", "bonus"];
+const PAID_BY = ["slot", "ap", "cantrip"];
+const FAIL_CAUSES = ["no_resource", "no_action", "no_bonus"];
+const CONSENT_STATES = ["willing", "forced"];
+const FAVOR_STATES = ["flush", "low", "empty"];
+const HOSTILITY_TIERS = ["0", "1", "2", "3"];
+const SATIATION_TIER_IDS = ["0", "1", "2", "3"];
+const ENEMY_TYPE_IDS = Object.keys(ENEMY_TYPES);
+const REGION_IDS = REGIONS.map((r) => r.id);
 
 const DEBUG_CHARACTERS = [
   ...COMPANIONS.map((c) => ({
@@ -107,6 +127,154 @@ const SECTIONS = {
     params: [...STATE_PARAMS, "combatAction"],
     fn: (s, opts) => renderCombatBeat(s, { interaction: opts.combatAction, trace: opts.trace }),
   },
+  "dm.combat.intro": {
+    params: ["enemyType", "region", "enemyCount"],
+    fn: (_s, opts) => {
+      const enemyType = opts.enemyType === RANDOM ? pick(ENEMY_TYPE_IDS) : opts.enemyType;
+      const region = opts.region === RANDOM ? pick(REGION_IDS) : opts.region;
+      const count = opts.enemyCount === RANDOM ? pick(["1", "2"]) : Number(opts.enemyCount);
+      const template = ENEMY_TYPES[enemyType] || ENEMY_TYPES.harvest_harpy;
+      const enemies = Array.from({ length: count }, (_, i) => ({
+        name: `${template.name} ${i + 1}`,
+        type: enemyType,
+        typeId: enemyType,
+        lbs: template.startLbs,
+        startLbs: template.startLbs,
+        startStage: 1,
+        role: template.role,
+        pronouns: "they",
+        hp: template.hp,
+      }));
+      const combat = { enemies, regionId: region };
+      const game = { player: MOCK_PLAYER, region };
+      return renderCombatIntro(game, combat, { trace: opts.trace });
+    },
+  },
+  "dm.combat.outro": {
+    params: ["enemyType", "region", "victoryType"],
+    fn: (_s, opts) => {
+      const enemyType = opts.enemyType === RANDOM ? pick(ENEMY_TYPE_IDS) : opts.enemyType;
+      const region = opts.region === RANDOM ? pick(REGION_IDS) : opts.region;
+      const victory = opts.victoryType === RANDOM ? pick(COMBAT_VICTORIES) : opts.victoryType;
+      const template = ENEMY_TYPES[enemyType] || ENEMY_TYPES.harvest_harpy;
+      const wrapup = {
+        victory: victory === "defeat" ? "lose" : victory,
+        region,
+        enemies: [{
+          name: template.name,
+          type: enemyType,
+          startStage: 1,
+          endStage: victory === "defeat" ? 1 : 5,
+          lbs: template.startLbs + (victory === "defeat" ? 0 : 80),
+          converted: victory === "converted",
+          killed: victory === "win",
+          pronouns: "they",
+        }],
+        allies: [{ name: MOCK_PLAYER.name, lbs: MOCK_PLAYER.lbs, isPlayer: true }],
+      };
+      const game = { player: MOCK_PLAYER, region, party: [] };
+      return renderCombatOutro(game, wrapup, { trace: opts.trace });
+    },
+  },
+  "dm.cast": {
+    params: ["castKind", "spellSchool", "castType", "paidBy", "failCause"],
+    fn: (s, opts) => {
+      const kind = opts.castKind === RANDOM ? pick(CAST_KINDS) : opts.castKind;
+      const school = opts.spellSchool === RANDOM ? pick(SPELL_SCHOOLS) : opts.spellSchool;
+      const castType = opts.castType === RANDOM ? pick(CAST_TYPES) : opts.castType;
+      const paidBy = opts.paidBy === RANDOM ? pick(PAID_BY) : opts.paidBy;
+      const failCause = opts.failCause === RANDOM ? pick(FAIL_CAUSES) : opts.failCause;
+      const spell = { name: "Test Spell", school, actionType: castType };
+      return renderCastFeedback(kind, s, spell, {
+        paidBy,
+        failCause: kind === "fizzle" ? failCause : undefined,
+        cost: { ok: true, method: paidBy === "cantrip" ? "cantrip" : paidBy },
+        trace: opts.trace,
+      });
+    },
+  },
+  "npc.satiation.refusal": {
+    params: ["satiationTier", "girl"],
+    fn: (s, opts) => renderSatiationRefusal(s, MOCK_PLAYER, {
+      tier: { id: Number(opts.satiationTier === RANDOM ? pick(SATIATION_TIER_IDS) : opts.satiationTier) },
+      trace: opts.trace,
+    }),
+  },
+  "npc.growth.forced": {
+    params: [...STATE_PARAMS, "consentState"],
+    fn: (s, opts) => renderForcedGrowth(s, MOCK_PLAYER, {
+      severity: opts.consentState === "forced" ? 2 : 1,
+      method: "feed",
+      trace: opts.trace,
+    }),
+  },
+  "npc.growth.rapture": {
+    params: STATE_PARAMS,
+    fn: (s, opts) => renderWillingRapture(s, MOCK_PLAYER, {
+      gainDesire: s.gainDesire ?? 80,
+      method: "feed",
+      trace: opts.trace,
+    }),
+  },
+  "npc.special": {
+    params: [...STATE_PARAMS, "consentState"],
+    fn: (s, opts) => renderSpecial(s, MOCK_PLAYER, {
+      playerClass: "cleric",
+      consentState: opts.consentState === RANDOM ? pick(CONSENT_STATES) : opts.consentState,
+      severity: 1,
+      gainDesire: s.gainDesire ?? 40,
+      trace: opts.trace,
+    }),
+  },
+  "dm.region.wary": {
+    params: ["region", "hostilityTier"],
+    fn: (s, opts) => renderRegionHostilityBeat(
+      { player: MOCK_PLAYER, region: opts.region === RANDOM ? pick(REGION_IDS) : opts.region },
+      opts.region === RANDOM ? pick(REGION_IDS) : opts.region,
+      {
+        hostilityTier: Number(opts.hostilityTier === RANDOM ? pick(HOSTILITY_TIERS) : opts.hostilityTier),
+        crackdown: false,
+        trace: opts.trace,
+      },
+    ),
+  },
+  "dm.region.crackdown": {
+    params: ["region"],
+    fn: (s, opts) => renderRegionHostilityBeat(
+      { player: MOCK_PLAYER, region: opts.region === RANDOM ? pick(REGION_IDS) : opts.region },
+      opts.region === RANDOM ? pick(REGION_IDS) : opts.region,
+      { hostilityTier: 3, crackdown: true, trace: opts.trace },
+    ),
+  },
+  "dm.favor.low": {
+    params: ["favorState"],
+    fn: (s, opts) => renderFavorWarning(MOCK_PLAYER, { region: "harvest_hearth" }, {
+      favorState: opts.favorState === RANDOM ? pick(FAVOR_STATES) : opts.favorState,
+      action: "growth",
+      trace: opts.trace,
+    }),
+  },
+  "dm.favor.empty": {
+    params: ["favorState"],
+    fn: (s, opts) => renderFavorWarning(MOCK_PLAYER, { region: "harvest_hearth" }, {
+      favorState: "empty",
+      action: "growth",
+      trace: opts.trace,
+    }),
+  },
+  "dm.special.cooldown": {
+    params: ["girl"],
+    fn: (s, opts) => renderSpecialCooldown(s, MOCK_PLAYER, { region: "harvest_hearth" }, { trace: opts.trace }),
+  },
+  "player.indulge": {
+    params: ["stage", "region"],
+    fn: (s, opts) => renderIndulge(MOCK_PLAYER, {
+      region: opts.region === RANDOM ? pick(REGION_IDS) : opts.region,
+    }, {
+      stage: Number(opts.stage === RANDOM ? pick(["2", "5", "8", "11"]) : opts.stage),
+      trace: opts.trace,
+    }),
+  },
   "char.desc": {
     params: STATE_PARAMS,
     fn: (s, opts) => render("{char.desc}", createContext({ subject: s, ref: MOCK_PLAYER, week: 3 }), { trace: opts.trace }),
@@ -126,7 +294,18 @@ const PARAM_DEFS = [
   { key: "feedType", label: "Feed type", options: FEED_TYPES },
   { key: "blessType", label: "Bless type", options: BLESS_TYPES },
   { key: "growthZone", label: "Growth zone", options: ["belly", "lower_body", "curves", "full", "bust", "random"], optionLabel: (v) => v === "random" ? "auto (body type)" : v },
-  { key: "combatAction", label: "Combat action", options: COMBAT_ACTIONS },
+  { key: "combatAction", label: "Combat action", options: ["attack", "feed", "growth", "convert"] },
+  { key: "enemyType", label: "Enemy type", options: ENEMY_TYPE_IDS },
+  { key: "region", label: "Region", options: REGION_IDS },
+  { key: "enemyCount", label: "Enemy count", options: ["1", "2"] },
+  { key: "victoryType", label: "Victory type", options: COMBAT_VICTORIES },
+  { key: "castKind", label: "Cast kind", options: CAST_KINDS },
+  { key: "spellSchool", label: "Spell school", options: SPELL_SCHOOLS },
+  { key: "castType", label: "Cast type", options: CAST_TYPES },
+  { key: "paidBy", label: "Paid by", options: PAID_BY },
+  { key: "failCause", label: "Fail cause", options: FAIL_CAUSES },
+  { key: "consentState", label: "Consent", options: CONSENT_STATES },
+  { key: "satiationTier", label: "Satiation tier", options: SATIATION_TIER_IDS },
 ];
 
 function rollSample(params) {
@@ -167,6 +346,17 @@ function rollSample(params) {
     blessType: v.blessType,
     growthZone: v.growthZone,
     combatAction: v.combatAction,
+    enemyType: v.enemyType,
+    region: v.region,
+    enemyCount: v.enemyCount,
+    victoryType: v.victoryType,
+    castKind: v.castKind,
+    spellSchool: v.spellSchool,
+    castType: v.castType,
+    paidBy: v.paidBy,
+    failCause: v.failCause,
+    consentState: v.consentState,
+    satiationTier: v.satiationTier,
   };
   const text = SECTIONS[v.section].fn(student, opts);
   const nodes = trace.filter((t) => t.leaf && t.text.trim() && !t.key.startsWith("subject."));

@@ -94,10 +94,10 @@ export const SUBCLASS_SPELL_GRANTS = {
 
 /** Cantrip pool per class (growth-themed first in UI). */
 export const CLASS_CANTRIP_POOL = {
-  wizard: ['gorgaras_spark', 'indulgent_touch', 'softening_ray', 'rich_cream', 'gentle_plump', 'feasts_whisper'],
-  cleric: ['indulgent_touch', 'gentle_plump', 'flavor_burst', 'feasts_whisper'],
-  bard: ['feasts_whisper', 'jiggle_charm', 'flavor_burst', 'indulgent_touch'],
-  warlock: ['gorgaras_spark', 'feasts_whisper', 'softening_ray', 'rich_cream'],
+  wizard: ['caloric_bolt', 'gorgaras_spark', 'indulgent_touch', 'softening_ray', 'syrup_splash', 'rich_cream', 'gentle_plump', 'feasts_whisper'],
+  cleric: ['caloric_bolt', 'honeyed_lash', 'indulgent_touch', 'gentle_plump', 'flavor_burst', 'feasts_whisper'],
+  bard: ['caloric_bolt', 'honeyed_lash', 'feasts_whisper', 'jiggle_charm', 'flavor_burst', 'syrup_splash', 'indulgent_touch'],
+  warlock: ['caloric_bolt', 'gluttons_ember', 'gorgaras_spark', 'feasts_whisper', 'softening_ray', 'rich_cream'],
 };
 
 /** Starting cantrip count and leveled spells at character creation. */

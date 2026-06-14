@@ -9,6 +9,11 @@ import { CLASS_SKILL_PROFICIENCIES } from "./skills.js";
 import { applyRaceStatBonuses, getRace } from "./races.js";
 import { getSubclass, getDefaultSubclassId } from "./subclasses.js";
 import { getStartLbsWithRace } from "./raceFeatures.js";
+import { ensureGainDesire } from "./gainDesire.js";
+import { ensureSatiation } from "./satiation.js";
+import { ensureFavor } from "./favor.js";
+import { drainForcedGrowthLog, tickRegionHostility } from "./regionHostility.js";
+import { flushHostilityPending } from "../hooks/questHooks.js";
 
 /**
  * @param {string} name
@@ -66,11 +71,12 @@ export function createPlayer(name, classId, options = {}) {
     spells: [],
     levelUpsPending: [],
     tempFlags: {},
-    restFlags: { hungerForMoreUsed: false },
+    restFlags: { hungerForMoreUsed: false, indulgeUsed: false },
   };
 
   initSpellSlots(player);
   initializeStartingSpells(player);
+  ensureFavor(player);
   player.ap = Math.min(player.ap, getMaxAbundancePoints(player));
   return player;
 }
@@ -104,8 +110,44 @@ export function createNewGame(name, classId, options = {}) {
       titles: [],
     },
     lastQuestMessage: null,
+    dm: {
+      sceneLine: null,
+      eventLine: null,
+      idleSince: 1,
+      lastKind: null,
+      actionCount: 0,
+      visitedRegions: { harvest_hearth: true },
+      lastHintDay: null,
+    },
+    settings: {
+      skipCombatScenes: false,
+    },
   };
   return ensurePartyUniversalSize(game);
+}
+
+/** Migrate / hydrate scarcity + hostility state on load. */
+export function ensureScarcityState(game) {
+  if (!game?.player) return game;
+  ensureFavor(game.player);
+  tickRegionHostility(game);
+  flushHostilityPending(game);
+  return game;
+}
+
+export function ensureDmState(game) {
+  if (!game.dm) {
+    game.dm = {
+      sceneLine: null,
+      eventLine: null,
+      idleSince: game.day ?? 1,
+      lastKind: null,
+      actionCount: 0,
+      visitedRegions: game.region ? { [game.region]: true } : {},
+      lastHintDay: null,
+    };
+  }
+  return game.dm;
 }
 
 export function syncPlayerFromCombat(game, combat) {
@@ -151,7 +193,10 @@ export function applyNpcState(game, npcId, updates) {
 
 export function getNpcState(game, npc) {
   const saved = game.npcStates?.[npc.id] || {};
-  return { ...npc, ...saved };
+  const merged = { ...npc, ...saved };
+  ensureGainDesire(merged);
+  ensureSatiation(merged, game);
+  return merged;
 }
 
 export function getPlayerDerivedStats(player) {

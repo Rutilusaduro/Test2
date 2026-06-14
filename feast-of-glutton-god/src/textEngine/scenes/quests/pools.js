@@ -320,3 +320,19 @@ registerQuestCopy('quest.side.paths.stage.master.complete', [
 registerQuestCopy('quest.side.paths.complete', [
   'Paths of Abundance complete. You are a problem-solver of divine appetite — and the world is softer for it.',
 ]);
+
+// ─── Side: Hostility Redemption ───────────────────────────────────────────────
+
+registerQuestCopy('quest.side.redemption.title', ['Amends to the Hearth']);
+registerQuestCopy('quest.side.redemption.desc', [
+  'The region has turned against your reckless growth. Hold a feast, mend bonds, and face the purity hunters — then mercy may reopen what crackdown sealed.',
+]);
+registerQuestCopy('quest.side.redemption.stage.earn.desc', [
+  'Prove abundance can be consensual again: feast communally, speak gently, and survive the inquisitors who hunt you.',
+]);
+registerQuestCopy('quest.side.redemption.stage.earn.complete', [
+  'Suspicion eases — not forgiven entirely, but willing to listen. One more step toward clearing the crackdown.',
+]);
+registerQuestCopy('quest.side.redemption.complete', [
+  'Amends accepted. Larders unlock, patrols thin, and the region remembers that your gift can be tender again.',
+]);

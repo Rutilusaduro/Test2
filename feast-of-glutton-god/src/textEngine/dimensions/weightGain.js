@@ -1,6 +1,8 @@
 import { getStage } from '../../gameData/stages.js';
 import { getCorruptionTier } from '../../gameData/corruption.js';
 import { getTier } from '../../gameData/relationships.js';
+import { getGainDesire, getGainDesireTier } from '../../gameData/gainDesire.js';
+import { getSatiationTier } from '../../gameData/satiation.js';
 import { getHungerTier, getAddictionLevel, isInWithdrawal } from '../../gameData/hungerAddiction.js';
 import {
   getFixationTier, getObsessionTier, getDependenceTier, getShameTier,
@@ -9,13 +11,18 @@ import { registerDimensions, relSize } from '../engine.js';
 
 let registered = false;
 
-const attitudeOf = (s) => getCorruptionTier(s.corruption || 0).id;
+// gainDesire is the first-class "feelings about gaining" axis.
+// attitude derives from its tier; corruption dimension kept as legacy corruption-tier alias.
+const corruptionTierOf = (s) => getCorruptionTier(s.corruption || 0).id;
+const attitudeOf = (s) => getGainDesireTier(getGainDesire(s)).id;
 
 export function registerWeightGainDimensions() {
   if (registered) return;
   registered = true;
   registerDimensions({
     stage:         { derive: (s) => getStage(s.lbs).id, range: true },
+    gainDesire:    { derive: (s) => getGainDesire(s), range: true },
+    satiationTier: { derive: (s) => getSatiationTier(s.satiation || 0).id, range: true },
     attitude:      { derive: attitudeOf, range: true },
     bodyType:      { derive: (s) => s.bodyType || null },
     archetype:     { derive: (s) => s.archetype || null },
@@ -26,7 +33,7 @@ export function registerWeightGainDimensions() {
     addictionLevel:{ derive: (s) => getAddictionLevel(s), range: true },
     relSize:       { derive: (s, env) => (env.ref ? relSize(s, env.ref) : null) },
     refStage:      { derive: (s, env) => (env.ref ? getStage(env.ref.lbs).id : null), range: true },
-    corruption:    { derive: attitudeOf, range: true },
+    corruption:    { derive: corruptionTierOf, range: true },
     relationship:  { derive: (s) => getTier(s.relationship || 0).id, range: true },
     studentId:     { derive: (s) => s.numericId ?? null },
     role:          { derive: (s) => s.role || null },

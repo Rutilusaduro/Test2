@@ -1,3 +1,5 @@
+import '../dimensions/gameSelectors.js';
+import './npc/unmet.js';
 import './npc/observe.js';
 import './npc/feed.js';
 import './npc/talk.js';
@@ -5,6 +7,9 @@ import './npc/flirt.js';
 import './npc/bless.js';
 import './npc/feast.js';
 import './npc/intimate.js';
+import './npc/special.js';
+import './npc/satiation.js';
+import './npc/consentGrowth.js';
 import './npc/questOffer.js';
 import './overworld/spellCast.js';
 import './world/events.js';
@@ -12,12 +17,20 @@ import './world/transformation.js';
 import './world/landmarkReactions.js';
 import './puzzles/index.js';
 import './combatText.js';
+import './combat/encounter.js';
 import './checks/index.js';
 import './growthEvent/index.js';
 import './growth/index.js';
 import './quests/index.js';
 import './leveling/index.js';
+import './dm/index.js';
+import './dm/combat.js';
+import './dm/cast.js';
+import './dm/region.js';
+import './dm/favor.js';
+import './player/indulge.js';
 
+export { renderUnmetDescriptor } from './npc/unmet.js';
 export { renderObserve, POSES } from './npc/observe.js';
 export { renderFeed, FEED_TEMPLATE } from './npc/feed.js';
 export { renderTalk, TALK_TEMPLATE } from './npc/talk.js';
@@ -32,3 +45,11 @@ export {
   resolveGrowthPoolKey,
   buildGrowthProseGlobals,
 } from './growth/index.js';
+export {
+  renderCombatIntro,
+  renderCombatOutro,
+  buildCombatIntro,
+  buildCombatWrapup,
+  getEnemySizeBand,
+} from './dm/combat.js';
+export { renderCastFeedback } from './dm/cast.js';

@@ -70,6 +70,18 @@ export function knowsSpell(character, spellId) {
   return getKnownSpellIds(character).includes(spellId);
 }
 
+export const DAMAGE_CANTRIP_IDS = ['caloric_bolt', 'honeyed_lash', 'gluttons_ember', 'syrup_splash'];
+
+/** Grant a class-appropriate damage cantrip if the caster knows none (save migration). */
+export function ensureDamageCantrip(character) {
+  ensureSpellState(character);
+  const pool = CLASS_CANTRIP_POOL[character.classId];
+  if (!pool) return false;
+  if (DAMAGE_CANTRIP_IDS.some((id) => knowsSpell(character, id))) return false;
+  const pick = pool.find((id) => DAMAGE_CANTRIP_IDS.includes(id)) ?? 'caloric_bolt';
+  return learnSpell(character, pick);
+}
+
 export function learnSpell(character, spellId) {
   ensureSpellState(character);
   if (!spellId || knowsSpell(character, spellId)) return false;
@@ -101,7 +113,11 @@ export function getPreparedCap(character) {
 export function buildStartingSpells(classId, subclassId) {
   const start = STARTING_SPELLS[classId] || { cantrips: 2, spells: 1 };
   const cantripPool = sortGrowthFirst(CLASS_CANTRIP_POOL[classId] || []);
-  const cantrips = cantripPool.slice(0, start.cantrips);
+  const damageFirst = [
+    ...cantripPool.filter((id) => DAMAGE_CANTRIP_IDS.includes(id)),
+    ...cantripPool.filter((id) => !DAMAGE_CANTRIP_IDS.includes(id)),
+  ];
+  const cantrips = damageFirst.slice(0, start.cantrips);
 
   const curriculum = getCurriculumForLevel(classId, 1);
   const options = sortGrowthFirst(curriculum);
