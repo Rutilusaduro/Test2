@@ -2,24 +2,29 @@ import { useState, useEffect } from "react";
 import { getRegion } from "../gameData/regions.js";
 import { getNpcsInRegion } from "../gameData/npcs.js";
 import { getNpcState, applyNpcState } from "../gameData/player.js";
-import { getStage } from "../gameData/stages.js";
+import { getStage, isAtSizeCap } from "../gameData/stages.js";
 import { getTier } from "../gameData/relationships.js";
 import { getCorruptionTier } from "../gameData/corruption.js";
 import { getXpProgress } from "../gameData/leveling.js";
 import { longRest } from "../gameData/leveling.js";
 import { getPlayerDerivedStats } from "../gameData/player.js";
 import { getUnlockedConnections } from "../gameData/questEngine.js";
+import { getAbundanceProgress } from "../gameData/abundanceSpread.js";
 import { recordRegionVisitForQuests } from "../hooks/questHooks.js";
 import NpcModal from "./NpcModal.jsx";
 import QuestLog from "./QuestLog.jsx";
+import SpellbookPanel from "./SpellbookPanel.jsx";
+import CharacterSheet from "./CharacterSheet.jsx";
 
 export default function WorldView({ game, onUpdate, onEncounter, onSave, onDebugContext }) {
   const [npcModal, setNpcModal] = useState(null);
+  const [showSheet, setShowSheet] = useState(false);
   const region = getRegion(game.region);
   const player = game.player;
   const stage = getStage(player.lbs);
   const xp = getXpProgress(player);
   const derived = getPlayerDerivedStats(player);
+  const abundance = getAbundanceProgress(game);
 
   const travel = (regionId) => {
     onUpdate((g) => {
@@ -74,16 +79,39 @@ export default function WorldView({ game, onUpdate, onEncounter, onSave, onDebug
       <div className="stats-bar">
         <span className="stat"><strong>{player.name}</strong> — {player.raceName || 'Human'} {player.subclass}</span>
         <span className="stat">Lv <strong>{player.level}</strong> ({Math.round(xp.pct)}% to next)</span>
-        <span className="stat">Stage: <strong>{stage.label}</strong> ({Math.round(player.lbs)} lbs)</span>
+        <span className="stat" title={stage.desc}>
+          Stage: <strong>{stage.label}</strong> ({Math.round(player.lbs)} lbs)
+          {isAtSizeCap(player) ? ' ★' : ''}
+        </span>
+        <span className="stat" title={abundance.current.desc}>
+          Influence: <strong>{abundance.current.label}</strong>
+        </span>
         <span className="stat">AC <strong>{derived.ac}</strong></span>
         <span className="stat">AP: <strong>{player.ap}</strong>/{derived.maxAp}</span>
         <span className="stat">HP: <strong>{player.hp}/{player.maxHp}</strong></span>
         <span className="stat">Party: <strong>{game.party.length}</strong></span>
       </div>
 
+      {abundance.next && (
+        <div style={{ padding: '0 1rem', marginBottom: '0.5rem' }}>
+          <div style={{ fontSize: '0.7rem', color: 'var(--text-dim)' }}>
+            Abundance spreading — {abundance.points} pts toward {abundance.next.label}
+          </div>
+          <div style={{ height: 4, background: 'rgba(0,0,0,0.3)', borderRadius: 2 }}>
+            <div style={{ width: `${abundance.pct}%`, height: '100%', background: 'var(--gold)' }} />
+          </div>
+        </div>
+      )}
+
       {game.lastLevelUpMessage && (
         <div className="panel prose" style={{ borderColor: "var(--gold)" }}>
           {game.lastLevelUpMessage}
+        </div>
+      )}
+
+      {game.lastQuestMessage && (
+        <div className="panel prose" style={{ borderColor: "var(--rose)", fontSize: "0.9rem" }}>
+          {game.lastQuestMessage}
         </div>
       )}
 
@@ -104,6 +132,13 @@ export default function WorldView({ game, onUpdate, onEncounter, onSave, onDebug
         </div>
       </div>
 
+      <SpellbookPanel
+        game={game}
+        npcs={npcs}
+        onGameUpdate={onUpdate}
+        onCastResult={(npc) => handleNpcUpdate(npc)}
+      />
+
       <div className="panel">
         <h2>People Here</h2>
         {npcs.length === 0 ? (
@@ -116,6 +151,7 @@ export default function WorldView({ game, onUpdate, onEncounter, onSave, onDebug
               return (
                 <button key={npc.id} onClick={() => openNpc(npc)}>
                   {npc.name}
+                  {npc.isCompanion && ' ★'}
                   <div style={{ fontSize: "0.8rem", color: "var(--text-dim)" }}>
                     {ns.label} · {rel.label}
                   </div>
@@ -131,12 +167,13 @@ export default function WorldView({ game, onUpdate, onEncounter, onSave, onDebug
       <div className="panel">
         <h2>Actions</h2>
         <div className="btn-grid">
+          <button onClick={() => setShowSheet(true)}>Character Sheet</button>
           <button onClick={onEncounter}>Seek Encounter</button>
           <button onClick={() => onUpdate((g) => {
             longRest(g.player);
             return { ...g, day: g.day + 1, lastLevelUpMessage: null };
           })}>
-            Rest & Feast (long rest — restore HP & spell slots)
+            Rest & Feast (long rest)
           </button>
           <button onClick={onSave}>Save Game</button>
         </div>
@@ -148,8 +185,9 @@ export default function WorldView({ game, onUpdate, onEncounter, onSave, onDebug
           <div key={c.id} style={{ marginBottom: "0.5rem" }}>
             <strong>{c.name}</strong> — {getStage(c.lbs).label}
             <span style={{ color: "var(--text-dim)", marginLeft: "0.5rem" }}>
-              {getCorruptionTier(c.corruption || 0).label}
+              {getTier(c.relationship || 0).label} · {getCorruptionTier(c.corruption || 0).label}
             </span>
+            {c.bondFlags?.devoted && <span style={{ color: "var(--gold-bright)" }}> ★ Devoted</span>}
           </div>
         ))}
       </div>
@@ -164,6 +202,10 @@ export default function WorldView({ game, onUpdate, onEncounter, onSave, onDebug
           onGameRefresh={() => onUpdate((g) => ({ ...g }))}
           onDebugContext={onDebugContext}
         />
+      )}
+
+      {showSheet && (
+        <CharacterSheet game={game} onClose={() => setShowSheet(false)} />
       )}
     </div>
   );

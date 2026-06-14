@@ -85,6 +85,41 @@ export const BONUS_SPELLS = {
     desc: 'Massive area growth event. Multiple characters may leap several size stages.',
     effect: { growth: 4, aoe: true, corruption: 10 },
   },
+  honeyed_overflow: {
+    id: 'honeyed_overflow', name: 'Honeyed Overflow', slotLevel: 1, school: 'enchantment',
+    desc: 'Sweet magic drips from your lips — targets swell as they listen, helpless and happy.',
+    effect: { charm: 1, growth: 1, corruption: 4 },
+  },
+  swell_kiss: {
+    id: 'swell_kiss', name: 'Swell Kiss', slotLevel: 1, school: 'abundance',
+    desc: 'A kiss that transfers caloric blessing lip to lip, belly to belly.',
+    effect: { growth: 1, corruption: 3, feed: 1 },
+  },
+  banquet_mist: {
+    id: 'banquet_mist', name: 'Banquet Mist', slotLevel: 3, school: 'conjuration',
+    desc: 'Perfumed fog of impossible feasts — all who breathe it grow drunk on fullness.',
+    effect: { growth: 1, aoe: true, corruption: 5, feed: 1 },
+  },
+  divine_plump: {
+    id: 'divine_plump', name: 'Divine Plump', slotLevel: 6, school: 'abundance',
+    desc: 'Holy light concentrates flesh into sacred, jiggling abundance.',
+    effect: { growth: 2, heal: 15, corruption: 6 },
+  },
+  cascade_of_curves: {
+    id: 'cascade_of_curves', name: 'Cascade of Curves', slotLevel: 5, school: 'transmutation',
+    desc: 'Rippling transmutation rolls through the body — hip to thigh to belly in waves.',
+    effect: { growth: 2, corruption: 5 },
+  },
+  lovers_feast: {
+    id: 'lovers_feast', name: "Lover's Feast", slotLevel: 3, school: 'abundance',
+    desc: 'An intimate spell for two — shared growth, shared pleasure, shared devotion.',
+    effect: { growth: 2, feed: 1, corruption: 4 },
+  },
+  matrons_blessing: {
+    id: 'matrons_blessing', name: "Matron's Blessing", slotLevel: 4, school: 'abundance',
+    desc: 'Motherly warmth swells the target safely — nurturing, vast, adored.',
+    effect: { growth: 2, heal: 20, corruption: 3 },
+  },
 };
 
 export const CLASS_SPELLS = {

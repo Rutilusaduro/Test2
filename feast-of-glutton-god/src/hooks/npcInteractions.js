@@ -25,6 +25,7 @@ import { getStage } from '../gameData/stages.js';
 import { spendAP } from '../gameData/player.js';
 import { checkSeduce, formatCheckSummary, toTextContext, DC } from '../gameData/skillChecks.js';
 import { recordNpcInteractionForQuests, recordNpcGrowthForQuests } from './questHooks.js';
+import { awardAbundanceSpread } from '../gameData/abundanceSpread.js';
 
 function withQuestProgress(game, npc, interaction, meta, result) {
   const quest = recordNpcInteractionForQuests(game, {
@@ -60,6 +61,13 @@ function withQuestProgress(game, npc, interaction, meta, result) {
     if (result.narrative) {
       result.narrative += `\n\n---\n${questMessages}`;
     }
+  }
+  if (['feed', 'bless', 'feast', 'intimate', 'talk'].includes(interaction)
+    || interaction?.startsWith('feed_') || interaction?.startsWith('bless_')) {
+    const key = interaction.startsWith('feed') ? 'npc_feed'
+      : interaction.startsWith('bless') ? 'npc_bless'
+        : `npc_${interaction}`;
+    awardAbundanceSpread(game, key);
   }
   result.questNotes = quest;
   return result;

@@ -90,6 +90,7 @@ export function createNewGame(name, classId, options = {}) {
     quests: { active: {}, completed: [], failed: [] },
     worldFlags: {
       regions_unlocked: ['harvest_hearth', 'market_square', 'fertile_heartlands'],
+      abundanceSpread: 0,
     },
     lastQuestMessage: null,
   };

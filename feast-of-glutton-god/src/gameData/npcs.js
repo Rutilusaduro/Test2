@@ -13,6 +13,61 @@ export const WORLD_NPCS = [
     desc: "The warm-hearted innkeeper whose kitchen never closes.",
   },
   {
+    id: "mira_bard",
+    name: "Mira Silverstring",
+    role: "bard",
+    bodyType: "hourglass",
+    archetype: "performer",
+    startLbs: 128,
+    location: "harvest_hearth",
+    companionId: "mira",
+    desc: "A playful wandering musician with a voice that makes hips sway.",
+  },
+  {
+    id: "greta_smith",
+    name: "Greta Ironpot",
+    role: "blacksmith",
+    bodyType: "athletic",
+    archetype: "competitive",
+    startLbs: 155,
+    location: "harvest_hearth",
+    companionId: "greta",
+    desc: "A boisterous smith who treats eating like forging — hammer, heat, and hunger.",
+  },
+  {
+    id: "lira_priestess",
+    name: "Lira Dawnwell",
+    role: "priestess",
+    bodyType: "pear",
+    archetype: "devout",
+    startLbs: 132,
+    location: "fertile_heartlands",
+    companionId: "lira",
+    desc: "A gentle priestess whose prayers taste like warm bread and honey.",
+  },
+  {
+    id: "sylvie_scholar",
+    name: 'Sylvara "Sylvie" Thorne',
+    role: "scholar",
+    bodyType: "apple",
+    archetype: "scholar",
+    startLbs: 126,
+    location: "ancient_temple",
+    companionId: "sylvie",
+    desc: "A curious wizard who studies growth the way others study stars.",
+  },
+  {
+    id: "thalia_witch",
+    name: "Thalia Blackfeast",
+    role: "witch",
+    bodyType: "voluptuous",
+    archetype: "dominant",
+    startLbs: 140,
+    location: "gorgara_cradle",
+    companionId: "thalia",
+    desc: "A hedonistic warlock whose pact hunger is contagious and delicious.",
+  },
+  {
     id: "vesperia",
     name: "Lady Vesperia",
     role: "noble",
@@ -88,7 +143,11 @@ export function createNpc(template) {
 }
 
 export function getNpcsInRegion(regionId, gameState) {
-  const npcs = WORLD_NPCS.filter((n) => n.location === regionId).map(createNpc);
+  const recruitedCompanionIds = new Set((gameState.party || []).map((c) => c.id));
+  const npcs = WORLD_NPCS
+    .filter((n) => n.location === regionId)
+    .filter((n) => !n.companionId || !recruitedCompanionIds.has(n.companionId))
+    .map(createNpc);
   const recruited = (gameState.party || [])
     .filter((c) => c.location === regionId || !c.location)
     .map((c) => ({ ...c, isCompanion: true }));

@@ -50,4 +50,9 @@ export const QUEST_SCORE = {
 export const QUEST_NPC_ALIASES = {
   elara: ['elara', 'elara_inn'],
   lyra: ['lyra', 'rival_lyra'],
+  thalia: ['thalia', 'thalia_witch'],
+  mira: ['mira', 'mira_bard'],
+  lira: ['lira', 'lira_priestess'],
+  sylvie: ['sylvie', 'sylvie_scholar', 'baker_sylvie'],
+  greta: ['greta', 'greta_smith'],
 };

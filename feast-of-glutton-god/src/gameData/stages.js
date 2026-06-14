@@ -45,10 +45,25 @@ export function lbsForStage(stageId) {
   return s.min + 5;
 }
 
-export function advanceStage(character, stages = 1) {
+/**
+ * Advance size stages with optional cap (player.sizeCap or explicit maxStage).
+ * @param {object} character
+ * @param {number} stages
+ * @param {{ maxStage?: number }} [opts]
+ */
+export function advanceStage(character, stages = 1, opts = {}) {
   const current = getStage(character.lbs).id;
-  const next = Math.min(current + stages, WEIGHT_STAGES.length - 1);
+  const cap = opts.maxStage ?? character.sizeCap ?? WEIGHT_STAGES.length - 1;
+  const next = Math.min(current + stages, cap, WEIGHT_STAGES.length - 1);
   const startStage = current;
+  if (next <= current) {
+    return { startStage, endStage: current, stagesJumped: 0, capped: true };
+  }
   character.lbs = lbsForStage(next);
-  return { startStage, endStage: next, stagesJumped: next - startStage };
+  return { startStage, endStage: next, stagesJumped: next - startStage, capped: next >= cap };
+}
+
+export function isAtSizeCap(character) {
+  const cap = character.sizeCap ?? WEIGHT_STAGES.length - 1;
+  return getStage(character.lbs).id >= cap;
 }

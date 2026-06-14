@@ -3,7 +3,7 @@ import { getStage, getTileSize } from "../gameData/stages.js";
 import {
   getReachableTiles, moveUnit, attackUnit, castSpell, feedTarget,
   advanceTurn, checkVictory, checkConversion, convertEnemy, getTurnSummary,
-  getActiveUnit, isPlayerTurn,
+  getActiveUnit, isPlayerTurn, useBonusAction, getAvailableBonusActions,
 } from "../gameData/combat.js";
 import { getCharacterSpells } from "../gameData/spellLearning.js";
 import { hasSpellSlot } from "../gameData/spellSlots.js";
@@ -25,6 +25,8 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebu
     : [];
   const spells = getCharacterSpells(player);
   const slots = player.spellSlots?.current || [];
+  const activeUnit = getActiveUnit(combat) || combat.allies.find((a) => a.isPlayer);
+  const bonusActions = activeUnit ? getAvailableBonusActions(activeUnit) : [];
 
   const reportCombat = (extra = {}) => {
     onDebugContext?.({
@@ -158,6 +160,25 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebu
     update(c);
   };
 
+  const doBonus = (actionId) => {
+    if (!isPlayerTurn(combat)) return;
+    const c = cloneCombat();
+    const active = getActiveUnit(c);
+    const target = c.enemies.find((e) => e.hp > 0 && !e.converted);
+    useBonusAction(c, active, actionId, target);
+    if (c.lastGrowth) {
+      const gt = renderGrowthScene(c.lastGrowth.unit, {
+        growthMethod: actionId === 'self_feed' ? 'feed' : 'blessing',
+        startStage: c.lastGrowth.startStage,
+        endStage: c.lastGrowth.endStage,
+        week: game.day,
+      });
+      setGrowthText(gt);
+    }
+    checkVictory(c);
+    update(c);
+  };
+
   const finishTurn = () => {
     const c = cloneCombat();
     advanceTurn(c);
@@ -249,6 +270,11 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebu
           <button onClick={selectMove} disabled={!isPlayerTurn(combat)}>Move</button>
           <button onClick={() => { setMode("attack"); }} disabled={!isPlayerTurn(combat)}>Attack</button>
           <button onClick={() => { setMode("feed"); }} disabled={!isPlayerTurn(combat)}>Feed</button>
+          {bonusActions.map((ba) => (
+            <button key={ba.id} onClick={() => doBonus(ba.id)} disabled={!isPlayerTurn(combat) || !turnSummary?.bonus}>
+              {ba.label}
+            </button>
+          ))}
           <button onClick={finishTurn} disabled={!isPlayerTurn(combat)}>End Turn</button>
           <button onClick={quickLogBug}>Log bug</button>
         </div>
