@@ -401,7 +401,7 @@ export const MAIN_QUESTS = [
     type: QUEST_TYPE.MAIN,
     act: 3,
     actLabel: 'Act III',
-    title: "The Leviathan's Coronation",
+    title: "Coronation of Abundance",
     titleKey: 'quest.main.coronation.title',
     descriptionKey: 'quest.main.coronation.desc',
     tags: [QUEST_TAG.ABUNDANCE, QUEST_TAG.GROWTH, QUEST_TAG.CONVERSION],

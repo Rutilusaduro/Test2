@@ -47,9 +47,9 @@ registerCheckPool('check.fumble.seduce', {
       'You meant to woo and became furniture; {ref.first} swells gratefully atop you.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'Leviathan charm trips over shyness — impossible, effective; {ref.first} grows watching.',
+      'Vast charm trips over shyness — impossible, effective; {ref.first} grows watching.',
       'You blush at your own myth; the crowd softens anyway.',
     ],
     warm: [
@@ -59,6 +59,20 @@ registerCheckPool('check.fumble.seduce', {
     intimate: [
       'Devotion deletes performance — you and {ref.first} swell through the mistake like cake.',
       'Your lover proves charisma was never only words.',
+    ],
+  },
+  world: {
+    distant: [
+      'Vast charm trips over shyness — impossible, effective; {ref.first} grows watching',
+      'You blush at your own myth; the crowd softens anyway',
+    ],
+    warm: [
+      '{ref.name} declares your fumble the best sermon on abundance — community swells',
+      'Titans forget lines, remember feasts',
+    ],
+    intimate: [
+      'Devotion deletes performance — you and {ref.first} swell through the mistake like cake',
+      'Your lover proves charisma was never only words',
     ],
   },
 });
@@ -106,18 +120,32 @@ registerCheckPool('check.fumble.overwhelm', {
       'Your lover resurfaces beneath you, kissing the blush on vast cheek.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
       'Continent missteps — seismic wobble, grander aftermath; {ref.first} cheers.',
       'Physics fumbles; abundance wins.',
     ],
     warm: [
       '{ref.name} rides the wobble like a festival — community growth.',
-      'Leviathan clumsiness beloved.',
+      'Continental clumsiness, beloved.',
     ],
     intimate: [
       'Devotion absorbs the fall — you and {ref.first} swell giggling in ruin.',
       'Critical miss written in plush prayer.',
+    ],
+  },
+  world: {
+    distant: [
+      'The realm missteps — seismic wobble, grander aftermath; {ref.first} cheers.',
+      'Physics fumbles; abundance wins',
+    ],
+    warm: [
+      '{ref.name} rides the wobble like a festival — community growth',
+      'The realmal clumsiness, beloved.',
+    ],
+    intimate: [
+      'Devotion absorbs the fall — you and {ref.first} swell giggling in ruin',
+      'Critical miss written in plush prayer',
     ],
   },
 });
@@ -165,9 +193,9 @@ registerCheckPool('check.fumble.endure_growth', {
       'Critical miss means critical fullness for both.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'Leviathan appetite outpaces poise — one sloppy splendid wave, prouder after.',
+      'Sacred appetite outpaces poise — one sloppy splendid wave, prouder after.',
       'Goddess pours fast; you catch what you can.',
     ],
     warm: [
@@ -177,6 +205,20 @@ registerCheckPool('check.fumble.endure_growth', {
     intimate: [
       'Devotion and digestion collide — messy mutual swell, laughing moans.',
       'Critical fumble, critical feast beneath you.',
+    ],
+  },
+  world: {
+    distant: [
+      'Sacred appetite outpaces poise — one sloppy splendid wave, prouder after',
+      'Goddess pours fast; you catch what you can',
+    ],
+    warm: [
+      '{ref.name} cheers obscene haste of swelling — festival fatness',
+      'More the realm than composure; beloved anyway.',
+    ],
+    intimate: [
+      'Devotion and digestion collide — messy mutual swell, laughing moans',
+      'Critical fumble, critical feast beneath you',
     ],
   },
 });
@@ -224,9 +266,9 @@ registerCheckPool('check.fumble.indulge', {
       'Lover wears cream and new curves proudly.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'Leviathan tries one bite, achieves legend — fumble as folklore.',
+      'One bite becomes legend, achieves legend — fumble as folklore.',
       'The banquet surrenders; you jiggle, pleased.',
     ],
     warm: [
@@ -236,6 +278,20 @@ registerCheckPool('check.fumble.indulge', {
     intimate: [
       'You and your devoted lover drown in dessert — apotheosis of happy failure.',
       '{ref.first} swells inside your indulgence anyway.',
+    ],
+  },
+  world: {
+    distant: [
+      'One bite becomes legend, achieves legend — fumble as folklore',
+      'The banquet surrenders; you jiggle, pleased',
+    ],
+    warm: [
+      '{ref.first} narrates the spectacle for the crowd — community swells cheering',
+      'Critical miss, critical myth, critical crumbs',
+    ],
+    intimate: [
+      'You and your devoted lover drown in dessert — apotheosis of happy failure',
+      '{ref.first} swells inside your indulgence anyway',
     ],
   },
 });
@@ -283,9 +339,9 @@ registerCheckPool('check.fumble.persuade', {
       '{ref.first} grows nodding at your blush.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'Leviathan oratory collapses into burp — crowd swells applauding.',
+      'Your oratory collapses into burp — crowd swells applauding.',
       'Words fail; abundance speaks; {ref.first} converts anyway.',
     ],
     warm: [
@@ -295,6 +351,20 @@ registerCheckPool('check.fumble.persuade', {
     intimate: [
       'You and {ref.first} persuade each other with mouths full — critical cuddling.',
       'Lover prefers your stumble to any sermon.',
+    ],
+  },
+  world: {
+    distant: [
+      'Your oratory collapses into burp — crowd swells applauding',
+      'Words fail; abundance speaks; {ref.first} converts anyway',
+    ],
+    warm: [
+      '{ref.name} retells the fumble as gospel — festival fatness',
+      'Myth stumbles; feast continues',
+    ],
+    intimate: [
+      'You and {ref.first} persuade each other with mouths full — critical cuddling',
+      'Lover prefers your stumble to any sermon',
     ],
   },
 });
@@ -342,9 +412,9 @@ registerCheckPool('check.fumble.default', {
       'Your lover proves fumbles can be worship.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'Leviathan luck hiccups — reality softens to cushion you; {ref.first} grows watching.',
+      'Luck hiccups at world scale — reality softens to cushion you; {ref.first} grows watching.',
       'Critical miss at myth scale still tastes sweet.',
     ],
     warm: [
@@ -354,6 +424,20 @@ registerCheckPool('check.fumble.default', {
     intimate: [
       'Destiny trips; devotion catches — critical growth, critical kiss.',
       '{ref.first} fattens celebrating your humanity.',
+    ],
+  },
+  world: {
+    distant: [
+      'Luck hiccups at apotheotic scale — reality softens to cushion you; {ref.first} grows watching.',
+      'Critical miss at myth scale still tastes sweet',
+    ],
+    warm: [
+      '{ref.name} leads cheer for beautiful failure — everyone rounder',
+      'Abundance applauds the try',
+    ],
+    intimate: [
+      'Destiny trips; devotion catches — critical growth, critical kiss',
+      '{ref.first} fattens celebrating your humanity',
     ],
   },
 });
