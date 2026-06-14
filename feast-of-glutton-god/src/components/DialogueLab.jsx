@@ -40,6 +40,7 @@ const SPELL_SCHOOLS = ["abundance", "enchantment", "transmutation", "evocation",
 const CAST_TYPES = ["action", "bonus"];
 const PAID_BY = ["slot", "ap", "cantrip"];
 const FAIL_CAUSES = ["no_resource", "no_action", "no_bonus"];
+const CAST_KINDS = ["invoke", "fizzle", "noaction", "nobonus"];
 const CONSENT_STATES = ["willing", "forced"];
 const FAVOR_STATES = ["flush", "low", "empty"];
 const HOSTILITY_TIERS = ["0", "1", "2", "3"];
