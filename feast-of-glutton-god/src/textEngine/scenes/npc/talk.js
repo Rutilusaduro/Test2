@@ -31,8 +31,8 @@ registerPool('npc.talk.greeting', [
 
 registerPool('npc.talk.topic', [
   { when: { relationship: 0, corruption: 0 }, text: [
-    'She speaks cautiously about the Fat Goddess, as if testing the word on her tongue.',
-    'She admits she\'s noticed changes in the village — people growing, smiling, eating more.',
+    'She speaks cautiously of the Fat Goddess — as if the name might summon Church warrants.',
+    'She admits the Reach feels different lately — fuller tables, wider smiles, worried clergy.',
   ]},
   { when: { relationship: 1 }, text: [
     'Conversation flows easier now — she laughs at your jokes and leans in when you speak of abundance.',
@@ -75,19 +75,27 @@ registerPool('npc.talk.topic', [
     'She speaks of blocked roads and cracked foundations — abundance has become civic engineering.',
   ]},
   { when: {}, text: [
-    'You talk of abundance, of the Fat Goddess\'s awakening, of the pleasure in growing.',
+    'You talk of fullness, of the patron you feed, of the pleasure in growing past the Wheel\'s measure.',
   ]},
 ]);
 
-export const TALK_TEMPLATE = '{npc.talk.greeting} {npc.talk.topic}';
+export const TALK_TEMPLATE = '{npc.talk.greeting} {npc.talk.companion} {npc.talk.antagonist} {npc.talk.topic}';
 
 export function renderTalk(npc, player, opts = {}) {
+  const wf = opts.game?.worldFlags ?? {};
+  const act = wf.main_act3_complete || wf.act3_gates_unlocked ? 3
+    : wf.main_act2_complete || wf.act2_gates_unlocked ? 2 : 1;
   const ctx = createContext({
     subject: npc,
     ref: player,
     globals: {
       location: opts.location,
       interaction: 'talk',
+      role: npc.role,
+      escalationTier: wf.escalationTier ?? 0,
+      act,
+      consentState: opts.consentState,
+      gainDesire: opts.gainDesire ?? npc.gainDesire,
       ...(opts.reactivity ?? {}),
     },
     seed: opts.seed,

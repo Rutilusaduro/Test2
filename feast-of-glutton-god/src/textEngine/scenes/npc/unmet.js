@@ -39,6 +39,18 @@ registerPool('npc.unmet.descriptor', [
     'A {bodyType.desc} guard stands watch, hand resting on a well-fed belt.',
     'Someone {word.body} in worn leathers scans the road with bored vigilance.',
   ]},
+  { when: { role: 'inquisitor' }, text: [
+    'A lean {bodyType.desc} inquisitor reads a Church warrant — white trim, harder eyes, no smile.',
+    'Someone {word.body} in measured-mail watches you like a problem that must be solved.',
+  ]},
+  { when: { role: 'herald' }, text: [
+    'A {bodyType.desc} herald in Sylwen\'s green tends a sickle-shrine — gentle face, terrible errand.',
+    'Someone {word.body} in harvest vestments carries a goddess\'s plea like a blade wrapped in silk.',
+  ]},
+  { when: { role: 'diviner' }, text: [
+    'A {bodyType.desc} diviner frowns at star-charts that will not balance — lantern ink, sleepless eyes.',
+    'Someone {word.body} in Lumen\'s grey mutters numbers that should not exist in the Wheel.',
+  ]},
   { when: {}, text: [
     'A {bodyType.desc} stranger goes about their business nearby.',
     'Someone {word.body} lingers in the scene — nameless for now, but not forgettable.',

@@ -3,6 +3,7 @@
  * Drives escalationTier for the DM narrator and gates Act II→III opposition (Prompt 3).
  */
 import { renderPortentBeat } from '../textEngine/scenes/dm/portent.js';
+import { renderVerityConfrontation, renderHeraldUltimatum } from '../textEngine/scenes/npc/antagonist.js';
 import { getRegionHostility, getHostilityTier } from './regionHostility.js';
 
 export const DIVINE_ATTENTION_TIERS = [
@@ -128,6 +129,17 @@ function checkPortentEvents(game, oldPoints, newPoints) {
     game.worldFlags.portentLog.push(entry);
     game.worldFlags.lastPortent = def.id;
     triggered.push({ def, entry, message });
+
+    if (def.id === 'inquisition_whispers' && !game.worldFlags.verity_act2_seen) {
+      game.worldFlags.verity_act2_seen = true;
+      const verityBeat = renderVerityConfrontation(game, { act: 2 });
+      if (verityBeat) entry.message = `${message}\n\n${verityBeat}`;
+    }
+    if (def.id === 'schism_rumor' && !game.worldFlags.sylwen_herald_seen) {
+      game.worldFlags.sylwen_herald_seen = true;
+      const heraldBeat = renderHeraldUltimatum(game, 'sylwen');
+      if (heraldBeat) entry.message = `${entry.message}\n\n${heraldBeat}`;
+    }
   }
   return triggered;
 }
@@ -148,6 +160,11 @@ export function raiseDivineAttention(game, source, amountOverride) {
 
   const portents = checkPortentEvents(game, oldPoints, total);
 
+  let antagonistBeat = null;
+  if (newTier > oldTier) {
+    antagonistBeat = renderVerityConfrontation(game);
+  }
+
   return {
     gained: base,
     total,
@@ -156,6 +173,7 @@ export function raiseDivineAttention(game, source, amountOverride) {
     tier: getDivineAttentionTier(total).current,
     portents,
     portent: portents[0] ?? null,
+    antagonistBeat,
   };
 }
 

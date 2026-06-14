@@ -38,7 +38,7 @@ export function createPlayer(name, classId, options = {}) {
 
   const player = {
     id: "player",
-    name: name || "Chosen of the Fat Goddess",
+    name: name || "Wanderer of the Reach",
     classId: cls.id,
     className: cls.name,
     subclassId,

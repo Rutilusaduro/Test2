@@ -32,6 +32,8 @@ import './dm/genre.js';
 import './dm/combat_gag.js';
 import './dm/portent.js';
 import './dm/cosmic.js';
+import './npc/companionPersonas.js';
+import './npc/antagonist.js';
 import './player/indulge.js';
 
 export { renderUnmetDescriptor } from './npc/unmet.js';

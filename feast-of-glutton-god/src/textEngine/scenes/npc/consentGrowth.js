@@ -70,7 +70,7 @@ export function renderForcedGrowth(npc, player, opts = {}) {
     history: opts.history,
     seed: opts.seed,
   });
-  return render('{npc.growth.forced}', ctx, { trace: opts.trace });
+  return render('{npc.growth.forced} {npc.companion.lira.resist}', ctx, { trace: opts.trace });
 }
 
 export function renderWillingRapture(npc, player, opts = {}) {

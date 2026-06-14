@@ -83,6 +83,9 @@ function applyCombatEndState(prev, combat) {
     for (const portent of spread.divineAttention?.portents ?? []) {
       if (portent.message) narrateEvent(next, portent.message, 'quest');
     }
+    if (spread.divineAttention?.antagonistBeat) {
+      narrateEvent(next, spread.divineAttention.antagonistBeat, 'quest');
+    }
 
     if (combat.trivialized) {
       const gag = combat.trivializeGag
@@ -93,6 +96,9 @@ function applyCombatEndState(prev, combat) {
       const trivialDivine = raiseDivineAttention(next, 'trivialize');
       for (const portent of trivialDivine.portents ?? []) {
         if (portent.message) narrateEvent(next, portent.message, 'quest');
+      }
+      if (trivialDivine.antagonistBeat) {
+        narrateEvent(next, trivialDivine.antagonistBeat, 'quest');
       }
     }
 

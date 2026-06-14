@@ -13,7 +13,7 @@ export const SEVERITY_HOSTILITY = { 1: 12, 2: 20, 3: 30 };
 export const HOSTILITY_TIERS = [
   { id: 0, min: 0, label: 'Calm', desc: 'The region bears your presence without alarm.' },
   { id: 1, min: 25, label: 'Wary', desc: 'Whispers follow you — neighbors watch how you touch the unwilling.' },
-  { id: 2, min: 50, label: 'Tense', desc: 'Purity patrols stir; doors close sooner when you approach.' },
+  { id: 2, min: 50, label: 'Tense', desc: 'Inquisition patrols stir; doors close sooner when you approach.' },
   { id: 3, min: 75, label: 'Crackdown', desc: 'Authority has turned — larders lock, and mercy must be earned again.' },
 ];
 

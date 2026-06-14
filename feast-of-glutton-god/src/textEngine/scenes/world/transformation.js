@@ -23,7 +23,7 @@ reg('transformation.region.market_square.1', [
   'The Grand Market hums with new cravings — merchants compete to sell larger sizes.',
 ]);
 reg('transformation.region.market_square.3', [
-  'Market Square celebrates abundance openly. Purity pamphlets go unsold.',
+  'Market Square celebrates fullness openly. Church pamphlets go unsold.',
 ]);
 reg('transformation.region.market_square.5', [
   'The Market belongs to fullness — scales and corsets are relics of a thinner past.',

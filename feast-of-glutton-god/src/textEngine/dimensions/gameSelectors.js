@@ -12,5 +12,6 @@ registerSelectors(
   'spellSchool', 'castType', 'paidBy', 'failCause', 'spellName',
   'consentState', 'playerClass', 'severity',
   'hostilityTier', 'favorState', 'crackdown', 'action', 'escalationTier',
-  'divineAttentionTier', 'portentId', 'threatTier',
+  'divineAttentionTier', 'portentId', 'threatTier', 'act', 'heraldId',
+  'escalationTierMin', 'escalationTierMax', 'consentState', 'gainDesireMin',
 );

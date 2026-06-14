@@ -23,12 +23,12 @@ registerPool('combat.encounter', [
     'Steel meets appetite: a slim rival blocks the way in {regionName}, jaw set, hips narrow, envy barely hidden behind bravado.',
   ]},
   { when: { enemyId: 'purity_inquisitor' }, text: [
-    'Fanatical paladins in white trim advance — hard bodies, harder stares. Incense and judgment roll off them in equal measure.',
-    'Purity inquisitors arrive like a cold front: lean, armored, convinced your softness is sin made flesh.',
+    'Inquisitors of the Measured Hand advance in white trim — lean, armored, sincerely convinced your fullness is catastrophe.',
+    'Church steel blocks the road in {regionName}: incense, warrants, and horror that does not wink.',
   ]},
   { when: { enemyId: 'famine_hag' }, text: [
-    'An ancient famine hag unfolds from the shadows — rail-thin, cruel, hungry in the worst way. The air chills; your belly protests anyway.',
-    'She is all angles and malice: the famine hag, a boss of eternal hunger who hates what the Fat Goddess is doing to the world.',
+    'the Lean Saint unfolds — Sylwen\'s scourge, famine blessed and sent. The air thins; your belly protests anyway.',
+    'She is all angles and holy hatred: the Lean Saint, sent because mortal inquisitors were not enough.',
   ]},
   { when: {}, text: [
     'Combat finds you in {regionName} — foes ahead, abundance in the air, and the DM whispers that this will get messy in the best way.',

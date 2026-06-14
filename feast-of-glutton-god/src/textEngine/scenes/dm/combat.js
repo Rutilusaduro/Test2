@@ -323,7 +323,7 @@ registerPool('dm.combat.enemy.appearance', appearanceVariants);
 
 registerPool('dm.combat.intro.threat', [
   { when: { role: 'boss' }, text: [
-    '"You spread corruption like butter on bread," the hag hisses. "I will starve it out of you."',
+    '"You spread heresy like butter on bread," the Lean Saint hisses. "I will starve it out of you."',
     '"Abundance is a lie," she breathes, voice like cracked ice. "I am the truth that hurts."',
     '"Kneel," the famine witch commands, "and I might let you die thin."',
     '"The goddess gorges you on lies," she snarls. "I bring the hunger that never ends."',

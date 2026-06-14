@@ -421,7 +421,7 @@ registerQuestCopy('quest.side.paths.complete', [
 
 registerQuestCopy('quest.side.redemption.title', ['Amends to the Hearth']);
 registerQuestCopy('quest.side.redemption.desc', [
-  'The region has turned against your reckless growth. Hold a feast, mend bonds, and face the purity hunters — then mercy may reopen what crackdown sealed.',
+  'Prove fullness can be consensual again: feast communally, speak gently, and survive the Inquisition hunters — then mercy may reopen what crackdown sealed.',
 ]);
 registerQuestCopy('quest.side.redemption.stage.earn.desc', [
   'Prove abundance can be consensual again: feast communally, speak gently, and survive the inquisitors who hunt you.',

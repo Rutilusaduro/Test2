@@ -25,6 +25,7 @@ import { renderFavorWarning, renderSpecialCooldown } from "../textEngine/scenes/
 import { renderIndulge } from "../textEngine/scenes/player/indulge.js";
 import { renderTrivializeGag } from "../textEngine/scenes/dm/combat_gag.js";
 import { renderPortentBeat } from "../textEngine/scenes/dm/portent.js";
+import { renderVerityConfrontation, renderHeraldUltimatum } from "../textEngine/scenes/npc/antagonist.js";
 import { ENEMY_TYPES } from "../gameData/enemies.js";
 import { REGIONS } from "../gameData/regions.js";
 import { resolveGrowthZone } from "../textEngine/growthLexicon.js";
@@ -297,6 +298,28 @@ const SECTIONS = {
       { trace: opts.trace },
     ),
   },
+  "npc.antagonist.verity": {
+    params: ["escalationTier", "act"],
+    fn: (_s, opts) => renderVerityConfrontation(
+      {
+        player: MOCK_PLAYER,
+        worldFlags: {
+          escalationTier: Number(opts.escalationTier === RANDOM ? pick(ESCALATION_TIERS) : opts.escalationTier),
+          act2_gates_unlocked: Number(opts.act) >= 2,
+          act3_gates_unlocked: Number(opts.act) >= 3,
+        },
+      },
+      { act: Number(opts.act === RANDOM ? pick(["1", "2", "3"]) : opts.act), trace: opts.trace },
+    ),
+  },
+  "npc.herald.pantheon": {
+    params: ["escalationTier"],
+    fn: (_s, opts) => renderHeraldUltimatum(
+      { player: MOCK_PLAYER, worldFlags: { escalationTier: Number(opts.escalationTier === RANDOM ? pick(ESCALATION_TIERS) : opts.escalationTier) } },
+      'sylwen',
+      { trace: opts.trace },
+    ),
+  },
   "char.desc": {
     params: STATE_PARAMS,
     fn: (s, opts) => render("{char.desc}", createContext({ subject: s, ref: MOCK_PLAYER, week: 3 }), { trace: opts.trace }),
@@ -309,7 +332,7 @@ const PARAM_DEFS = [
   { key: "section", label: "Section", options: SECTION_KEYS },
   { key: "girl", label: "Character", options: DEBUG_CHARACTERS.map((c) => String(c.id)), optionLabel: (v) => DEBUG_CHARACTERS.find((c) => String(c.id) === v)?.name || v },
   { key: "stage", label: "Stage", options: WEIGHT_STAGES.map((w) => String(w.id)), optionLabel: (v) => `${v} · ${WEIGHT_STAGES[Number(v)].label}` },
-  { key: "corruption", label: "Corruption", options: ["0", "1", "2"], optionLabel: (v) => ({ 0: "0 · Resistant", 1: "1 · Curious", 2: "2 · Enthusiastic" })[v] },
+  { key: "corruption", label: "Softening", options: ["0", "1", "2"], optionLabel: (v) => ({ 0: "0 · Still Measured", 1: "1 · Softening", 2: "2 · Genre-Converted" })[v] },
   { key: "relationship", label: "Relationship", options: ["0", "1", "2", "3", "4", "5"], optionLabel: (v) => ({ 0: "Neutral", 1: "Friendly", 2: "Close", 3: "Intimate", 4: "Craving", 5: "Devoted" })[v] },
   { key: "mood", label: "Mood", options: MOODS },
   { key: "pose", label: "Pose", options: POSES },
@@ -331,6 +354,7 @@ const PARAM_DEFS = [
   { key: "hostilityTier", label: "Hostility tier", options: HOSTILITY_TIERS },
   { key: "favorState", label: "Favor state", options: FAVOR_STATES },
   { key: "escalationTier", label: "Escalation tier", options: ESCALATION_TIERS },
+  { key: "act", label: "Act", options: ["1", "2", "3"] },
   { key: "portentId", label: "Portent", options: PORTENT_IDS },
 ];
 

@@ -336,7 +336,7 @@ registerPuzzleCopy('puzzle.solve.ember_transform', [
   'A feast-blessed duchy needs no blockade. Factions kneel to shared transformation.',
 ]);
 registerPuzzleCopy('puzzle.solve.ember_combat', [
-  'The inquisitor falls. Purity\'s blockade shatters like a fasting vow in a bakery.',
+  'The inquisitor falls. The Measured Hand\'s blockade shatters like a fasting vow in a bakery.',
 ]);
 registerPuzzleCopy('puzzle.solve.ember_persuade', [
   'Words sweeter than honey divide zealots from pragmatists. The road opens.',

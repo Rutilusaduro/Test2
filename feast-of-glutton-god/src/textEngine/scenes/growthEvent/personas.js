@@ -2,65 +2,71 @@ import { registerModuleVariants } from '../../engine.js';
 
 const W = 4;
 
-// Companion growth reaction voices — keyed on numericId (see companions.js).
+// Companion growth reaction voices — world-native softening arcs (Phase 4).
 registerModuleVariants('ge.reactionDialogue', [
+  // Mira — delighted bard (characterId 0)
   { when: { characterId: 0, corruption: 0 }, priority: 1, weight: W, text: [
-    '"Look what you\'re doing to me…" Mira giggles breathlessly. "I\'m getting so soft already."',
+    '"The chorus wasn\'t supposed to include my waistline," Mira giggles, "but the audience is cheering."',
   ]},
   { when: { characterId: 0, corruption: 1 }, priority: 1, weight: W, text: [
-    '"Every note I play now carries the weight of my new body," she sings, patting her belly.',
+    '"Encore!" she sings, patting new softness. "The Reach can call it heresy. I call it harmony."',
   ]},
   { when: { characterId: 0, corruption: 2 }, priority: 1, weight: W, text: [
-    '"Play it again — I want the whole hall to grow with me."',
+    '"Write that I died of moderation," she laughs, "and watch the ticket sales."',
   ]},
 
+  // Lira — conflicted Sylwen priestess (characterId 1)
   { when: { characterId: 1, corruption: 0 }, priority: 1, weight: W, text: [
-    '"Oh goddess… it\'s so warm… so right," Lira moans reverently.',
+    '"Sylwen forgive me—" Lira gasps as measure yields to warmth. "I only meant to help the harvest…"',
   ]},
   { when: { characterId: 1, corruption: 1 }, priority: 1, weight: W, text: [
-    '"I feel… blessed." She places both hands on her new belly and shudders in pleasure.',
+    '"This cannot be holy." Her hands shake on a belly that feels answered anyway. "Why does holy feel like this?"',
   ]},
   { when: { characterId: 1, corruption: 2 }, priority: 1, weight: W, text: [
-    '"Make me your shrine. I want to be soft enough for everyone to worship."',
+    '"I am still Her priestess," Lira whispers — softer, fuller, no longer certain what that means.',
   ]},
 
+  // Sylvie — Lumen scholar (characterId 2)
   { when: { characterId: 2, corruption: 0 }, priority: 1, weight: W, text: [
-    '"F-for the record, this was entirely scientific—" Sylvie squeaks as her curves balloon outward.',
+    '"Anomalous mass gain," Sylvie mutters, fascinated. "I should publish. I should eat."',
   ]},
   { when: { characterId: 2, corruption: 1 }, priority: 1, weight: W, text: [
-    '"The caloric density is… exceptional. I need more data."',
+    '"The index expands." She beams. "So do I. Excellent correlation."',
   ]},
   { when: { characterId: 2, corruption: 2 }, priority: 1, weight: W, text: [
-    '"I\'ve cracked the formula. More input equals more perfection."',
+    '"Peer review is for thin wizards," she declares, crumbs on her thesis.',
   ]},
 
+  // Thalia — guild witch (characterId 3)
   { when: { characterId: 3, corruption: 0 }, priority: 1, weight: W, text: [
-    '"Yes… more!" Thalia growls, voice thick with pleasure.',
+    '"Clause one: power. Clause two: pleasure." Thalia grins. "Clause three: dessert."',
   ]},
   { when: { characterId: 3, corruption: 1 }, priority: 1, weight: W, text: [
-    '"Look at me. I\'m becoming a goddess in my own right."',
+    '"The Veil pays dividends." She arches into new curves like interest compounding.',
   ]},
   { when: { characterId: 3, corruption: 2 }, priority: 1, weight: W, text: [
-    '"The pact demands tribute. Keep feeding your queen."',
+    '"Countersigned in butter," she purrs. "Best contract I ever broke."',
   ]},
 
+  // Greta — Korthak champion (characterId 4)
   { when: { characterId: 4, corruption: 0 }, priority: 1, weight: W, text: [
-    '"That all you got?!" Greta bellows, patting her new gut proudly.',
+    '"Ha!" Greta slaps her gut. "Korthak never trained me for this — I like it anyway."',
   ]},
   { when: { characterId: 4, corruption: 1 }, priority: 1, weight: W, text: [
-    '"I\'m just gettin\' started! Come on, keep feeding me!"',
+    '"Round two!" she roars. "If this is sin, sin benches more than prayer."',
   ]},
   { when: { characterId: 4, corruption: 2 }, priority: 1, weight: W, text: [
-    '"Champion of the feast — and still climbing!"',
+    '"Champion of the feast!" Ironpot laughs. "Tell the marches I won."',
   ]},
 
+  // Elara — frontier host (characterId 5)
   { when: { characterId: 5, corruption: 0 }, priority: 1, weight: W, text: [
-    '"I\'m so big… I love it," Elara whimpers happily.',
+    '"More stew," Elara murmurs, dazed. "Guests need stew. I… need stew."',
   ]},
   { when: { characterId: 5, corruption: 1 }, priority: 1, weight: W, text: [
-    '"Don\'t stop… make me even softer for you."',
+    '"The hearth is big enough for all of us," she sighs, patting her apron over a rounder middle.',
   ]},
   { when: { characterId: 5, corruption: 2 }, priority: 1, weight: W, text: [
-    '"The whole world should eat like this. Let me show them."',
+    '"Eat," she commands gently. "That\'s the whole sermon now."',
   ]},
 ]);

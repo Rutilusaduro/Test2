@@ -108,6 +108,10 @@ function withQuestProgress(game, npc, interaction, meta, result) {
         if (result.narrative) result.narrative += `\n\n---\n${portent.message}`;
       }
     }
+    if (spread?.divineAttention?.antagonistBeat) {
+      result.text = (result.text || '') + `\n\n---\n${spread.divineAttention.antagonistBeat}`;
+      if (result.narrative) result.narrative += `\n\n---\n${spread.divineAttention.antagonistBeat}`;
+    }
     const transform = awardRegionTransformation(game, game.region, key);
     if (transform.levelUp && transform.message) {
       result.text = (result.text || '') + `\n\n---\n${transform.message}`;
@@ -116,6 +120,10 @@ function withQuestProgress(game, npc, interaction, meta, result) {
     if (transform.divineAttention?.portent?.message) {
       result.text = (result.text || '') + `\n\n---\n${transform.divineAttention.portent.message}`;
       if (result.narrative) result.narrative += `\n\n---\n${transform.divineAttention.portent.message}`;
+    }
+    if (transform.divineAttention?.antagonistBeat) {
+      result.text = (result.text || '') + `\n\n---\n${transform.divineAttention.antagonistBeat}`;
+      if (result.narrative) result.narrative += `\n\n---\n${transform.divineAttention.antagonistBeat}`;
     }
     const relBonus = getRelationshipInfluenceBonus(result.npc ?? npc);
     if (interaction === 'feast' || interaction === 'bless' || interaction?.startsWith('bless')) {
@@ -212,7 +220,7 @@ export function doTalk(npc, player, game) {
     return { text: beat, npc, ok: false, declined: true };
   }
   const reactivity = getReactivityGlobals(game, game.region);
-  const text = renderTalk(npc, player, { location: game.region, history: getTextHistory(game), reactivity });
+  const text = renderTalk(npc, player, { location: game.region, history: getTextHistory(game), reactivity, game });
   const relResult = applyRelationshipGain(npc, 'talk', null, game);
   const offers = getQuestOffersForNpc(game, npc);
   let questOfferText = '';

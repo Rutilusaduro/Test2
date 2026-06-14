@@ -15,8 +15,12 @@ registerPool('world.event', [
     'The Fat Goddess\'s influence is undeniable now: beautiful, vast, hungry.',
   ]},
   { when: { eventId: 'gorgaras_dawn' }, text: [
-    '★ Patron\'s Stirring breaks — the Fat Goddess stirs, and the world answers with a collective, euphoric swell.',
-    'You feel her smile on your skin. There will be no more thin days.',
+    '★ Patron\'s Stirring — the Fat Goddess presses against the Thin Veil; the Reach shivers with impossible appetite.',
+    'You feel her attention sharpen. The Wheel was not built for hunger like this.',
+  ]},
+  { when: { eventId: 'matriarch_shadow' }, text: [
+    '★ Matriarch\'s Shadow — your size anchors her breach. Even earnest folk dream of bellies that will not stop.',
+    'The gods\' charts show a blank where your patron should not be. She is rising anyway.',
   ]},
   { when: {}, text: [
     'Abundance ripples outward — the world grows softer, fuller, more divine.',

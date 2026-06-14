@@ -11,7 +11,7 @@ export const WORLD_NPCS = [
     startLbs: 168,
     location: "harvest_hearth",
     companionId: "elara",
-    desc: "The warm-hearted innkeeper whose kitchen never closes.",
+    desc: "Harvest's Hearth innkeeper — frontier host who never stops cooking for the road.",
   },
   {
     id: "mira_bard",
@@ -22,7 +22,7 @@ export const WORLD_NPCS = [
     startLbs: 128,
     location: "harvest_hearth",
     companionId: "mira",
-    desc: "A playful wandering musician with a voice that makes hips sway.",
+    desc: "A Reach tavern bard whose ballads once praised Sylwen's measure — now they praise softer things.",
   },
   {
     id: "greta_smith",
@@ -33,7 +33,7 @@ export const WORLD_NPCS = [
     startLbs: 155,
     location: "harvest_hearth",
     companionId: "greta",
-    desc: "A boisterous smith who treats eating like forging — hammer, heat, and hunger.",
+    desc: "Korthak-blessed smith of the marches — competitive, armored, hungry for the next forge-feast.",
   },
   {
     id: "lira_priestess",
@@ -44,7 +44,7 @@ export const WORLD_NPCS = [
     startLbs: 132,
     location: "fertile_heartlands",
     companionId: "lira",
-    desc: "A gentle priestess whose prayers taste like warm bread and honey.",
+    desc: "Sylwen priestess sworn to measured plenty — prayers taste like bread, guilt tastes like your cooking.",
   },
   {
     id: "sylvie_scholar",
@@ -55,7 +55,7 @@ export const WORLD_NPCS = [
     startLbs: 126,
     location: "ancient_temple",
     companionId: "sylvie",
-    desc: "A curious wizard who studies growth the way others study stars.",
+    desc: "Lumen court-wizard cataloging temple relics — star-charts in one hand, pastry in the other.",
   },
   {
     id: "thalia_witch",
@@ -66,7 +66,7 @@ export const WORLD_NPCS = [
     startLbs: 140,
     location: "gorgara_cradle",
     companionId: "thalia",
-    desc: "A hedonistic warlock whose pact hunger is contagious and delicious.",
+    desc: "Guild factor turned hedge-witch at the Thin Veil — contracts, pacts, and contagious appetite.",
   },
   {
     id: "vesperia",
@@ -146,7 +146,19 @@ export const WORLD_NPCS = [
     archetype: "devout",
     startLbs: 122,
     location: "ember_duchy",
-    desc: "An Inquisitor of the Measured Hand — lean, severe, sworn to enforce divine moderation.",
+    desc: "Inquisitor of the Measured Hand — Javert-earnest, lean, horrified that you make famine lose.",
+    antagonist: true,
+    antagonistAct: 2,
+  },
+  {
+    id: "sylwen_herald",
+    name: "Sister Amaran",
+    role: "herald",
+    bodyType: "pear",
+    archetype: "devout",
+    startLbs: 130,
+    location: "fertile_heartlands",
+    desc: "Sylwen's harvest-herald — tragic foil in green vestments, voice gentle, verdict terrible.",
   },
 ];
 
