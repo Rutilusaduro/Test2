@@ -14,7 +14,7 @@ import {
   getSatiationLockReason,
   isSatiationRefusing,
 } from '../gameData/satiation.js';
-import { addCorruption } from '../gameData/corruption.js';
+import { addCorruption, getCorruptionTier } from '../gameData/corruption.js';
 import { getStage } from '../gameData/stages.js';
 import {
   awardRelationship,

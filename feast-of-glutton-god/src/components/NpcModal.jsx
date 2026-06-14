@@ -6,6 +6,7 @@ import {
 import { getStage } from "../gameData/stages.js";
 import { getTier, getRelationshipProgress } from "../gameData/relationships.js";
 import { getGainDesireTier } from "../gameData/gainDesire.js";
+import { getCorruptionTier } from "../gameData/corruption.js";
 import { getSatiationTier } from "../gameData/satiation.js";
 import SkillCheckRoll from "./SkillCheckRoll.jsx";
 
