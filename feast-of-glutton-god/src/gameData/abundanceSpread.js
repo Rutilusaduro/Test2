@@ -1,16 +1,16 @@
 /**
- * Abundance Spread — tracks how Gorgara's influence grows across the world.
+ * Abundance Spread — tracks how your patron's hunger grows across the earnest world.
  * Feeds quest scoring, region auras, and celebratory milestones.
  */
 
 export const ABUNDANCE_MILESTONES = [
-  { points: 0, label: 'First Spark', desc: 'A single flame of indulgence flickers.' },
-  { points: 50, label: 'Warm Hearth', desc: 'Homes grow softer; kitchens never empty.' },
+  { points: 0, label: 'First Spark', desc: 'A single heresy flickers — your patron tastes the world.' },
+  { points: 50, label: 'Warm Hearth', desc: 'Homes grow softer; kitchens never empty along your road.' },
   { points: 120, label: 'Feast Tide', desc: 'Whole neighborhoods swell with shared appetite.' },
-  { points: 250, label: 'Golden Overflow', desc: 'Abundance spills into streets and temples alike.' },
-  { points: 500, label: "Gorgara's Dawn", desc: 'The goddess stirs — the world hungers beautifully.' },
-  { points: 900, label: 'Continental Surge', desc: 'Nations feel your rival gospel on the wind.' },
-  { points: 1500, label: 'Matriarch\'s Shadow', desc: 'Gorgara is not the only hunger the continent knows.' },
+  { points: 250, label: 'Golden Overflow', desc: 'Abundance spills into streets and shrine-corners alike.' },
+  { points: 500, label: "Patron's Stirring", desc: 'The Hunger Beyond the Wheel grows heavy with attention.' },
+  { points: 900, label: 'Reach-Wide Surge', desc: 'Nations feel your patron\'s pulse on the wind.' },
+  { points: 1500, label: 'Matriarch\'s Shadow', desc: 'Your patron is no longer the only hunger the gods can name.' },
 ];
 
 export const ABUNDANCE_AWARDS = {

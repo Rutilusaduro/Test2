@@ -96,7 +96,7 @@ export const WORLD_NPCS = [
     archetype: "devout",
     startLbs: 145,
     location: "fertile_heartlands",
-    desc: "A temple priestess torn between purity vows and Gorgara's call.",
+    desc: "A temple priestess torn between Sylwen's measured vows and the pull of fullness.",
   },
   {
     id: "goblin_queen",
@@ -126,7 +126,27 @@ export const WORLD_NPCS = [
     archetype: "proud",
     startLbs: 122,
     location: "market_square",
-    desc: "A proud slim adventurer who despises your spreading gospel.",
+    desc: "A proud slim adventurer who despises the heresy you carry.",
+  },
+  {
+    id: "lumen_diviner",
+    name: "Brother Cael",
+    role: "diviner",
+    bodyType: "slim",
+    archetype: "scholar",
+    startLbs: 118,
+    location: "gilded_citadel",
+    desc: "A Lumen-temple diviner who reads star-charts and frowns at patterns that should not exist.",
+  },
+  {
+    id: "measured_inquisitor",
+    name: "Sister Verity",
+    role: "inquisitor",
+    bodyType: "athletic",
+    archetype: "devout",
+    startLbs: 122,
+    location: "ember_duchy",
+    desc: "An Inquisitor of the Measured Hand — lean, severe, sworn to enforce divine moderation.",
   },
 ];
 

@@ -343,7 +343,7 @@ registerPuzzleCopy('puzzle.solve.ember_persuade', [
 ]);
 
 registerPuzzleCopy('puzzle.solve.citadel_rite', [
-  'Mass indulgence shakes the grand seal. The cathedral-city tastes your rival gospel.',
+  'Mass indulgence shakes the grand seal. The cathedral-city tastes your patron\'s hunger.',
 ]);
 registerPuzzleCopy('puzzle.solve.citadel_monolith', [
   'You become immobile grandeur before the seal. Even purity kneels to a living god.',

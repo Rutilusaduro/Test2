@@ -3,24 +3,24 @@ import '../../modules.js';
 
 registerPool('dm.arrival', [
   { when: { firstVisit: true, region: 'harvest_hearth' }, text: [
-    'You step into Harvest\'s Hearth — ovens breathing, wheat gold in every window. A good place to learn appetite.',
-    'The village greets you with bread-smoke and curious eyes. They don\'t know you yet. You will fix that.',
+    'You step into Harvest\'s Hearth — ovens breathing, wheat gold in every window. A proper frontier village.',
+    'The village greets you with bread-smoke and curious eyes. They don\'t know your secret yet.',
   ]},
   { when: { firstVisit: true, region: 'gorgara_cradle' }, text: [
-    'Gorgara\'s Cradle hums beneath your feet — sacred, hungry, patient. The goddess has been waiting.',
-    'Golden light pools in the grotto air. Whatever you came to become, it starts listening here.',
+    'The Thin Veil hums beneath your feet — your shrine, your thin place. Your patron has been listening.',
+    'Pale light pools in the grotto air. Whatever you came to become, it starts here.',
   ]},
   { when: { firstVisit: true }, text: [
-    'A new stretch of the Everfull Continent opens before you — unfamiliar roads, unfamiliar hungers.',
-    'You arrive somewhere you have never stood. Take it in. The world will remember what you do next.',
+    'A new stretch of the Aurelan Reach opens before you — unfamiliar roads, earnest faces.',
+    'You arrive somewhere you have never stood. The world plays its fantasy straight; you carry something else.',
   ]},
   { when: { regionTransformLevelMin: 3 }, text: [
-    'You return to {regionName}, and the land itself seems fatter with devotion — streets softer, bellies braver.',
-    'Familiar ground, but abundance has rewritten the scenery since your last visit. Good.',
+    'You return to {regionName}, and abundance has rewritten the scenery since your last visit.',
+    'Familiar ground, but the land leans softer now — streets braver, bellies fuller.',
   ]},
   { when: {}, text: [
-    'You find yourself in {regionName} again — same roads, new appetites stirring.',
-    'Back in {regionName}. The feast never truly pauses here; it only changes course.',
+    'You find yourself in {regionName} again — same roads, new hungers stirring.',
+    'Back in {regionName}. Life goes on as it always has here, until you decide otherwise.',
   ]},
 ]);
 

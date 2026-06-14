@@ -6,7 +6,7 @@ registerPool('dm.region.wary', [
   { when: { hostilityTierMin: 2, region: 'gilded_citadel' }, text: [
     'Eyes track you in the Gilded Citadel — not hunger, but judgment.',
     'Temple incense cannot mask the suspicion coiling around your footsteps here.',
-    'A purity acolyte whispers as you pass; the Citadel remembers who you forced.',
+    'A purity acolyte whispers as you pass; the Citadel remembers those who broke the Wheel\'s measure.',
   ]},
   { when: { hostilityTierMin: 2, region: 'ember_duchy' }, text: [
     'Velvet masks hide mouths that used to smile — the duchy has grown careful of you.',
@@ -45,7 +45,7 @@ registerPool('dm.region.crackdown', [
   { when: { crackdown: true, region: 'gilded_citadel' }, text: [
     'Crackdown — the Citadel\'s bells toll for purity, and your name rides the sound.',
     'Larders seal behind blessed iron; even whispers of feeding carry a sentence here.',
-    'Inquisitors march in ordered ranks — the temple-city has decided you are a crisis.',
+    'Inquisitors of the Measured Hand march in ordered ranks — the temple-city has decided you are a crisis.',
   ]},
   { when: { crackdown: true, region: 'ember_duchy' }, text: [
     'The duchy locks its pantries — velvet turns to steel when crackdown comes.',

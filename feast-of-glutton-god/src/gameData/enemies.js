@@ -63,7 +63,7 @@ export const ENEMY_TYPES = {
   },
   purity_inquisitor: {
     id: "purity_inquisitor",
-    name: "Purity Inquisitor",
+    name: "Inquisitor of the Measured Hand",
     bodyType: "athletic",
     startLbs: 120,
     hp: 32,
@@ -71,11 +71,11 @@ export const ENEMY_TYPES = {
     movement: 4,
     role: "elite",
     conversion: 0.6,
-    desc: "Fanatical slim paladins who hunt abundance cultists.",
+    desc: "Militant paladins of the orthodox Church who enforce divine moderation and hunt heresy.",
   },
   famine_hag: {
     id: "famine_hag",
-    name: "Famine Hag",
+    name: "the Lean Saint",
     bodyType: "straight",
     startLbs: 95,
     hp: 45,
@@ -83,7 +83,7 @@ export const ENEMY_TYPES = {
     movement: 2,
     role: "boss",
     conversion: 0.5,
-    desc: "Ancient rail-thin crone who curses with eternal hunger.",
+    desc: "Sylwen's Scourge — a sanctioned divine instrument; famine as the answer to gluttony.",
   },
 };
 

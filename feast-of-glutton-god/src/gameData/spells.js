@@ -6,7 +6,7 @@ export const CANTRIPS = [
   { id: 'gentle_plump', name: 'Gentle Plump', slotLevel: 0, school: 'abundance', desc: 'Softly swell a willing target by one stage with a pleasurable surge.', effect: { growth: 1 } },
   { id: 'indulgent_touch', name: 'Indulgent Touch', slotLevel: 0, school: 'abundance', desc: 'Touch a willing creature and cause a small, pleasurable growth surge.', effect: { growth: 1, corruption: 1 } },
   { id: 'feasts_whisper', name: "Feast's Whisper", slotLevel: 0, school: 'enchantment', desc: 'Whisper temptations that make a target crave indulgence.', effect: { charm: 1, corruption: 2 }, environment: { charm: true } },
-  { id: 'gorgaras_spark', name: "Gorgara's Spark", slotLevel: 0, school: 'abundance', desc: 'A minor divine spark of growth — can be upcast with higher slots.', effect: { growth: 1 } },
+  { id: 'gorgaras_spark', name: "Gorgara's Spark", slotLevel: 0, school: 'abundance', desc: 'A minor spark of your patron\'s hunger — can be upcast with higher slots.', effect: { growth: 1 } },
   { id: 'rich_cream', name: 'Rich Cream', slotLevel: 0, school: 'conjuration', desc: 'Conjure slippery, creamy abundance. Contact causes minor pleasurable weight gain.', effect: { growth: 1, corruption: 2, feed: 1 }, environment: { soften: true, slick: true } },
   { id: 'flavor_burst', name: 'Flavor Burst', slotLevel: 0, school: 'abundance', desc: 'Conjure delicious food that tempts and feeds.', effect: { feed: 1, corruption: 3 }, environment: { fertile: true, soften: true } },
   { id: 'jiggle_charm', name: 'Jiggle Charm', slotLevel: 0, school: 'enchantment', desc: 'Hypnotic sway that charms and distracts.', effect: { charm: 1 }, environment: { charm: true } },
@@ -142,7 +142,7 @@ export const BONUS_SPELLS = {
   },
   gorgaras_awakening: {
     id: 'gorgaras_awakening', name: "Gorgara's Awakening", slotLevel: 9, school: 'abundance', minSizeStage: 8,
-    desc: 'Massive area growth event. Multiple characters may leap several size stages.',
+    desc: 'Your patron surges through you — massive area growth as the Hunger Beyond stirs awake.',
     effect: { growth: 4, aoe: true, corruption: 10 },
   },
   honeyed_overflow: {
@@ -226,14 +226,14 @@ export const CLASS_SPELLS = {
     },
     {
       id: 'gorgara_grand_feast', name: "Gorgara's Grand Feast", slotLevel: 5, apCost: 24,
-      desc: 'Golden caloric energy explodes across the battlefield.', effect: { growth: 2, aoe: true, heal: 15 },
+      desc: 'Your patron\'s golden hunger explodes across the battlefield.', effect: { growth: 2, aoe: true, heal: 15 },
       overflow: { slotBonus: 0, apCost: 35, effect: { growth: 3, aoe: true, heal: 25, corruption: 6 } },
     },
   ],
   warlock: [
     {
       id: 'gorgara_claim', name: "Gorgara's Claim", slotLevel: 2, apCost: 6,
-      desc: 'Remote hunger invocation on a target.', effect: { corruption: 6, growth: 1 },
+      desc: 'Invoke your patron\'s remote hunger upon a target.', effect: { corruption: 6, growth: 1 },
     },
     {
       id: 'essence_drain', name: 'Essence Drain', slotLevel: 3, apCost: 12,

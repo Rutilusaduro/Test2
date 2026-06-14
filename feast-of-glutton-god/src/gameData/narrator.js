@@ -5,6 +5,7 @@ import { getNpcsInRegion } from './npcs.js';
 import { getNpcState, ensureDmState } from './player.js';
 import { getQuestOffersForNpc } from './questOffers.js';
 import { renderDmLine } from '../textEngine/scenes/dm/index.js';
+import { renderGenreBeat } from '../textEngine/scenes/dm/genre.js';
 
 const IDLE_ACTION_THRESHOLD = 5;
 
@@ -32,12 +33,17 @@ export function narrate(game, kind, params = {}) {
     if (firstVisit) {
       dm.visitedRegions = { ...visited, [regionId]: true };
     }
-    const line = renderDmLine('arrival', game, {
+    const arrivalLine = renderDmLine('arrival', game, {
       regionId,
       regionName: region?.name ?? regionId,
       firstVisit,
       regionTransformLevel: transform.level.id,
     });
+    const genreLine = renderGenreBeat(game, 'frame', {
+      regionId,
+      escalationTier: game.worldFlags?.escalationTier ?? 0,
+    });
+    const line = genreLine ? `${arrivalLine} ${genreLine}` : arrivalLine;
     dm.sceneLine = line;
     dm.eventLine = null;
     dm.lastKind = 'arrival';

@@ -1,6 +1,6 @@
 /**
  * World events unlocked by Abundance Spread milestones.
- * Always positive — celebrations of spreading Gorgara's gospel.
+ * Celebrations of your patron's growing presence across the earnest world.
  */
 import { getAbundanceSpread, awardAbundanceSpread } from './abundanceSpread.js';
 import { addAbundancePoints } from './player.js';
@@ -32,7 +32,7 @@ export const MILESTONE_WORLD_EVENTS = {
   },
   500: {
     id: 'gorgaras_dawn',
-    label: "Gorgara's Dawn",
+    label: "Patron's Stirring",
     rewards: { ap: 50 },
     worldFlags: { gorgaras_dawn: true, unlock_ember_duchy: true },
     unlockRegions: ['ember_duchy'],
@@ -41,7 +41,7 @@ export const MILESTONE_WORLD_EVENTS = {
   },
   900: {
     id: 'continental_surge',
-    label: 'Continental Surge',
+    label: 'Reach-Wide Surge',
     rewards: { ap: 75 },
     worldFlags: { continental_surge: true, unlock_gilded_citadel: true },
     unlockRegions: ['gilded_citadel'],

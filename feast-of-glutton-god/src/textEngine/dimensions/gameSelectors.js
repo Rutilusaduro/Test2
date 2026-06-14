@@ -11,5 +11,5 @@ registerSelectors(
   'outcomeKind', 'partySize', 'regionName', 'role', 'archetype',
   'spellSchool', 'castType', 'paidBy', 'failCause', 'spellName',
   'consentState', 'playerClass', 'severity',
-  'hostilityTier', 'favorState', 'crackdown', 'action',
+  'hostilityTier', 'favorState', 'crackdown', 'action', 'escalationTier',
 );

@@ -37,7 +37,7 @@ reg('transformation.region.fertile_heartlands.5', [
 ]);
 
 reg('transformation.region.gorgara_cradle.3', [
-  'Sacred grotto light warms. Even Gorgara\'s cradle tastes your rival gospel.',
+  'Sacred grotto light warms. Even the Thin Veil tastes your patron\'s heresy.',
 ]);
 reg('transformation.region.ember_duchy.3', [
   'Ember\'s court whispers of indulgence. Lawmakers dine instead of debating restraint.',

@@ -7,9 +7,9 @@ import { getStageMechanics } from './stageMechanics.js';
 import { getAbundanceSpread } from './abundanceSpread.js';
 
 export const INFLUENCE_TRACKS = {
-  political: { label: 'Political', desc: 'Courts, law, and land bow to your decree.' },
-  religious: { label: 'Religious', desc: 'Temples preach your gospel of fullness.' },
-  cultural: { label: 'Cultural', desc: 'Fashion, feast, and art spread your aesthetic.' },
+  political: { label: 'Political', desc: 'Courts, charters, and land learn your name.' },
+  religious: { label: 'Religious', desc: 'Hidden shrines multiply; your patron\'s rites spread in shadow.' },
+  cultural: { label: 'Cultural', desc: 'Feast, fashion, and song carry your aesthetic across the Reach.' },
 };
 
 export const HOLDING_TYPES = {
@@ -34,16 +34,16 @@ export const INSTITUTION_TYPES = {
     desc: 'Scholars study the theology of indulgence.',
   },
   temple: {
-    label: 'Temple of Abundance',
+    label: 'Shrine of the Hunger Beyond',
     track: 'religious',
     minInfluence: 60,
-    desc: 'A shrine where Gorgara\'s rites bend toward your name.',
+    desc: 'A hidden shrine where your patron\'s rites bend the faithful toward fullness.',
   },
   order: {
     label: 'Order of the Everfull',
     track: 'religious',
     minInfluence: 120,
-    desc: 'A religious order devoted to spreading sacred growth.',
+    desc: 'A sworn order devoted to feeding the Hunger Beyond the Wheel into the world.',
   },
   court: {
     label: 'Court of Plenty',
@@ -59,7 +59,7 @@ export const TITLE_THRESHOLDS = [
   { id: 'landed_patron', track: 'political', min: 75, label: 'Landed Patron' },
   { id: 'high_matron', track: 'religious', min: 120, label: 'High Matron of Plenty' },
   { id: 'duchess_of_indulgence', track: 'political', min: 180, label: 'Duchess of Indulgence' },
-  { id: 'rival_incarnate', track: 'religious', min: 300, label: 'Rival Incarnate of Gorgara' },
+  { id: 'rival_incarnate', track: 'religious', min: 300, label: 'Avatar of the Hunger Beyond' },
 ];
 
 export function ensureInfluenceState(game) {
@@ -198,7 +198,7 @@ export function getAvailablePowerPaths(game) {
   if (inf.religious >= 20) paths.push({ id: 'religious', label: 'Religious — temples, orders, rites' });
   if (inf.political >= 20) paths.push({ id: 'political', label: 'Political — land, courts, decrees' });
   if (getTotalInfluence(game) >= 100) {
-    paths.push({ id: 'replacement', label: 'Rival Goddess — continent-spanning cult leadership' });
+    paths.push({ id: 'replacement', label: 'Patron Incarnate — heresy made flesh across the Reach' });
   }
   return paths;
 }

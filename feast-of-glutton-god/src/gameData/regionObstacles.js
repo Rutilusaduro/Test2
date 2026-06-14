@@ -68,7 +68,7 @@ export const CONNECTION_GATES = [
     to: 'gilded_citadel',
     puzzleId: 'ember_contested_approach',
     solvedFlag: 'puzzle_ember_approach_solved',
-    blockedText: 'Purity hardliners and abundance cultists contest the road to the Gilded Citadel — the capital will not yield to a single appetite.',
+    blockedText: 'Church hardliners and heresy-hunters contest the road to the Gilded Citadel — the capital will not yield to unchecked appetite.',
     unlocks: [
       { method: 'puzzle_solved', puzzleId: 'ember_contested_approach' },
       { method: 'place_giant', minStage: 12, regionId: 'ember_duchy', label: 'A titan landmark silences both factions' },
