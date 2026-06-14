@@ -85,6 +85,8 @@ export const COMPANIONS = [
   },
 ];
 
+import { MAX_STAGE_ID } from "./stages.js";
+
 export function createCompanionData(template) {
   return {
     ...template,
@@ -99,6 +101,7 @@ export function createCompanionData(template) {
     gender: "she",
     pronouns: "she",
     isCompanion: true,
+    sizeCap: MAX_STAGE_ID,
   };
 }
 

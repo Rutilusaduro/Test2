@@ -14,6 +14,7 @@ import { initSpellSlots } from "./gameData/spellSlots.js";
 import { ensureQuestState } from "./gameData/questEngine.js";
 import { ensureInfluenceState } from "./gameData/influence.js";
 import { ensureTransformationState } from "./gameData/worldTransformation.js";
+import { ensurePartyUniversalSize } from "./gameData/universalSize.js";
 import { recordCombatEndForQuests } from "./hooks/questHooks.js";
 import { recordPuzzleSolvedForQuests } from "./hooks/puzzleHooks.js";
 import { applySolutionImmediate } from "./gameData/puzzleEngine.js";
@@ -53,6 +54,7 @@ export default function App() {
 
   const startNewGame = useCallback((name, classId, options = {}) => {
     const g = createNewGame(name, classId, options);
+    ensurePartyUniversalSize(g);
     setGame(g);
     setScreen("world");
   }, []);
@@ -68,6 +70,7 @@ export default function App() {
       if (!g.player.raceName) g.player.raceName = 'Human';
       migratePlayerSpells(g.player);
       ensureQuestState(g);
+      ensurePartyUniversalSize(g);
       setGame(g);
       setScreen("world");
     }

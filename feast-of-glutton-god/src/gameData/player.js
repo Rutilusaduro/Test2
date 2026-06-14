@@ -1,6 +1,7 @@
 import { getClass } from "./classes.js";
 import { getStage } from "./stages.js";
 import { createCompanionData, COMPANIONS } from "./companions.js";
+import { ensurePartyUniversalSize } from "./universalSize.js";
 import { initSpellSlots } from "./spellSlots.js";
 import { getMaxAbundancePoints, getArmorClass } from "./stats.js";
 import { getSizeCapForLevel, initializeStartingSpells } from "./leveling.js";
@@ -77,7 +78,7 @@ export function createPlayer(name, classId, options = {}) {
 export function createNewGame(name, classId, options = {}) {
   const player = createPlayer(name, classId, options);
   const elara = createCompanionData(COMPANIONS.find((c) => c.id === "elara"));
-  return {
+  const game = {
     player,
     party: [elara],
     region: "harvest_hearth",
@@ -104,6 +105,7 @@ export function createNewGame(name, classId, options = {}) {
     },
     lastQuestMessage: null,
   };
+  return ensurePartyUniversalSize(game);
 }
 
 export function syncPlayerFromCombat(game, combat) {

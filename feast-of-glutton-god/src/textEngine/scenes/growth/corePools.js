@@ -18,86 +18,100 @@ import {
 const STAGE_UP_SELF = {
   3: {
     distant: [
-      '{subject.first} tips into Chubby and feels the word land — soft, real, surprisingly good.',
-      'The mirror finally agrees: {they}\'ve crossed into chubby, belly leading with pride.',
+      '{subject.first} thickens past mere softness — belly leading, hips following, undeniable.',
+      'The mirror finally agrees: {they}\'ve crossed a line, and the line feels good.',
     ],
     warm: [
-      '{subject.first} crosses into chubby laughing — curves deepening like a gift unwrapped.',
-      'Chubby, honestly chubby now; {they} pat {their} waist and find only pleasure.',
+      '{subject.first} swells laughing — curves deepening like a gift unwrapped.',
+      'Honestly fuller now; {they} pat {their} waist and find only pleasure.',
     ],
     intimate: [
-      '{subject.first} swells into chubby moaning — {ref.first} whispers praise against new softness.',
-      'Chubby arrives like a confession; {they} lean into {ref.name}, hungry for more.',
+      '{subject.first} swells moaning — {ref.first} whispers praise against new softness.',
+      'New fullness arrives like a confession; {they} lean into {ref.name}, hungry for more.',
     ],
   },
   6: {
     distant: [
-      '{subject.first} crosses into Fat and gasps — heavier, softer, undeniably powerful.',
-      'Fat, properly fat; {they} feel {their} body command the room and love it.',
+      '{subject.first} gasps as weight settles low and lush — heavier, softer, undeniably powerful.',
+      '{They} feel {their} body command the room and love it.',
     ],
     warm: [
-      '{subject.first} settles into fat with a stunned grin — friends cheer the new plush.',
-      'The scale names it fat; {subject.name} wears the word like a crown.',
+      '{subject.first} settles with a stunned grin — friends cheer the new plush.',
+      '{subject.name} wears the new size like a crown.',
     ],
     intimate: [
-      '{subject.first} blooms into fat in {ref.first}\'s arms — lover counting every new roll.',
-      'Fat feels like coming home; {they} kiss {ref.name} through jiggling bliss.',
+      '{subject.first} blooms in {ref.first}\'s arms — lover counting every new roll.',
+      'Coming home in flesh; {they} kiss {ref.name} through jiggling bliss.',
     ],
   },
   7: {
     distant: [
-      '{subject.first} crosses into Very Fat — weight settling low and lush, breath sweet.',
-      'Very fat now: thighs pressing, belly cascading, and {they} feel magnificent.',
+      '{subject.first} swells until doorways feel theoretical — thighs pressing, belly cascading.',
+      'Each step celebrates mass; {they} feel magnificent and still hungry.',
     ],
     warm: [
-      '{subject.first} waddles into very fat laughing — each step celebrates mass.',
-      'Very fat deepens {their} voice, {their} hips, {their} hunger; {they} want more.',
+      '{subject.first} waddles deeper into size laughing — each step a little earthquake.',
+      'New weight deepens {their} voice, {their} hips, {their} hunger; {they} want more.',
     ],
     intimate: [
-      '{subject.first} swells to very fat against {ref.first} — devotion in new pounds.',
-      'Very fat and worshipped; {ref.name} holds {them} through delicious heaviness.',
+      '{subject.first} swells against {ref.first} — devotion in new pounds.',
+      'Worshipped and heavy; {ref.name} holds {them} through delicious immensity.',
     ],
   },
   8: {
     distant: [
-      '{subject.first} becomes Enormous — furniture groans, {they} glow with commanding power.',
-      'Enormous: the word stops exaggerating; {they} fill space like weather.',
+      '{subject.first} grows until furniture groans — {they} glow with commanding power.',
+      'The room reorganizes around {them}; {they} fill space like weather.',
     ],
     warm: [
-      '{subject.first} crosses enormous amid applause — a landmark in the making.',
-      'Enormous softness reshapes the room; {subject.name} owns every inch.',
+      '{subject.first} swells amid applause — a landmark in the making.',
+      'Softness reshapes the room; {subject.name} owns every inch.',
     ],
     intimate: [
-      '{subject.first} grows enormous in {ref.first}\'s worship — lover lost in vast warmth.',
-      'Enormous and adored; {they} pull {ref.name} into softness that swallows gently.',
+      '{subject.first} grows in {ref.first}\'s worship — lover lost in vast warmth.',
+      'Adored and vast; {they} pull {ref.name} into softness that swallows gently.',
     ],
   },
   9: {
     distant: [
-      '{subject.first} crosses Colossal — movement a project, pleasure a continent.',
-      'Colossal mass settles; {they} feel divine scale humming under skin.',
+      '{subject.first} swells until movement is a project — pleasure a continent.',
+      'Divine scale hums under {their} skin; the floor remembers {them}.',
     ],
     warm: [
-      '{subject.first} becomes colossal to cheers — friends dwarfed and happy.',
-      'Colossal and radiant; {subject.name} is the feast made flesh.',
+      '{subject.first} grows to cheers — friends dwarfed and happy.',
+      'Radiant and immense; {subject.name} is the feast made flesh.',
     ],
     intimate: [
-      '{subject.first} swells colossal while {ref.first} clings — devotion at titan scale.',
-      'Colossal love; {ref.name} kisses what {they} can reach, praising every swell.',
+      '{subject.first} swells while {ref.first} clings — devotion at impossible scale.',
+      '{ref.name} kisses what {they} can reach, praising every swell.',
     ],
   },
   11: {
     distant: [
-      '{subject.first} crosses Leviathan — no larger word remains; abundance incarnate.',
-      'Leviathan: myth wearing flesh; {they} settle like a temple finding its god.',
+      '{subject.first} stops being mobile without help — and starts being inevitable.',
+      'Myth wears flesh; {they} settle like a temple finding its god.',
     ],
     warm: [
-      '{subject.first} arrives at leviathan amid awe — the journey celebrated in gasps.',
-      'Leviathan and laughing; {subject.name} is the world made soft.',
+      '{subject.first} arrives amid awe — the journey celebrated in gasps.',
+      'Laughing and vast; {subject.name} is the world made soft.',
     ],
     intimate: [
-      '{subject.first} becomes leviathan in {ref.first}\'s devotion — love without ceiling.',
-      'Leviathan worship; {ref.name} vows to keep feeding what cannot stop being beautiful.',
+      '{subject.first} swells in {ref.first}\'s devotion — love without ceiling.',
+      '{ref.name} vows to keep feeding what cannot stop being beautiful.',
+    ],
+  },
+  14: {
+    distant: [
+      'There is no larger thing left to become — only more of {subject.first}, spreading like a feast that never ends.',
+      'Apotheosis feels like settling: vast, warm, and final.',
+    ],
+    warm: [
+      'Crowds gather at a distance that feels respectful and hungry; {subject.name} is the horizon now.',
+      'History will measure time as before and after this swell.',
+    ],
+    intimate: [
+      '{ref.first} whispers devotion into flesh that has outgrown language.',
+      'Love without limit; {subject.name} breathes, and the world rearranges.',
     ],
   },
 };
@@ -105,86 +119,100 @@ const STAGE_UP_SELF = {
 const STAGE_UP_TARGET = {
   3: {
     distant: [
-      '{subject.first} rounds into chubby before your eyes — softness spreading, undeniable.',
-      'You watch {subject.name} cross into chubby; {they} blush, pleased, fuller.',
+      '{subject.first} rounds before your eyes — softness spreading, undeniable.',
+      'You watch {subject.name} cross a threshold; {they} blush, pleased, fuller.',
     ],
     warm: [
-      '{subject.first} swells into chubby grinning at you — friendship fattening beautifully.',
-      'Chubby suits {subject.name}; you see {them} stand taller in new curves.',
+      '{subject.first} swells grinning at you — friendship fattening beautifully.',
+      'New curves suit {subject.name}; you see {them} stand taller in abundance.',
     ],
     intimate: [
-      'You feel {subject.first} bloom into chubby against you — lover\'s weight a gift.',
-      '{subject.name} moans crossing into chubby in your arms; you worship every inch.',
+      'You feel {subject.first} bloom against you — lover\'s weight a gift.',
+      '{subject.name} moans in your arms; you worship every inch.',
     ],
   },
   6: {
     distant: [
-      '{subject.first} crosses into fat with a shiver — heavier, commanding, gorgeous.',
-      'Fat claims {subject.name}; you stare, hunger stirring, admiration undeniable.',
+      '{subject.first} shivers heavier — commanding, gorgeous, impossible to ignore.',
+      'New mass claims {subject.name}; you stare, hunger stirring.',
     ],
     warm: [
       '{subject.first} fattens to a new tier and laughs — you cheer the plush victory.',
-      'You watch {subject.name} become fat and feel proud to know {them}.',
+      'You watch {subject.name} swell and feel proud to know {them}.',
     ],
     intimate: [
-      '{subject.first} swells into fat kissing you — devotion dripping from new softness.',
-      'You hold {subject.name} as {they} cross into fat, whispering yes.',
+      '{subject.first} swells kissing you — devotion dripping from new softness.',
+      'You hold {subject.name} through the crossing, whispering yes.',
     ],
   },
   7: {
     distant: [
-      '{subject.first} settles into very fat — belly cascading, presence overwhelming.',
-      'Very fat reshapes {subject.name}; you feel gravity shift toward {them}.',
+      '{subject.first} settles heavier — belly cascading, presence overwhelming.',
+      'New scale reshapes {subject.name}; you feel gravity shift toward {them}.',
     ],
     warm: [
-      'You steady {subject.first} as very fat arrives — friend grander, happier.',
-      '{subject.name} waddles into very fat; you applaud the jiggle.',
+      'You steady {subject.first} as size arrives — friend grander, happier.',
+      '{subject.name} waddles deeper; you applaud the jiggle.',
     ],
     intimate: [
-      '{subject.first} grows very fat in your lap — lover too much and exactly enough.',
-      'You worship {subject.name} crossing into very fat; {they} sigh your name.',
+      '{subject.first} grows in your lap — lover too much and exactly enough.',
+      'You worship {subject.name} through the swell; {they} sigh your name.',
     ],
   },
   8: {
     distant: [
-      '{subject.first} becomes enormous — the room reorganizes around {their} softness.',
-      'Enormous suits {subject.name}; you watch myth take shape.',
+      '{subject.first} grows until the room reorganizes around {their} softness.',
+      'Myth takes shape in {subject.name}; you watch, thrilled.',
     ],
     warm: [
-      'You cheer as {subject.first} crosses enormous — community softness, festival air.',
-      '{subject.name} swells enormous; you feel blessed to witness.',
+      'You cheer as {subject.first} swells — community softness, festival air.',
+      '{subject.name} grows vast; you feel blessed to witness.',
     ],
     intimate: [
-      '{subject.first} grows enormous against you — lover vast, warm, yours.',
-      'You lose yourself in {subject.name}\'s enormous swell, kissing what you can.',
+      '{subject.first} grows against you — lover vast, warm, yours.',
+      'You lose yourself in {subject.name}\'s swell, kissing what you can.',
     ],
   },
   9: {
     distant: [
-      '{subject.first} crosses colossal — a titan born in pleasure before you.',
-      'Colossal mass claims {subject.name}; you stare, thrilled, small.',
+      '{subject.first} swells colossal before you — a titan born in pleasure.',
+      'Impossible mass claims {subject.name}; you stare, thrilled, small.',
     ],
     warm: [
-      'You narrate {subject.first}\'s colossal crossing — joy contagious.',
-      '{subject.name} fattens colossal; you swell a little just watching.',
+      'You narrate {subject.first}\'s crossing — joy contagious.',
+      '{subject.name} fattens vast; you swell a little just watching.',
     ],
     intimate: [
-      '{subject.first} becomes colossal in your worship — devotion at impossible scale.',
-      'You cling to {subject.name} as {they} swell colossal, moaning praise.',
+      '{subject.first} grows in your worship — devotion at impossible scale.',
+      'You cling to {subject.name} as {they} swell, moaning praise.',
     ],
   },
   11: {
     distant: [
-      '{subject.first} crosses leviathan — abundance incarnate, awe in your throat.',
-      'Leviathan claims {subject.name}; you witness apotheosis of plush.',
+      '{subject.first} becomes immobile and immense — awe in your throat.',
+      'Abundance incarnate; you witness apotheosis of plush.',
     ],
     warm: [
-      'You lead cheers as {subject.first} becomes leviathan — feast eternal.',
-      '{subject.name} arrives at leviathan; you feel history in the jiggle.',
+      'You lead cheers as {subject.first} settles vast — feast eternal.',
+      '{subject.name} arrives at immobility; you feel history in the jiggle.',
     ],
     intimate: [
-      '{subject.first} swells leviathan while you vow devotion — love without limit.',
-      'You worship {subject.name} crossing into leviathan; flesh and prayer merge.',
+      '{subject.first} swells while you vow devotion — love without limit.',
+      'You worship {subject.name}; flesh and prayer merge.',
+    ],
+  },
+  14: {
+    distant: [
+      'You witness the ceiling of the scale — {subject.first} is no longer a person in a place, but the place.',
+      'The world will need new maps; you are glad to be alive for this.',
+    ],
+    warm: [
+      'You cheer as legend settles into flesh — {subject.name} is the feast that never ends.',
+      'Everyone you know will hear about this swell.',
+    ],
+    intimate: [
+      'You whisper vows into flesh that has outgrown language — love without limit.',
+      '{subject.name} breathes, and you feel the ground answer.',
     ],
   },
 };
@@ -243,18 +271,32 @@ const SURGE_SELF = {
       '{subject.name} swells through a surge like prayer answered fast.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'Leviathan surge — {subject.first} reshapes the air, grander in a heartbeat.',
-      '{subject.name} balloons suddenly; myth winks through flesh.',
+      'A mythic surge reshapes the air around {subject.first} — grander in a heartbeat.',
+      '{subject.name} balloons suddenly; legend winks through flesh.',
     ],
     warm: [
       'Festival gasp as {subject.first} surges — everyone rounder for witnessing.',
       'Sudden titan growth; {subject.name} laughs like weather.',
     ],
     intimate: [
-      'Your lover surges leviathan-scale against you — bliss unbearable, beautiful.',
+      'Your lover surges against you at impossible scale — bliss unbearable, beautiful.',
       '{subject.first} swells in worship until words fail.',
+    ],
+  },
+  world: {
+    distant: [
+      'The horizon hiccups — {subject.first} grows as if the continent inhaled.',
+      '{subject.name} reshapes the map in one breath; awe has no synonym left.',
+    ],
+    warm: [
+      'Crowds kneel at a respectful distance; {subject.first} surges into legend.',
+      'History will cite this swell; {subject.name} glows, vast and laughing.',
+    ],
+    intimate: [
+      'You cling to {subject.first} as apotheosis ripples through flesh — devotion without ceiling.',
+      '{subject.name} swells until love is the only geography left.',
     ],
   },
 };
@@ -302,9 +344,9 @@ const SURGE_TARGET = {
       'You hold {subject.name} through violent softness; bliss shared.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      '{subject.first} surges like a leviathan waking — you witness myth.',
+      '{subject.first} surges like a sleeping giant waking — you witness myth.',
       'Continental swell; {subject.name} reshapes reality kindly.',
     ],
     warm: [
@@ -367,9 +409,9 @@ const MINOR_SELF = {
       '{subject.first} softens further in your arms; bliss quiet and deep.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'Leviathan adds another layer — minor by titan standards, glorious anyway.',
+      'Immensity adds another layer — minor by titan standards, glorious anyway.',
       '{subject.name} ripples larger; the world makes room.',
     ],
     warm: [
@@ -378,7 +420,7 @@ const MINOR_SELF = {
     ],
     intimate: [
       'You count new softness on {subject.first}\'s vastness — love precise.',
-      'Even leviathans tease growth; you moan gratitude.',
+      'Even the vast tease growth; you moan gratitude.',
     ],
   },
 };
@@ -426,9 +468,9 @@ const MINOR_TARGET = {
       '{subject.name} grows in your lap, inch by sacred inch.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      '{subject.first} grows a little more leviathan — awe habitual now.',
+      '{subject.first} grows a little more immense — awe habitual now.',
       'Minor continental shift; you bless it.',
     ],
     warm: [
@@ -496,7 +538,7 @@ const OVERFLOW_TARGET_BY_JUMP = {
   },
   3: {
     distant: [
-      '{subject.first} leaps three stages — you witness leviathan birth in real time.',
+      '{subject.first} leaps three stages — you witness myth born in real time.',
       'Overflow reshapes {subject.name}; you kneel, smiling.',
     ],
     warm: [

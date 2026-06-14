@@ -7,6 +7,7 @@ import { getTier, awardRelationship, getTierUpMessage } from './relationships.js
 import { awardAbundanceSpreadWithEvents } from './worldEvents.js';
 import { getCorruptionTier } from './corruption.js';
 import { getStage, advanceStage } from './stages.js';
+import { applyGrowthWithPresentation } from './growthPresentation.js';
 import { addAbundancePoints } from './player.js';
 import { addExperience, XP_SOURCES } from './leveling.js';
 import { getNpcState, applyNpcState } from './player.js';
@@ -442,15 +443,18 @@ function runGrowthTrigger(game, player, growthSpec, npc) {
     ? getNpcForObjective(game, growthSpec.npcId)
     : npc;
   if (!targetNpc) return '';
-  const startStage = getStage(targetNpc.lbs).id;
   const stages = growthSpec.stages ?? 1;
-  advanceStage(targetNpc, stages);
+  const presentation = applyGrowthWithPresentation(targetNpc, game, stages, {
+    growthMethod: 'quest',
+    regionId: game?.region,
+  });
   applyNpcState(game, targetNpc.id, targetNpc);
+  if (presentation.text) return presentation.text;
   const proseKey = growthSpec.proseKey ?? 'growth.target.minor';
   return renderGrowthProse(proseKey, targetNpc, player, {
-    startStage,
-    endStage: getStage(targetNpc.lbs).id,
-    stagesJumped: stages,
+    startStage: presentation.startStage,
+    endStage: presentation.endStage,
+    stagesJumped: presentation.stagesJumped,
     growthPerspective: growthSpec.target === 'player' ? 'self' : 'target',
   });
 }

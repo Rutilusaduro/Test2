@@ -4,13 +4,13 @@
 import { getSpell, getSpellForCast, spellHasEnvironmentUse } from './spells.js';
 import { hasSpellSlot, spendSpellSlot } from './spellSlots.js';
 import { spendAP } from './player.js';
-import { advanceStage, getStage } from './stages.js';
 import { addCorruption } from './corruption.js';
 import { awardRelationship, getGrowthStageBonus } from './relationships.js';
 import { getPreparedSpells, isSpellPrepared } from './spellPreparation.js';
 import { awardAbundanceSpreadWithEvents } from './worldEvents.js';
 import { renderOverworldSpellCast } from '../textEngine/scenes/overworld/spellCast.js';
-import { renderGrowthScene } from '../textEngine/scenes/growthEvent/index.js';
+import { applyGrowthWithPresentation } from './growthPresentation.js';
+import { getStage } from './stages.js';
 import { getStagePerk } from './stagePerks.js';
 import { getFeature } from './regionFeatures.js';
 import {
@@ -56,17 +56,15 @@ function applyOverworldSpellEffects(game, npc, player, spell) {
 
   if (eff.growth) {
     const stages = (eff.growth || 0) + relBonus;
-    const startStage = getStage(npc.lbs).id;
-    results.growth = advanceStage(npc, stages);
-    results.growth.startStage = startStage;
+    const presentation = applyGrowthWithPresentation(npc, game, stages, { growthMethod: 'spell' });
+    results.growth = presentation;
     addCorruption(npc, 3 * stages);
     results.relationship = awardRelationship(npc, 'spell_bless', 4 + stages);
     awardAbundanceSpreadWithEvents(game, 'overworld_spell_growth');
   }
   if (eff.feed && !eff.growth) {
-    const startStage = getStage(npc.lbs).id;
-    results.growth = advanceStage(npc, 1 + relBonus);
-    results.growth.startStage = startStage;
+    const presentation = applyGrowthWithPresentation(npc, game, 1 + relBonus, { growthMethod: 'feed' });
+    results.growth = presentation;
     addCorruption(npc, 4);
     results.relationship = awardRelationship(npc, 'feed');
     awardAbundanceSpreadWithEvents(game, 'overworld_spell_growth');
@@ -119,12 +117,7 @@ export function castSpellOnNpc(game, npc, spellId, opts = {}) {
 
   let growthText = '';
   if (effects.growth?.stagesJumped > 0) {
-    growthText = renderGrowthScene(target, {
-      growthMethod: 'spell',
-      startStage: effects.growth.startStage,
-      endStage: effects.growth.endStage,
-      week: game.day,
-    });
+    growthText = effects.growth.text || '';
   }
 
   const spread = awardAbundanceSpreadWithEvents(game, 'overworld_spell_growth');

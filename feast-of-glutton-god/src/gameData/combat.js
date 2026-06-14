@@ -1,4 +1,5 @@
-import { getStage, getTileSize, getMovement, advanceStage, getHpBonus } from "./stages.js";
+import { getStage, getTileSize, getMovement, getHpBonus } from "./stages.js";
+import { advanceStageUniversal } from "./growthPresentation.js";
 import { addCorruption } from "./corruption.js";
 import { getCombatModifiers } from "./stagePerks.js";
 import { createEnemy } from "./enemies.js";
@@ -220,7 +221,7 @@ export function attackUnit(combat, attacker, target) {
 }
 
 export function applyGrowth(unit, stages = 1) {
-  const result = advanceStage(unit, stages);
+  const result = advanceStageUniversal(unit, stages);
   const endStage = getStage(unit.lbs).id;
   const hpMult = getHpBonus(endStage) + 0.15;
   const hpBonus = Math.floor(unit.maxHp * hpMult * stages);

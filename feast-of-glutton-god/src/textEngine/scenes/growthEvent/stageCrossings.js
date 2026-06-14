@@ -1,94 +1,87 @@
 // ═══════════════════════════════════════════════════════════════
-// GROWTH EVENT — per-stage crossing lexicon. Unique flavor for the
-// moment a girl crosses INTO a named weight stage. Milestone stages
-// (Chubby/Fat/Enormous/Blob/Leviathan) run deeper. Personas extend
-// grow.crossingDialogue per girl.
+// GROWTH EVENT — per-stage crossing lexicon (15-tier ladder).
+// Physical sensation only — no size stage names in prose.
 // ═══════════════════════════════════════════════════════════════
 import { registerPool } from '../../engine.js';
 
-// ── grow.crossing ──────────────────────────────────────────────
-// Shape: FULL SENTENCE. Keyed on endStage (the stage just crossed into).
 registerPool('grow.crossing', [
   { when: {}, text: [
     'She settles into a size she wasn\'t, a little while ago.',
     'A line gets quietly crossed, and there\'s no crossing back.',
   ] },
-  // 1 Slim
   { when: { endStage: 1 }, text: [
-    'The last of the hard angles soften; she\'s slim now, but only barely.',
-    'Whatever sharpness she had blurs gently into slim.',
+    'The last hard angles soften; curves arrive like a secret finally spoken aloud.',
+    'Whatever sharpness she had blurs into gentle roundness — unmistakable now, impossible to deny.',
   ] },
-  // 2 Soft
   { when: { endStage: 2 }, text: [
-    'She crosses into genuinely soft — the kind you can\'t pass off as anything else.',
-    'There\'s give to her everywhere now. Soft is the honest word for it.',
+    'Her belly rounds outward for real; thighs brush, hips widen, and the mirror stops arguing.',
+    'There\'s give to her everywhere now — plush, honest, and growing warmer by the breath.',
   ] },
-  // 3 Chubby (milestone — first undeniable)
   { when: { endStage: 3 }, text: [
-    'And there it is: chubby, plainly and finally, no more hedging.',
-    'She crosses into chubby and feels the word land — the first one she can\'t argue with.',
-    'Soft tips over into chubby, the curve of her belly now leading the way.',
-    'This is the size where the old clothes go in a box. Chubby, and climbing.',
+    'She thickens past mere softness into something that sways when she walks and commands when she stands still.',
+    'The old clothes go in a box; her presence fills doorways before her body quite does.',
+    'Curves deepen like poured honey — belly leading, hips following, and hunger smiling behind.',
   ] },
-  // 4 Plump
   { when: { endStage: 4 }, text: [
-    'Chubby rounds out into plump, full and unmistakable.',
-    'She thickens past chubby into something richer — plump, and wearing it well.',
+    'Doorways feel narrower; chairs protest sooner; she notices the world measuring her differently.',
+    'She thickens into magnificence — every step a little earthquake of jiggle, every breath a little victory.',
   ] },
-  // 5 Heavy
   { when: { endStage: 5 }, text: [
-    'She crosses into heavy, the weight announcing itself in every motion.',
-    'Plump deepens into heavy; she feels the difference in her knees, her breath, her balance.',
+    'She towers now — not metaphorically. Heads tilt up. Floors remember her longer.',
+    'Strength and size braid together; her belly hangs heavy and proud, and ordinary people look small beside her.',
   ] },
-  // 6 Fat (milestone)
   { when: { endStage: 6 }, text: [
-    'And now the only word that fits is fat. She crosses into it whole.',
-    'Heavy gives way to fat — no softer word survives the size of her now.',
-    'She tips into fat, and the room rearranges itself a little to make room.',
-    'Fat, properly fat, the kind that changes how a doorway feels. She\'s there now.',
+    'Her footfalls send tremors through floorboards; mortals scatter with delighted alarm.',
+    'She has outgrown the language of "tall" — this is something that reshapes rooms by entering them.',
   ] },
-  // 7 Very Fat
   { when: { endStage: 7 }, text: [
-    'She crosses into very fat, past the point where ordinary furniture was ever the plan.',
-    'Fat deepens into very fat, every surface she uses now chosen for how much it can hold.',
+    'She swells until she could curl around treasure — or a village — and still have softness to spare.',
+    'Heat rolls off her in waves; the air tastes like indulgence, and furniture has given up pretending.',
+    'At this scale she hoards flesh the way legends hoard gold — warm, vast, and impossible to ignore.',
   ] },
-  // 8 Enormous (milestone)
   { when: { endStage: 8 }, text: [
-    'Enormous. The word stops being an exaggeration and becomes a measurement.',
-    'She crosses into enormous, and the scale of her becomes the first thing any room is about.',
-    'Very fat rolls over into enormous — a size that reorganizes everything around her.',
-    'She settles into enormous like a landmark settling into a landscape.',
+    'Halls shrink around her; ceilings feel lower though they have not moved.',
+    'She is geography now — movement slow, presence absolute, hunger a weather pattern.',
+    'Stone and timber remember their purpose is to contain mortals, not whatever she is becoming.',
   ] },
-  // 9 Colossal
   { when: { endStage: 9 }, text: [
-    'She crosses into colossal, vast beyond what most rooms were built to consider.',
-    'Enormous gives way to colossal, and movement becomes a project rather than a reflex.',
+    'Each breath rearranges the air; each inch gained feels like a decree the world must obey.',
+    'Movement becomes labor — influence does not. She is heavy enough to be politics.',
+    'The ground dimples where she settles; onlookers forget their errands and stare like pilgrims.',
   ] },
-  // 10 Blob (milestone)
   { when: { endStage: 10 }, text: [
-    'She crosses into the size that has only one honest name left: blob.',
-    'Colossal surrenders to blob — a body that exists now mostly to be vast and fed.',
-    'She settles, finally, into a blob, the world rearranged permanently around her bulk.',
-    'There\'s no contour left to describe one piece at a time. She is, simply, a blob now.',
+    'Chambers were built for people; she is nearly built for chambers — filling them until worship feels practical.',
+    'She cannot stand without the world noticing; she cannot sit without the world changing shape.',
+    'Servants would need carts to feed her if servants still reached her lips without ladders.',
   ] },
-  // 11 Leviathan (milestone — top)
   { when: { endStage: 11 }, text: [
-    'And past even blob: leviathan, a size with no ceiling above it left to reach for.',
-    'She crosses into leviathan, the final word, the one nothing climbs beyond.',
-    'Blob deepens into leviathan — she has become something the building is built around.',
-    'Leviathan. There is no larger thing to become. She has arrived at the end of the scale.',
+    'She stops being mobile without help — and starts being inevitable. Command replaces wandering.',
+    'Walls crack from proximity alone; she is a landmark that breathes.',
+    'The city will come to her now, because she cannot reasonably go to it.',
+  ] },
+  { when: { endStage: 12 }, text: [
+    'Realms rearrange around her stillness — roads bend, rumors run faster than wagons.',
+    'She is a mountain of softness and authority; birds nest in the shadow of her curves.',
+    'To approach her is pilgrimage; to grow beside her is doctrine.',
+  ] },
+  { when: { endStage: 13 }, text: [
+    'Continents feel smaller — not because the map changed, but because she did.',
+    'Cults rise in her shadow with quiet devotion; the horizon is belly, thigh, and blessing.',
+    'She does not walk the world anymore. The world orbits her appetite.',
+  ] },
+  { when: { endStage: 14 }, text: [
+    'There is no larger thing left to become — only more of her, spreading like a feast that never ends.',
+    'Apotheosis feels less like lightning and more like settling: vast, warm, and final.',
+    'Gorgara\'s rival does not arrive with trumpets. She arrives with groaning stone and grateful screaming.',
+    'The scale has no ceiling left. She is the ceiling — soft, sacred, and still growing in legend.',
   ] },
 ]);
 
-// ── grow.crossingDialogue ──────────────────────────────────────
-// Shape: DIALOGUE BEAT. Keyed endStage band × corruption. priority
-// hard-gate prevents tier leak; personas.js layers per-girl voices.
 registerPool('grow.crossingDialogue', [
   { when: {}, priority: 1, text: ['', '', ''] },
-  // rounded band (3-5)
   { when: { endStageMin: 3, endStageMax: 5, corruption: 0 }, priority: 1, text: [
     '"When did this happen?" she says, half to herself.',
-    '"That word fits now. Huh," she says quietly.',
+    '"I can feel it in my knees," she murmurs, surprised and pleased.',
   ] },
   { when: { endStageMin: 3, endStageMax: 5, corruption: 1 }, priority: 1, text: [
     '"I keep crossing lines I said I wouldn\'t," she says, not sounding upset about it.',
@@ -96,7 +89,6 @@ registerPool('grow.crossingDialogue', [
   { when: { endStageMin: 3, endStageMax: 5, corruption: 2 }, priority: 1, text: [
     '"Good," she says simply, testing the new size with both hands. "Keep it coming."',
   ] },
-  // heavy band (6-8)
   { when: { endStageMin: 6, endStageMax: 8, corruption: 0 }, priority: 1, text: [
     '"I used to know exactly what I weighed," she says. "Now I just feel it before I see it."',
   ] },
@@ -106,14 +98,22 @@ registerPool('grow.crossingDialogue', [
   { when: { endStageMin: 6, endStageMax: 8, corruption: 2 }, priority: 1, text: [
     '"This is what I am now," she says, and there\'s no apology in it at all.',
   ] },
-  // vast band (9-11)
-  { when: { endStageMin: 9, corruption: 0 }, priority: 1, text: [
+  { when: { endStageMin: 9, endStageMax: 11, corruption: 0 }, priority: 1, text: [
     '"I don\'t think I understood it would go this far," she says, quietly awed.',
   ] },
-  { when: { endStageMin: 9, corruption: 1 }, priority: 1, text: [
+  { when: { endStageMin: 9, endStageMax: 11, corruption: 1 }, priority: 1, text: [
     '"There\'s no part of me that fits the old life," she says. "I stopped missing it."',
   ] },
-  { when: { endStageMin: 9, corruption: 2 }, priority: 1, text: [
+  { when: { endStageMin: 9, endStageMax: 11, corruption: 2 }, priority: 1, text: [
     '"All the way," she breathes. "I want all the way."',
+  ] },
+  { when: { endStageMin: 12, corruption: 0 }, priority: 1, text: [
+    '"The ground feels… far away," she says, voice echoing off cracked stone.',
+  ] },
+  { when: { endStageMin: 12, corruption: 1 }, priority: 1, text: [
+    '"Let them come to me," she says. "I have room for all of them."',
+  ] },
+  { when: { endStageMin: 12, corruption: 2 }, priority: 1, text: [
+    '"More," she whispers, and the walls shiver like they heard.',
   ] },
 ]);

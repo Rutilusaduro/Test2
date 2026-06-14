@@ -140,7 +140,10 @@ export function lbsForStage(stageId) {
 
 export function advanceStage(character, stages = 1, opts = {}) {
   const current = getStage(character.lbs).id;
-  const cap = opts.maxStage ?? character.sizeCap ?? MAX_STAGE_ID;
+  const defaultCap = character?.id === 'player' || character?.isPlayer
+    ? (character.sizeCap ?? MAX_STAGE_ID)
+    : MAX_STAGE_ID;
+  const cap = opts.maxStage ?? defaultCap;
   const next = Math.min(current + stages, cap, MAX_STAGE_ID);
   const startStage = current;
   if (next <= current) {

@@ -15,6 +15,7 @@ import './fragments.js';
 import './environment.js';
 import './stageCrossings.js';
 import './personas.js';
+import './worldReactions.js';
 
 // ── beat skeletons ─────────────────────────────────────────────
 // Each beat is a pool of FULL-SENTENCE skeletons; fragment slots live
@@ -80,8 +81,7 @@ function magnitudeTier({ stagesJumped = 0, malfunctionTier = null } = {}) {
   return 'notable';
 }
 
-// Which beats render at each magnitude. crossing only when a stage was crossed;
-// environment joins 'significant' once the body is large (endStage ≥ 6).
+// environment joins once the body is large (endStage ≥ 4); more beats at mythic scale.
 function beatsForMagnitude(tier, { stagesJumped = 0, endStage = 0 } = {}) {
   const crossed = stagesJumped >= 1;
   if (tier === 'dramatic') {
@@ -90,10 +90,12 @@ function beatsForMagnitude(tier, { stagesJumped = 0, endStage = 0 } = {}) {
   }
   if (tier === 'significant') {
     return ['ge.onset', 'ge.surge', 'ge.strain',
-      ...(endStage >= 6 ? ['ge.environmentBeat'] : []),
+      ...(endStage >= 4 ? ['ge.environmentBeat'] : []),
       ...(crossed ? ['ge.crossingBeat'] : []), 'ge.reaction', 'ge.settle'];
   }
-  return ['ge.onset', 'ge.surge', 'ge.reaction'];
+  return ['ge.onset', 'ge.surge',
+    ...(endStage >= 7 ? ['ge.environmentBeat'] : []),
+    ...(crossed ? ['ge.reaction'] : [])];
 }
 
 // ── context globals ────────────────────────────────────────────
@@ -125,7 +127,9 @@ export function buildGrowthGlobals(student, params = {}) {
 }
 
 function weightBandFromStage(stageId) {
-  const bands = { lean: [0, 2], mid: [3, 5], heavy: [6, 8], extreme: [9, 11] };
+  const bands = {
+    lean: [0, 2], mid: [3, 5], heavy: [6, 8], vast: [9, 11], world: [12, 14],
+  };
   for (const [band, [lo, hi]] of Object.entries(bands)) {
     if (stageId >= lo && stageId <= hi) return band;
   }
@@ -160,3 +164,4 @@ export function renderStageCrossingLine(student, { endStage = null, week = 1 } =
 }
 
 export { magnitudeTier };
+export { renderWorldGrowthReaction } from './worldReactions.js';

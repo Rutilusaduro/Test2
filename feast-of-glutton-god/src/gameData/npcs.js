@@ -1,4 +1,5 @@
 import { COMPANIONS } from "./companions.js";
+import { MAX_STAGE_ID } from "./stages.js";
 
 export const WORLD_NPCS = [
   {
@@ -139,6 +140,7 @@ export function createNpc(template) {
     gender: "she",
     pronouns: "she",
     isCompanion: false,
+    sizeCap: MAX_STAGE_ID,
   };
 }
 

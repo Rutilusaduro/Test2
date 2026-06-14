@@ -6,9 +6,8 @@ import { renderFlirt } from '../textEngine/scenes/npc/flirt.js';
 import { renderBless } from '../textEngine/scenes/npc/bless.js';
 import { renderFeast } from '../textEngine/scenes/npc/feast.js';
 import { renderIntimate } from '../textEngine/scenes/npc/intimate.js';
-import { renderGrowthScene } from '../textEngine/scenes/growthEvent/index.js';
 import { renderCombatBeat } from '../textEngine/scenes/combatText.js';
-import { advanceStage } from '../gameData/stages.js';
+import { applyGrowthWithPresentation } from '../gameData/growthPresentation.js';
 import { addCorruption } from '../gameData/corruption.js';
 import {
   awardRelationship,
@@ -107,12 +106,16 @@ function appendTierUp(result, npc, relResult) {
   return result;
 }
 
-function growNpc(npc, baseStages, method = 'feed') {
+function growNpc(npc, game, baseStages, method = 'feed') {
   const bonus = getGrowthStageBonus(npc, method);
   const stages = baseStages + bonus;
   const startStage = getStage(npc.lbs).id;
-  const growth = advanceStage(npc, stages);
-  return { ...growth, startStage, bonusStages: bonus };
+  const presentation = applyGrowthWithPresentation(npc, game, stages, { growthMethod: method });
+  return {
+    ...presentation,
+    startStage: presentation.startStage ?? startStage,
+    bonusStages: bonus,
+  };
 }
 
 let sessionHistory = null;
@@ -211,21 +214,13 @@ export function doFlirt(npc, player, game) {
 }
 
 export function doFeed(npc, player, game, feedType = 'hand') {
-  const startStage = getStage(npc.lbs).id;
   const baseStages = feedType === 'magical' ? 2 : 1;
-  const growth = growNpc(npc, baseStages, 'feed');
+  const growth = growNpc(npc, game, baseStages, 'feed');
   const text = renderFeed(npc, player, { feedType, location: game.region, history: getTextHistory(game) });
   addCorruption(npc, feedType === 'magical' ? 6 : 4);
   const relResult = applyRelationshipGain(npc, feedType === 'magical' ? 'feed_magical' : 'feed');
-  const growthText = renderGrowthScene(npc, {
-    growthMethod: 'feed',
-    startStage,
-    endStage: growth.endStage,
-    gainLbs: 10,
-    week: game.day,
-  });
   let result = appendTierUp({
-    text: text + '\n\n' + growthText, npc, growth,
+    text: text + '\n\n' + (growth.text || ''), npc, growth,
   }, npc, relResult);
   return withQuestProgress(game, npc, 'feed', { feedType }, result);
 }
@@ -237,9 +232,8 @@ export function doBless(npc, player, game, blessType = 'minor') {
   const costs = { minor: 5, major: 15, targeted: 10 };
   const cost = costs[blessType] || 5;
   if (!spendAP(game, cost)) return { text: 'Not enough Abundance Points.', npc, ok: false };
-  const startStage = getStage(npc.lbs).id;
   const baseStages = blessType === 'major' ? 2 : 1;
-  const growth = growNpc(npc, baseStages, 'blessing');
+  const growth = growNpc(npc, game, baseStages, 'blessing');
   const text = renderBless(npc, player, {
     blessType,
     zone: blessType === 'targeted' ? 'belly' : undefined,
@@ -248,14 +242,8 @@ export function doBless(npc, player, game, blessType = 'minor') {
   addCorruption(npc, blessType === 'major' ? 10 : 5);
   const awardKey = blessType === 'major' ? 'bless_major' : blessType === 'targeted' ? 'bless_targeted' : 'bless_minor';
   const relResult = applyRelationshipGain(npc, awardKey);
-  const growthText = renderGrowthScene(npc, {
-    growthMethod: 'blessing',
-    startStage,
-    endStage: growth.endStage,
-    week: game.day,
-  });
   let result = appendTierUp({
-    text: text + '\n\n' + growthText, npc, growth, ok: true,
+    text: text + '\n\n' + (growth.text || ''), npc, growth, ok: true,
   }, npc, relResult);
   return withQuestProgress(game, npc, 'bless', { blessType }, result);
 }
@@ -265,21 +253,14 @@ export function doFeast(npc, player, game) {
     return { text: getInteractionLockReason(npc, 'feast'), npc, ok: false };
   }
   if (!spendAP(game, 20)) return { text: 'Not enough Abundance Points for a feast.', npc, ok: false };
-  const startStage = getStage(npc.lbs).id;
-  const growth = growNpc(npc, 3, 'feast');
+  const growth = growNpc(npc, game, 3, 'feast');
   const text = renderFeast(npc, player, { history: getTextHistory(game) });
   addCorruption(npc, 15);
   const relResult = applyRelationshipGain(npc, 'feast');
-  const growthText = renderGrowthScene(npc, {
-    growthMethod: 'feast',
-    startStage,
-    endStage: growth.endStage,
-    week: game.day,
-  });
-  game.day += 1;
   let result = appendTierUp({
-    text: text + '\n\n' + growthText, npc, growth, ok: true,
+    text: text + '\n\n' + (growth.text || ''), npc, growth, ok: true,
   }, npc, relResult);
+  game.day += 1;
   return withQuestProgress(game, npc, 'feast', null, result);
 }
 
@@ -335,13 +316,11 @@ export function doSpecial(npc, player, game) {
     warlock: "You invoke Gorgara's Claim — hunger floods her until she moans your name.",
   };
   const line = bySubclass[player.subclassId] || byClass[player.classId] || byClass.cleric;
-  const startStage = getStage(npc.lbs).id;
-  const growth = growNpc(npc, 2, 'blessing');
+  const growth = growNpc(npc, game, 2, 'blessing');
   addCorruption(npc, 8);
   const relResult = applyRelationshipGain(npc, 'special');
-  const growthText = renderGrowthScene(npc, { growthMethod: 'blessing', startStage, endStage: growth.endStage, week: game.day });
   let result = appendTierUp({
-    text: line + '\n\n' + growthText, npc, growth,
+    text: line + '\n\n' + (growth.text || ''), npc, growth,
   }, npc, relResult);
   return withQuestProgress(game, npc, 'special', null, result);
 }
@@ -350,19 +329,12 @@ export function doIntimate(npc, player, game) {
   if (!canUnlockInteraction(npc, 'intimate')) {
     return { text: getInteractionLockReason(npc, 'intimate'), npc, ok: false };
   }
-  const startStage = getStage(npc.lbs).id;
-  const growth = growNpc(npc, 2, 'intimate');
+  const growth = growNpc(npc, game, 2, 'intimate');
   addCorruption(npc, 5);
   const relResult = applyRelationshipGain(npc, 'intimate');
   const sceneText = renderIntimate(npc, player, { location: game.region, history: getTextHistory(game) });
-  const growthText = renderGrowthScene(npc, {
-    growthMethod: 'intimate',
-    startStage,
-    endStage: growth.endStage,
-    week: game.day,
-  });
   let result = appendTierUp({
-    text: sceneText + '\n\n' + growthText, npc, growth,
+    text: sceneText + '\n\n' + (growth.text || ''), npc, growth,
   }, npc, relResult);
   return withQuestProgress(game, npc, 'intimate', null, result);
 }
