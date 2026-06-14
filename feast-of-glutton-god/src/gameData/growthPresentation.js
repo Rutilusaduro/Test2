@@ -30,6 +30,7 @@ export function applyGrowthWithPresentation(character, game, stages = 1, opts = 
     growthMethod: opts.growthMethod ?? opts.method ?? 'general',
     observer: opts.observer ?? null,
     week: game?.day ?? 1,
+    raisedBy: opts.raisedBy,
   });
 
   return { ...result, ...narrative };
@@ -44,6 +45,7 @@ export function buildGrowthNarrative(character, game, params) {
     growthMethod,
     observer,
     week,
+    raisedBy,
   } = params;
 
   const locale = getLocaleKey(regionId);
@@ -91,7 +93,7 @@ export function buildGrowthNarrative(character, game, params) {
       stagesJumped,
       regionId,
       growthMethod,
-      raisedBy: opts.raisedBy ?? (character?.id === game.player?.id ? 'self' : 'player'),
+      raisedBy: raisedBy ?? (character?.id === game.player?.id ? 'self' : 'player'),
     });
     persistentReactionLines = reaction.lines ?? [];
   }
