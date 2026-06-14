@@ -1,3 +1,4 @@
+import '../dimensions/gameSelectors.js';
 import './npc/unmet.js';
 import './npc/observe.js';
 import './npc/feed.js';
@@ -20,6 +21,7 @@ import './growth/index.js';
 import './quests/index.js';
 import './leveling/index.js';
 import './dm/index.js';
+import './dm/combat.js';
 
 export { renderUnmetDescriptor } from './npc/unmet.js';
 export { renderObserve, POSES } from './npc/observe.js';
@@ -36,3 +38,10 @@ export {
   resolveGrowthPoolKey,
   buildGrowthProseGlobals,
 } from './growth/index.js';
+export {
+  renderCombatIntro,
+  renderCombatOutro,
+  buildCombatIntro,
+  buildCombatWrapup,
+  getEnemySizeBand,
+} from './dm/combat.js';

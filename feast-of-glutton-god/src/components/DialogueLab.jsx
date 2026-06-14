@@ -15,6 +15,9 @@ import { renderFeast } from "../textEngine/scenes/npc/feast.js";
 import { renderIntimate } from "../textEngine/scenes/npc/intimate.js";
 import { renderGrowthScene } from "../textEngine/scenes/growthEvent/index.js";
 import { renderCombatBeat } from "../textEngine/scenes/combatText.js";
+import { renderCombatIntro, renderCombatOutro } from "../textEngine/scenes/dm/combat.js";
+import { ENEMY_TYPES } from "../gameData/enemies.js";
+import { REGIONS } from "../gameData/regions.js";
 import { resolveGrowthZone } from "../textEngine/growthLexicon.js";
 import "../textEngine/growthLexicon.js";
 
@@ -25,7 +28,9 @@ const REL_POINTS = { 0: 5, 1: 20, 2: 40, 3: 60, 4: 80, 5: 95 };
 const POSES = ["standing", "sitting", "walking"];
 const FEED_TYPES = ["hand", "magical", "feast"];
 const BLESS_TYPES = ["minor", "major", "targeted"];
-const COMBAT_ACTIONS = ["attack", "feed", "growth", "convert"];
+const COMBAT_VICTORIES = ["win", "converted", "defeat"];
+const ENEMY_TYPE_IDS = Object.keys(ENEMY_TYPES);
+const REGION_IDS = REGIONS.map((r) => r.id);
 
 const DEBUG_CHARACTERS = [
   ...COMPANIONS.map((c) => ({
@@ -107,6 +112,55 @@ const SECTIONS = {
     params: [...STATE_PARAMS, "combatAction"],
     fn: (s, opts) => renderCombatBeat(s, { interaction: opts.combatAction, trace: opts.trace }),
   },
+  "dm.combat.intro": {
+    params: ["enemyType", "region", "enemyCount"],
+    fn: (_s, opts) => {
+      const enemyType = opts.enemyType === RANDOM ? pick(ENEMY_TYPE_IDS) : opts.enemyType;
+      const region = opts.region === RANDOM ? pick(REGION_IDS) : opts.region;
+      const count = opts.enemyCount === RANDOM ? pick(["1", "2"]) : Number(opts.enemyCount);
+      const template = ENEMY_TYPES[enemyType] || ENEMY_TYPES.harvest_harpy;
+      const enemies = Array.from({ length: count }, (_, i) => ({
+        name: `${template.name} ${i + 1}`,
+        type: enemyType,
+        typeId: enemyType,
+        lbs: template.startLbs,
+        startLbs: template.startLbs,
+        startStage: 1,
+        role: template.role,
+        pronouns: "they",
+        hp: template.hp,
+      }));
+      const combat = { enemies, regionId: region };
+      const game = { player: MOCK_PLAYER, region };
+      return renderCombatIntro(game, combat, { trace: opts.trace });
+    },
+  },
+  "dm.combat.outro": {
+    params: ["enemyType", "region", "victoryType"],
+    fn: (_s, opts) => {
+      const enemyType = opts.enemyType === RANDOM ? pick(ENEMY_TYPE_IDS) : opts.enemyType;
+      const region = opts.region === RANDOM ? pick(REGION_IDS) : opts.region;
+      const victory = opts.victoryType === RANDOM ? pick(COMBAT_VICTORIES) : opts.victoryType;
+      const template = ENEMY_TYPES[enemyType] || ENEMY_TYPES.harvest_harpy;
+      const wrapup = {
+        victory: victory === "defeat" ? "lose" : victory,
+        region,
+        enemies: [{
+          name: template.name,
+          type: enemyType,
+          startStage: 1,
+          endStage: victory === "defeat" ? 1 : 5,
+          lbs: template.startLbs + (victory === "defeat" ? 0 : 80),
+          converted: victory === "converted",
+          killed: victory === "win",
+          pronouns: "they",
+        }],
+        allies: [{ name: MOCK_PLAYER.name, lbs: MOCK_PLAYER.lbs, isPlayer: true }],
+      };
+      const game = { player: MOCK_PLAYER, region, party: [] };
+      return renderCombatOutro(game, wrapup, { trace: opts.trace });
+    },
+  },
   "char.desc": {
     params: STATE_PARAMS,
     fn: (s, opts) => render("{char.desc}", createContext({ subject: s, ref: MOCK_PLAYER, week: 3 }), { trace: opts.trace }),
@@ -126,7 +180,11 @@ const PARAM_DEFS = [
   { key: "feedType", label: "Feed type", options: FEED_TYPES },
   { key: "blessType", label: "Bless type", options: BLESS_TYPES },
   { key: "growthZone", label: "Growth zone", options: ["belly", "lower_body", "curves", "full", "bust", "random"], optionLabel: (v) => v === "random" ? "auto (body type)" : v },
-  { key: "combatAction", label: "Combat action", options: COMBAT_ACTIONS },
+  { key: "combatAction", label: "Combat action", options: ["attack", "feed", "growth", "convert"] },
+  { key: "enemyType", label: "Enemy type", options: ENEMY_TYPE_IDS },
+  { key: "region", label: "Region", options: REGION_IDS },
+  { key: "enemyCount", label: "Enemy count", options: ["1", "2"] },
+  { key: "victoryType", label: "Victory type", options: COMBAT_VICTORIES },
 ];
 
 function rollSample(params) {
@@ -167,6 +225,10 @@ function rollSample(params) {
     blessType: v.blessType,
     growthZone: v.growthZone,
     combatAction: v.combatAction,
+    enemyType: v.enemyType,
+    region: v.region,
+    enemyCount: v.enemyCount,
+    victoryType: v.victoryType,
   };
   const text = SECTIONS[v.section].fn(student, opts);
   const nodes = trace.filter((t) => t.leaf && t.text.trim() && !t.key.startsWith("subject."));

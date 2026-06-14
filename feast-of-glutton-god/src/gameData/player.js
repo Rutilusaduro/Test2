@@ -113,6 +113,9 @@ export function createNewGame(name, classId, options = {}) {
       visitedRegions: { harvest_hearth: true },
       lastHintDay: null,
     },
+    settings: {
+      skipCombatScenes: false,
+    },
   };
   return ensurePartyUniversalSize(game);
 }

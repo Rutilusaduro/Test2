@@ -41,7 +41,7 @@ function ActionPip({ label, ready, spentFlash }) {
   );
 }
 
-export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebugContext }) {
+export default function CombatView({ game, combat, onUpdateCombat, onEnd, onVictory, introBlocking, onDebugContext }) {
   const player = combat.allies.find((a) => a.isPlayer) || game.player;
   const [mode, setMode] = useState("move");
   const [growthText, setGrowthText] = useState("");
@@ -50,7 +50,6 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebu
   const [actionConfirm, setActionConfirm] = useState("");
   const [logOpen, setLogOpen] = useState(false);
   const [flashAction, setFlashAction] = useState(null);
-  const [showIntro, setShowIntro] = useState(Boolean(combat.introLine));
   const [pendingSpell, setPendingSpell] = useState(null);
   const [spellTargetIds, setSpellTargetIds] = useState([]);
 
@@ -100,10 +99,18 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebu
     setTimeout(() => setFlashAction(null), 600);
   };
 
+  const sceneBlocked = Boolean(introBlocking) || Boolean(game.combatWrapup);
+
   const update = (c, confirm = "") => {
     onUpdateCombat({ ...c });
     if (confirm) setActionConfirm(confirm);
-    if (c.victory) setTimeout(() => onEnd(c), 1500);
+    if (c.victory) {
+      const skip = game.settings?.skipCombatScenes;
+      setTimeout(() => {
+        if (skip) onEnd(c);
+        else onVictory?.(c);
+      }, 1500);
+    }
     reportCombat({ lastText: growthText || c.log.slice(-1)[0] });
   };
 
@@ -165,7 +172,7 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebu
   };
 
   const beginSpellCast = (spell) => {
-    if (!isPlayerTurn(combat) || showIntro) return;
+    if (!isPlayerTurn(combat) || sceneBlocked) return;
     const targeting = deriveSpellTargeting(spell);
     if (!targetingNeedsInput(targeting)) {
       const c = cloneCombat();
@@ -212,7 +219,7 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebu
   };
 
   const handleCellClick = (x, y) => {
-    if (showIntro || combat.victory || !isPlayerTurn(combat)) return;
+    if (sceneBlocked || combat.victory || !isPlayerTurn(combat)) return;
     const c = cloneCombat();
     const active = getActiveUnit(c);
 
@@ -369,18 +376,6 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebu
 
   return (
     <div className="app combat-view">
-      {showIntro && combat.introLine && (
-        <div className="combat-intro-overlay">
-          <div className="panel panel--narration combat-intro">
-            <h2>Encounter</h2>
-            <p className="prose">{combat.introLine}</p>
-            <button type="button" className="primary" onClick={() => setShowIntro(false)}>
-              Engage!
-            </button>
-          </div>
-        </div>
-      )}
-
       <div className="header">
         <h1>Round {turnSummary?.round ?? combat.turn} — {turnSummary?.active ?? "…"}</h1>
         <p className="subtitle">
@@ -473,7 +468,7 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebu
                 key={s.id}
                 className={pendingSpell?.id === s.id ? "primary" : ""}
                 onClick={() => cast(s)}
-                disabled={!isPlayerTurn(combat) || !canCast || showIntro}
+                disabled={!isPlayerTurn(combat) || !canCast || sceneBlocked}
               >
                 {s.name} {s.slotLevel ? `(L${s.slotLevel})` : "(cantrip)"}
                 {s.apCost ? ` / ${s.apCost} AP` : ""}
@@ -496,17 +491,17 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebu
               <button onClick={cancelSpellCast}>Cancel</button>
             </>
           )}
-          <button onClick={() => { setMode("move"); setActionConfirm(""); cancelSpellCast(); }} disabled={!isPlayerTurn(combat) || showIntro}>Move</button>
+          <button onClick={() => { setMode("move"); setActionConfirm(""); cancelSpellCast(); }} disabled={!isPlayerTurn(combat) || sceneBlocked}>Move</button>
           <button
             onClick={() => {
               if (mode === "attack" && selectedEnemy) confirmAttack();
               else { setMode("attack"); setActionConfirm("Tap an enemy, then Attack again."); }
             }}
-            disabled={!isPlayerTurn(combat) || !turnSummary?.action || showIntro}
+            disabled={!isPlayerTurn(combat) || !turnSummary?.action || sceneBlocked}
           >
             Attack
           </button>
-          <button onClick={() => { setMode("feed"); cancelSpellCast(); setActionConfirm("Tap an enemy to feed."); }} disabled={!isPlayerTurn(combat) || showIntro}>Feed</button>
+          <button onClick={() => { setMode("feed"); cancelSpellCast(); setActionConfirm("Tap an enemy to feed."); }} disabled={!isPlayerTurn(combat) || sceneBlocked}>Feed</button>
           {bonusActions.map((ba) => (
             <button key={ba.id} onClick={() => doBonus(ba.id)} disabled={!isPlayerTurn(combat) || !turnSummary?.bonus}>
               {ba.label}

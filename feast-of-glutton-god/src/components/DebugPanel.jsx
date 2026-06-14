@@ -139,13 +139,25 @@ export default function DebugPanel({
                 ))}
               </div>
               <div style={{ fontSize: 10, color: "#888", marginBottom: 6 }}>JUMP TO REGION</div>
-              <div style={{ display: "flex", gap: 4, flexWrap: "wrap" }}>
+              <div style={{ display: "flex", gap: 4, flexWrap: "wrap", marginBottom: 12 }}>
                 {REGIONS.map((r) => (
                   <button key={r.id} type="button" style={{ ...C.smBtn, background: game.region === r.id ? "rgba(139,34,82,0.5)" : undefined }} onClick={() => jumpRegion(r.id)}>
                     {r.name}
                   </button>
                 ))}
               </div>
+              <div style={{ fontSize: 10, color: "#888", marginBottom: 6 }}>COMBAT SCENES</div>
+              <label style={{ fontSize: 11, color: "#aaa", display: "flex", gap: 8, alignItems: "center" }}>
+                <input
+                  type="checkbox"
+                  checked={game.settings?.skipCombatScenes ?? false}
+                  onChange={(e) => onUpdateGame?.((g) => ({
+                    ...g,
+                    settings: { ...(g.settings || {}), skipCombatScenes: e.target.checked },
+                  }))}
+                />
+                Skip combat DM intro/outro scenes
+              </label>
             </div>
           )}
 

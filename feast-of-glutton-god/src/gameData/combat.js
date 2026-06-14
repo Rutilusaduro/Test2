@@ -25,8 +25,6 @@ import { getSpellSaveDC } from "./stats.js";
 import { resolveCastCost, getSpellPowerMultiplier } from "./spellSlots.js";
 import { getSpellForCast } from "./spells.js";
 import { awardFatteningXp } from "./leveling.js";
-import { getRegion } from "./regions.js";
-import { renderCombatEncounterIntro } from "../textEngine/scenes/combat/encounter.js";
 
 const GRID_SIZE = 10;
 
@@ -54,20 +52,21 @@ export function createCombatState(player, party, enemyTypeId, regionId) {
     prepareCombatUnit({ ...player, x: 1, y: 4, isPlayer: true }, "ally", 0),
     ...party.map((c, i) => prepareCombatUnit({ ...c, x: 1, y: 6 + i * 2, isPlayer: false }, "ally", i + 1)),
   ];
-  const preparedEnemies = enemies.map((e, i) => prepareCombatUnit(e, "enemy", i));
+  const preparedEnemies = enemies.map((e, i) => {
+    const unit = prepareCombatUnit(e, "enemy", i);
+    return {
+      ...unit,
+      type: e.typeId || e.id,
+      startLbs: e.lbs,
+      startStage: getStage(e.lbs).id,
+    };
+  });
 
   const turnState = initCombatTurnState(allies, preparedEnemies);
   beginTurn(turnState, null);
 
   const log = ["Combat begins! Abundance fills the air."];
   if (turnState.log?.length) log.push(...turnState.log);
-
-  const region = getRegion(regionId);
-  const introLine = renderCombatEncounterIntro(
-    { player, region },
-    preparedEnemies,
-    { regionId, regionName: region?.name },
-  );
 
   const combat = {
     gridSize: GRID_SIZE,
@@ -80,7 +79,7 @@ export function createCombatState(player, party, enemyTypeId, regionId) {
     regionId,
     log,
     lastGrowth: null,
-    introLine,
+    introDismissed: false,
     enemyTypeId: enemyTypeId || preparedEnemies[0]?.typeId,
   };
 

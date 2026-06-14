@@ -163,7 +163,8 @@ button.primary:hover:not(:disabled) {
 .combat-cell.spell-target { outline: 2px solid var(--gold-bright); }
 .combat-cell.selected { outline: 2px solid var(--rose); }
 
-.combat-intro-overlay {
+.combat-intro-overlay,
+.combat-scene-overlay {
   position: fixed;
   inset: 0;
   z-index: 200;
@@ -174,14 +175,20 @@ button.primary:hover:not(:disabled) {
   padding: 1rem;
 }
 
-.combat-intro {
+.combat-intro,
+.combat-scene-popup {
   max-width: 520px;
   width: 100%;
 }
 
-.combat-intro .primary {
+.combat-intro .primary,
+.combat-scene-popup .primary {
   margin-top: 1rem;
   width: 100%;
+}
+
+.combat-scene-popup .prose + .prose {
+  margin-top: 0.75rem;
 }
 
 .log {
