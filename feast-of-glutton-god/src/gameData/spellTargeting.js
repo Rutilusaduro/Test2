@@ -20,6 +20,10 @@ const SPELL_TARGET_OVERRIDES = {
   indulgent_touch: { kind: TARGET_KIND.TOUCH_ENEMY, range: 1 },
   swell_kiss: { kind: TARGET_KIND.TOUCH_ENEMY, range: 1 },
   softening_ray: { kind: TARGET_KIND.MULTI_ENEMY, range: 6, maxTargets: 3 },
+  caloric_bolt: { kind: TARGET_KIND.RANGED_ENEMY, range: 6 },
+  honeyed_lash: { kind: TARGET_KIND.TOUCH_ENEMY, range: 1 },
+  gluttons_ember: { kind: TARGET_KIND.RANGED_ENEMY, range: 6 },
+  syrup_splash: { kind: TARGET_KIND.AOE_CENTER, range: 5, radius: 2 },
   gorgaras_spark: { kind: TARGET_KIND.RANGED_ENEMY, range: 6 },
   feast_song: { kind: TARGET_KIND.RANGED_ENEMY, range: 6 },
   prayer_full_belly: { kind: TARGET_KIND.RANGED_ALLY, range: 6 },
@@ -47,6 +51,16 @@ export function deriveSpellTargeting(spell) {
   if (override) return { maxTargets: 1, radius: 0, ...override };
 
   const eff = spell.effect || {};
+  if (eff.damage) {
+    const d = eff.damage;
+    if (d.save && (d.aoe || eff.aoe)) {
+      return { kind: TARGET_KIND.AOE_CENTER, range: d.range ?? 5, radius: d.radius ?? 2, maxTargets: 99 };
+    }
+    if (d.melee || d.range === 1) {
+      return { kind: TARGET_KIND.TOUCH_ENEMY, range: 1, maxTargets: 1, radius: 0 };
+    }
+    return { kind: TARGET_KIND.RANGED_ENEMY, range: d.range ?? 6, maxTargets: 1, radius: 0 };
+  }
   if (eff.selfGrowth && !eff.growth && !eff.drain && !eff.aoe) {
     return { kind: TARGET_KIND.SELF, range: 0, maxTargets: 1, radius: 0 };
   }

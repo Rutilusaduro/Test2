@@ -11,6 +11,63 @@ export const CANTRIPS = [
   { id: 'flavor_burst', name: 'Flavor Burst', slotLevel: 0, school: 'abundance', desc: 'Conjure delicious food that tempts and feeds.', effect: { feed: 1, corruption: 3 }, environment: { fertile: true, soften: true } },
   { id: 'jiggle_charm', name: 'Jiggle Charm', slotLevel: 0, school: 'enchantment', desc: 'Hypnotic sway that charms and distracts.', effect: { charm: 1 }, environment: { charm: true } },
   { id: 'softening_ray', name: 'Softening Ray', slotLevel: 0, school: 'abundance', desc: 'A ray of plush caloric energy.', effect: { growth: 1, corruption: 2 }, environment: { soften: true, swell: true } },
+  {
+    id: 'caloric_bolt', name: 'Caloric Bolt', slotLevel: 0, school: 'evocation',
+    desc: 'Hurl a bolt of concentrated caloric force. Spell attack for overindulgence damage.',
+    effect: {
+      damage: {
+        dice: { count: 1, sides: 10 },
+        damageType: 'overindulgence',
+        spellAttack: true,
+        growthConversion: 0.12,
+        range: 6,
+      },
+    },
+  },
+  {
+    id: 'honeyed_lash', name: 'Honeyed Lash', slotLevel: 0, school: 'conjuration',
+    desc: 'A whip of golden syrup snaps at a foe in melee reach. Spell attack.',
+    effect: {
+      damage: {
+        dice: { count: 1, sides: 8 },
+        damageType: 'pleasurable_pressure',
+        spellAttack: true,
+        melee: true,
+        growthConversion: 0.18,
+        range: 1,
+      },
+    },
+  },
+  {
+    id: 'gluttons_ember', name: "Glutton's Ember", slotLevel: 0, school: 'abundance',
+    desc: 'A spark of divine excess burns the target — abundance damage with a sting of corruption.',
+    effect: {
+      damage: {
+        dice: { count: 1, sides: 8 },
+        damageType: 'abundance_overload',
+        spellAttack: true,
+        corruptionOnHit: 3,
+        growthConversion: 0.2,
+        range: 6,
+      },
+    },
+  },
+  {
+    id: 'syrup_splash', name: 'Syrup Splash', slotLevel: 0, school: 'conjuration',
+    desc: 'Splash hot syrup in a small area. Creatures make a DEX save or take sticky abundance damage.',
+    effect: {
+      damage: {
+        dice: { count: 1, sides: 6 },
+        damageType: 'overindulgence',
+        save: 'dex',
+        halfOnSuccess: true,
+        aoe: true,
+        radius: 2,
+        range: 5,
+        growthConversion: 0.15,
+      },
+    },
+  },
 ];
 
 /** Spells granted by specific subclasses or shared across classes. */

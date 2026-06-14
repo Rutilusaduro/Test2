@@ -11,12 +11,17 @@ import {
 import {
   resolveAttackRoll,
   resolveMeleeDamage,
+  resolveSpellDamage,
+  resolveEffectWithSave,
   applyCombatDamage,
   applyAttackCritEffects,
   formatAttackSummary,
+  formatSaveSummary,
   ATTACK_TYPES,
+  DAMAGE_TYPES,
   getAttackReach,
 } from "./combatRolls.js";
+import { getSpellSaveDC } from "./stats.js";
 import { resolveCastCost, getSpellPowerMultiplier } from "./spellSlots.js";
 import { getSpellForCast } from "./spells.js";
 import { awardFatteningXp } from "./leveling.js";
@@ -321,17 +326,80 @@ export function castSpell(combat, caster, spell, target, opts = {}) {
     return combat;
   }
 
-  if (castSpellData.slotLevel > 0 && entry && !canUseAction(combat.turnState, entry.id, ACTION_TYPES.ACTION)) {
+  const effPreview = castSpellData.effect || {};
+  const isDamagingCantrip = castSpellData.slotLevel === 0 && effPreview.damage;
+  const spendsAction = castSpellData.slotLevel > 0 || isDamagingCantrip || effPreview.feed;
+
+  if (spendsAction && entry && !canUseAction(combat.turnState, entry.id, ACTION_TYPES.ACTION)) {
     combat.log.push("Action already used this turn!");
-    if (cost.method === "slot") {
-      // refund slot — simplified: don't spend if blocked
-    }
     return combat;
   }
 
   const power = getSpellPowerMultiplier(caster, cost.slotLevelUsed || castSpellData.slotLevel || 1);
   const eff = { ...castSpellData.effect };
   const scale = (n) => (typeof n === "number" ? Math.max(1, Math.round(n * power)) : n);
+
+  const applyGrowthFn = (unit, stages) => {
+    const g = applyGrowth(unit, stages);
+    onUnitGrew(combat.turnState, unit, g);
+    combat.lastGrowth = { unit, ...g };
+    maybeAwardFatteningXp(combat, caster, unit, g);
+    return g;
+  };
+
+  if (eff.damage) {
+    const dmgSpec = eff.damage;
+    const damageTargets = opts.targets?.length ? opts.targets : [target].filter(Boolean);
+    const dice = dmgSpec.dice ?? { count: 1, sides: 8 };
+    const damageType = dmgSpec.damageType ?? DAMAGE_TYPES.ABUNDANCE_OVERLOAD;
+
+    for (const t of damageTargets) {
+      if (!t || t.hp <= 0) continue;
+
+      if (dmgSpec.save) {
+        const dc = getSpellSaveDC(caster);
+        const rolled = resolveSpellDamage(caster, { ...dmgSpec, dice, damageType });
+        const result = resolveEffectWithSave(t, dmgSpec, {
+          saveStat: dmgSpec.save,
+          dc,
+          damage: rolled.total,
+          halfOnSuccess: dmgSpec.halfOnSuccess !== false,
+          applyGrowthFn,
+        });
+        combat.log.push(formatSaveSummary(result.save));
+        if (result.applied?.hpDamage > 0) {
+          combat.log.push(`${t.name} takes ${result.applied.hpDamage} HP from ${castSpellData.name}.`);
+          if (result.applied.growthStages > 0) {
+            combat.log.push(`${t.name} swells from the impact!`);
+          }
+        } else {
+          combat.log.push(`${t.name} resists the worst of ${castSpellData.name}.`);
+        }
+      } else if (dmgSpec.spellAttack !== false) {
+        const attack = resolveAttackRoll(caster, t, {
+          attackType: ATTACK_TYPES.SPELL,
+          label: castSpellData.name,
+        });
+        if (attack.hit) {
+          const damage = resolveSpellDamage(caster, { ...dmgSpec, dice, damageType }, {
+            critical: attack.isCriticalHit,
+          });
+          const applied = applyCombatDamage(t, damage, { applyGrowthFn });
+          combat.log.push(formatAttackSummary(attack, damage, applied));
+          if (dmgSpec.corruptionOnHit) addCorruption(t, scale(dmgSpec.corruptionOnHit));
+        } else {
+          combat.log.push(`${castSpellData.name}: ${attack.naturalRoll} + ${attack.modifierTotal} = ${attack.total} vs AC ${attack.ac} — MISS`);
+        }
+      } else {
+        const damage = resolveSpellDamage(caster, { ...dmgSpec, dice, damageType });
+        const applied = applyCombatDamage(t, damage, { applyGrowthFn });
+        combat.log.push(`${t.name} takes ${applied.hpDamage} HP from ${castSpellData.name}.`);
+      }
+
+      if (t.hp <= 0) combat.log.push(`${t.name} falls!`);
+    }
+    checkVictory(combat);
+  }
 
   if (eff.heal && target) {
     target.hp = Math.min(target.maxHp, target.hp + scale(eff.heal));
@@ -389,7 +457,7 @@ export function castSpell(combat, caster, spell, target, opts = {}) {
   const costNote = cost.method === "ap" ? ` (${cost.apSpent} AP)` : cost.upcast ? " (upcast)" : "";
   combat.log.push(`Cast ${castSpellData.name}${costNote}.`);
 
-  if (entry && castSpellData.slotLevel > 0) spendAction(combat.turnState, entry.id, ACTION_TYPES.ACTION);
+  if (entry && spendsAction) spendAction(combat.turnState, entry.id, ACTION_TYPES.ACTION);
   return combat;
 }
 

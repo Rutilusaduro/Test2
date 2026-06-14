@@ -22,7 +22,7 @@ import { recordPuzzleSolvedForQuests } from "./hooks/puzzleHooks.js";
 import { applySolutionImmediate } from "./gameData/puzzleEngine.js";
 import { recordCombatVictory } from "./gameData/obstacleUnlocks.js";
 import { syncGateUnlocks } from "./gameData/regionObstacles.js";
-import { ensureSpellState, getCharacterSpells } from "./gameData/spellLearning.js";
+import { ensureSpellState, getCharacterSpells, ensureDamageCantrip } from "./gameData/spellLearning.js";
 import { autoPrepareSpells } from "./gameData/spellPreparation.js";
 import { completePendingLevelUp as completeLevelUpChoice } from "./gameData/levelUpChoices.js";
 import "./textEngine/scenes/index.js";
@@ -41,6 +41,7 @@ function migratePlayerSpells(player) {
   if (player.classId === 'wizard' && !player.spellsPrepared?.length) {
     autoPrepareSpells(player);
   }
+  ensureDamageCantrip(player);
 }
 
 function applyLevelUpResults(game, levelUps) {
