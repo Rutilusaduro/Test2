@@ -79,7 +79,7 @@ registerPool('npc.talk.topic', [
   ]},
 ]);
 
-export const TALK_TEMPLATE = '{npc.talk.greeting} {npc.talk.companion} {npc.talk.antagonist} {npc.talk.topic}';
+export const TALK_TEMPLATE = '{npc.talk.greeting} {npc.talk.companion} {npc.companion.softeningTier} {npc.talk.antagonist} {npc.talk.topic}';
 
 export function renderTalk(npc, player, opts = {}) {
   const wf = opts.game?.worldFlags ?? {};
@@ -92,6 +92,7 @@ export function renderTalk(npc, player, opts = {}) {
       location: opts.location,
       interaction: 'talk',
       role: npc.role,
+      level: player?.level ?? 1,
       escalationTier: wf.escalationTier ?? 0,
       act,
       consentState: opts.consentState,

@@ -1,4 +1,6 @@
 import './pools.js';
+import './milestones.js';
+import { MILESTONE_LEVELS } from './milestones.js';
 
 import { createContext, render } from '../../engine.js';
 import '../../modules.js';
@@ -11,15 +13,17 @@ function getLevelTier(level = 1) {
 }
 
 export function renderLevelUpText(key, player, options = {}) {
+  const level = options.level ?? player?.level;
   const ctx = createContext({
     subject: player,
     globals: {
-      level: options.level ?? player?.level,
-      levelTier: options.levelTier ?? getLevelTier(options.level ?? player?.level),
+      level,
+      levelTier: options.levelTier ?? getLevelTier(level),
       classId: player?.classId,
       subclassId: player?.subclassId,
       growthLevelUp: options.growthLevelUp ?? false,
       growthSpell: options.growthSpell ?? false,
+      isMilestone: MILESTONE_LEVELS.has(level),
       ...(options.globals ?? {}),
     },
   });
@@ -28,6 +32,15 @@ export function renderLevelUpText(key, player, options = {}) {
 
 export function buildLevelUpMessage(player, levelUpResult) {
   const parts = [];
+
+  // Milestone narration renders FIRST — ★ DM voice marks the event.
+  if (MILESTONE_LEVELS.has(levelUpResult.level)) {
+    const milestone = renderLevelUpText('levelup.milestone', player, {
+      level: levelUpResult.level,
+    });
+    if (milestone) parts.push(milestone);
+  }
+
   const celebration = renderLevelUpText('levelup.celebration', player, {
     level: levelUpResult.level,
     growthLevelUp: levelUpResult.growthLevelUp,
