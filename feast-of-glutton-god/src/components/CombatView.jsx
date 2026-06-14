@@ -7,7 +7,8 @@ import {
   getActiveUnit, isPlayerTurn, useBonusAction, getAvailableBonusActions,
 } from "../gameData/combat.js";
 import { getPreparedSpells } from "../gameData/spellPreparation.js";
-import { hasSpellSlot } from "../gameData/spellSlots.js";
+import { previewCastCost } from "../gameData/spellSlots.js";
+import { getSpellForCast } from "../gameData/spells.js";
 import { renderCombatNarration } from "../hooks/npcInteractions.js";
 import { renderGrowthScene } from "../textEngine/scenes/growthEvent/index.js";
 import { addBugNote, captureGameContext } from "../hooks/bugLog.js";
@@ -39,6 +40,33 @@ function ActionPip({ label, ready, spentFlash }) {
       <span className="action-pip__label">{label}</span>
     </span>
   );
+}
+
+function spellCostLabel(spell, player, overflowCast) {
+  const data = getSpellForCast(spell, overflowCast && spell.overflow);
+  const preview = previewCastCost(player, data, { overflow: overflowCast && spell.overflow });
+  const actionType = spell.actionType === "bonus" ? "Bonus" : "Action";
+  const level = spell.slotLevel ? `L${spell.slotLevel}` : "cantrip";
+  let pay = "Cantrip";
+  if (preview.ok) {
+    if (preview.method === "ap") pay = `AP ${preview.apSpent ?? data.apCost ?? "?"}`;
+    else if (preview.method === "slot") pay = "Slot";
+  } else {
+    pay = "—";
+  }
+  return `${spell.name} — ${actionType} · ${level} · ${pay}`;
+}
+
+function canAffordSpell(spell, player, overflowCast) {
+  return previewCastCost(
+    player,
+    getSpellForCast(spell, overflowCast && spell.overflow),
+    { overflow: overflowCast && spell.overflow },
+  ).ok;
+}
+
+function spellActionReady(spell, turnSummary) {
+  return spell.actionType === "bonus" ? turnSummary?.bonus : turnSummary?.action;
 }
 
 export default function CombatView({ game, combat, onUpdateCombat, onEnd, onVictory, introBlocking, onDebugContext }) {
@@ -165,7 +193,7 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onVict
       setGrowthText(gt);
       c.log.push(renderCombatNarration(c.lastGrowth.unit, "growth"));
     }
-    flashSpend("action");
+    flashSpend(spell.actionType === "bonus" ? "bonus" : "action");
     checkVictory(c);
     resetSpellMode();
     update(c, `Cast ${spell.name}.`);
@@ -173,6 +201,8 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onVict
 
   const beginSpellCast = (spell) => {
     if (!isPlayerTurn(combat) || sceneBlocked) return;
+    if (!spellActionReady(spell, turnSummary)) return;
+    if (!canAffordSpell(spell, player, overflowCast)) return;
     const targeting = deriveSpellTargeting(spell);
     if (!targetingNeedsInput(targeting)) {
       const c = cloneCombat();
@@ -462,16 +492,17 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onVict
         </label>
         <div className="btn-grid">
           {spells.map((s) => {
-            const canCast = s.slotLevel === 0 || hasSpellSlot(player, s.slotLevel) || (s.apCost && player.ap >= s.apCost);
+            const canCastResource = canAffordSpell(s, player, overflowCast);
+            const actionReady = spellActionReady(s, turnSummary);
             return (
               <button
                 key={s.id}
                 className={pendingSpell?.id === s.id ? "primary" : ""}
                 onClick={() => cast(s)}
-                disabled={!isPlayerTurn(combat) || !canCast || sceneBlocked}
+                disabled={!isPlayerTurn(combat) || !canCastResource || !actionReady || sceneBlocked}
+                title={spellCostLabel(s, player, overflowCast)}
               >
-                {s.name} {s.slotLevel ? `(L${s.slotLevel})` : "(cantrip)"}
-                {s.apCost ? ` / ${s.apCost} AP` : ""}
+                {spellCostLabel(s, player, overflowCast)}
               </button>
             );
           })}

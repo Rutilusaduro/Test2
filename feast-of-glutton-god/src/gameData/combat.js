@@ -24,6 +24,7 @@ import {
 import { getSpellSaveDC } from "./stats.js";
 import { resolveCastCost, getSpellPowerMultiplier } from "./spellSlots.js";
 import { getSpellForCast } from "./spells.js";
+import { renderCastFeedback } from "../textEngine/scenes/dm/cast.js";
 import { awardFatteningXp } from "./leveling.js";
 
 const GRID_SIZE = 10;
@@ -294,9 +295,9 @@ export function useBonusAction(combat, unit, actionId, target = null) {
 
 export { getAvailableBonusActions };
 
-export function feedTarget(combat, feeder, target, amount = 1) {
+export function feedTarget(combat, feeder, target, amount = 1, opts = {}) {
   const entry = getActiveEntry(combat.turnState);
-  if (entry && !canUseAction(combat.turnState, entry.id, ACTION_TYPES.ACTION)) {
+  if (!opts.skipActionSpend && entry && !canUseAction(combat.turnState, entry.id, ACTION_TYPES.ACTION)) {
     combat.log.push("Action already used this turn!");
     return combat;
   }
@@ -308,7 +309,7 @@ export function feedTarget(combat, feeder, target, amount = 1) {
   combat.log.push(`${feeder.name} feeds ${target.name} — she swells with pleasure!`);
   combat.lastGrowth = { unit: target, ...growth };
   if (entry) {
-    spendAction(combat.turnState, entry.id, ACTION_TYPES.ACTION);
+    if (!opts.skipActionSpend) spendAction(combat.turnState, entry.id, ACTION_TYPES.ACTION);
     onUnitGrew(combat.turnState, target, growth);
     if (combat.turnState.log?.length) combat.log.push(...combat.turnState.log.slice(-2));
   }
@@ -318,25 +319,30 @@ export function feedTarget(combat, feeder, target, amount = 1) {
 export function castSpell(combat, caster, spell, target, opts = {}) {
   const entry = getActiveEntry(combat.turnState);
   const castSpellData = getSpellForCast(spell, opts.overflow);
-  const cost = resolveCastCost(caster, castSpellData, opts);
+  const economyType = castSpellData.actionType === "bonus" ? ACTION_TYPES.BONUS : ACTION_TYPES.ACTION;
 
-  if (!cost.ok) {
-    combat.log.push("No spell slots or Abundance Points available!");
+  if (entry && !canUseAction(combat.turnState, entry.id, economyType)) {
+    const blockKind = economyType === ACTION_TYPES.BONUS ? "nobonus" : "noaction";
+    combat.log.push(renderCastFeedback(blockKind, caster, castSpellData));
     return combat;
   }
 
-  const effPreview = castSpellData.effect || {};
-  const isDamagingCantrip = castSpellData.slotLevel === 0 && effPreview.damage;
-  const spendsAction = castSpellData.slotLevel > 0 || isDamagingCantrip || effPreview.feed;
-
-  if (spendsAction && entry && !canUseAction(combat.turnState, entry.id, ACTION_TYPES.ACTION)) {
-    combat.log.push("Action already used this turn!");
+  const cost = resolveCastCost(caster, castSpellData, opts);
+  if (!cost.ok) {
+    combat.log.push(renderCastFeedback("fizzle", caster, castSpellData, { failCause: "no_resource" }));
     return combat;
   }
 
   const power = getSpellPowerMultiplier(caster, cost.slotLevelUsed || castSpellData.slotLevel || 1);
   const eff = { ...castSpellData.effect };
   const scale = (n) => (typeof n === "number" ? Math.max(1, Math.round(n * power)) : n);
+  let actionSpent = false;
+  const spendCastAction = () => {
+    if (entry && !actionSpent) {
+      spendAction(combat.turnState, entry.id, economyType);
+      actionSpent = true;
+    }
+  };
 
   const applyGrowthFn = (unit, stages) => {
     const g = applyGrowth(unit, stages);
@@ -427,7 +433,9 @@ export function castSpell(combat, caster, spell, target, opts = {}) {
   }
   if (eff.corruption && target) addCorruption(target, scale(eff.corruption));
   if (eff.feed && target) {
-    feedTarget(combat, caster, target, scale(eff.feed));
+    feedTarget(combat, caster, target, scale(eff.feed), { skipActionSpend: true });
+    spendCastAction();
+    combat.log.push(renderCastFeedback("invoke", caster, castSpellData, { cost }));
     return combat;
   }
   if (eff.charm && target) {
@@ -453,10 +461,8 @@ export function castSpell(combat, caster, spell, target, opts = {}) {
     combat.log.push(`${castSpellData.name} blesses ${caster.name} with ${eff.buff} power.`);
   }
 
-  const costNote = cost.method === "ap" ? ` (${cost.apSpent} AP)` : cost.upcast ? " (upcast)" : "";
-  combat.log.push(`Cast ${castSpellData.name}${costNote}.`);
-
-  if (entry && spendsAction) spendAction(combat.turnState, entry.id, ACTION_TYPES.ACTION);
+  spendCastAction();
+  combat.log.push(renderCastFeedback("invoke", caster, castSpellData, { cost }));
   return combat;
 }
 

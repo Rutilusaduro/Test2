@@ -9,4 +9,5 @@ registerSelectors(
   'firstVisit', 'dmKind', 'hintKind', 'regionTransformLevel', 'enemyId', 'enemyCount', 'enemyPlural',
   'enemyType', 'enemySizeBand', 'victoryType', 'regionTransformation', 'sceneVariant',
   'outcomeKind', 'partySize', 'regionName', 'role', 'archetype',
+  'spellSchool', 'castType', 'paidBy', 'failCause', 'spellName',
 );

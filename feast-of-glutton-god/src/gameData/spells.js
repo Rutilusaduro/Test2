@@ -247,10 +247,34 @@ export const CLASS_SPELLS = {
   ],
 };
 
+/**
+ * Bonus-action spells — quick/minor magic castable alongside one Action per turn.
+ * indulgent_touch: tactile one-touch surge — intimate, fast
+ * jiggle_charm: brief hypnotic sway — distraction without full commitment
+ * gorgaras_spark: minor divine self-spark — personal nudge of growth
+ * rich_cream: conjure slick cream — fast conjured snack contact
+ * abundant_berry: hand-fed berry — minor nourishing bite
+ */
+const BONUS_ACTION_SPELL_IDS = new Set([
+  'indulgent_touch',
+  'jiggle_charm',
+  'gorgaras_spark',
+  'rich_cream',
+  'abundant_berry',
+]);
+
+function normalizeSpell(spell) {
+  if (!spell) return spell;
+  return {
+    ...spell,
+    actionType: BONUS_ACTION_SPELL_IDS.has(spell.id) ? 'bonus' : (spell.actionType || 'action'),
+  };
+}
+
 const SPELL_INDEX = new Map([
-  ...CANTRIPS.map((s) => [s.id, s]),
-  ...Object.values(BONUS_SPELLS).map((s) => [s.id, s]),
-  ...Object.values(CLASS_SPELLS).flat().map((s) => [s.id, s]),
+  ...CANTRIPS.map((s) => [s.id, normalizeSpell(s)]),
+  ...Object.values(BONUS_SPELLS).map((s) => [s.id, normalizeSpell(s)]),
+  ...Object.values(CLASS_SPELLS).flat().map((s) => [s.id, normalizeSpell(s)]),
 ]);
 
 export function getSpell(id) {
@@ -285,14 +309,15 @@ export function getSpellsForBuild(classId, subclassId) {
 }
 
 export function getSpellForCast(spell, overflow = false) {
-  if (!overflow || !spell.overflow) return spell;
-  return {
-    ...spell,
-    name: spell.overflow.name || `${spell.name} (Overflow)`,
-    slotLevel: spell.slotLevel + (spell.overflow.slotBonus ?? 1),
-    apCost: spell.overflow.apCost ?? spell.apCost,
-    effect: { ...spell.effect, ...spell.overflow.effect },
-  };
+  const base = normalizeSpell(spell);
+  if (!overflow || !base.overflow) return base;
+  return normalizeSpell({
+    ...base,
+    name: base.overflow.name || `${base.name} (Overflow)`,
+    slotLevel: base.slotLevel + (base.overflow.slotBonus ?? 1),
+    apCost: base.overflow.apCost ?? base.apCost,
+    effect: { ...base.effect, ...base.overflow.effect },
+  });
 }
 
 export function getSpellEnvironmentTags(spell) {

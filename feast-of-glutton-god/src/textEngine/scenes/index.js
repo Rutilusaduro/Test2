@@ -22,6 +22,7 @@ import './quests/index.js';
 import './leveling/index.js';
 import './dm/index.js';
 import './dm/combat.js';
+import './dm/cast.js';
 
 export { renderUnmetDescriptor } from './npc/unmet.js';
 export { renderObserve, POSES } from './npc/observe.js';
@@ -45,3 +46,4 @@ export {
   buildCombatWrapup,
   getEnemySizeBand,
 } from './dm/combat.js';
+export { renderCastFeedback } from './dm/cast.js';

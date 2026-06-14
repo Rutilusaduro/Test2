@@ -28,6 +28,7 @@ const {
   renderCombatOutro,
   getEnemySizeBand,
 } = await import(pathToFileURL(path.join(ROOT, 'src/textEngine/scenes/dm/combat.js')).href);
+const { renderCastFeedback } = await import(pathToFileURL(path.join(ROOT, 'src/textEngine/scenes/dm/cast.js')).href);
 
 const MAX_VARIANT_CHARS = 200;
 const errors = [];
@@ -66,8 +67,8 @@ function collectTexts(variant) {
   return [];
 }
 
-const COMBAT_POOL_PREFIX = 'dm.combat.';
-const STRICT_POOL = (key) => key.startsWith(COMBAT_POOL_PREFIX);
+const DM_POOL_PREFIXES = ['dm.combat.', 'dm.cast.'];
+const STRICT_POOL = (key) => DM_POOL_PREFIXES.some((p) => key.startsWith(p));
 
 // ── static: pool variant length + when keys (combat DM pools) ──
 
@@ -206,14 +207,39 @@ function sweepCombatOutro(iterations = 200) {
   }
 }
 
+const SPELL_SCHOOLS = ['abundance', 'enchantment', 'transmutation', 'evocation', 'conjuration'];
+const CAST_TYPES = ['action', 'bonus'];
+const PAID_BY = ['slot', 'ap', 'cantrip'];
+const FAIL_CAUSES = ['no_resource', 'no_action', 'no_bonus'];
+const CAST_KINDS = ['invoke', 'fizzle', 'noaction', 'nobonus'];
+
+function sweepCastFeedback(iterations = 150) {
+  for (let i = 0; i < iterations; i++) {
+    const kind = CAST_KINDS[i % CAST_KINDS.length];
+    const school = SPELL_SCHOOLS[i % SPELL_SCHOOLS.length];
+    const castType = CAST_TYPES[i % CAST_TYPES.length];
+    const paidBy = PAID_BY[i % PAID_BY.length];
+    const failCause = FAIL_CAUSES[i % FAIL_CAUSES.length];
+    const spell = { name: 'Sweep Spell', school, actionType: castType };
+    const text = renderCastFeedback(kind, MOCK_PLAYER, spell, {
+      paidBy,
+      failCause: kind === 'fizzle' ? failCause : undefined,
+      cost: { ok: true, method: paidBy === 'cantrip' ? 'cantrip' : paidBy },
+      seed: `cast_${i}`,
+    });
+    assertCleanRender(`dm.cast.${kind} #${i}`, text);
+  }
+}
+
 const SWEEPS = [
   { name: 'dm.combat.intro', run: sweepCombatIntro },
   { name: 'dm.combat.outro', run: sweepCombatOutro },
+  { name: 'dm.cast', run: sweepCastFeedback },
 ];
 
 for (const sweep of SWEEPS) {
   try {
-    sweep.run(200);
+    sweep.run(sweep.name === 'dm.cast' ? 150 : 200);
   } catch (err) {
     errors.push(`[sweep] ${sweep.name}: ${err.message}`);
   }

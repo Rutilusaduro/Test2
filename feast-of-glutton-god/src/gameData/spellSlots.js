@@ -194,6 +194,33 @@ export function resolveCastCost(character, spell, opts = {}) {
   return { ok: false, reason: "no_slot_or_ap" };
 }
 
+/**
+ * Dry-run cast cost — does not spend slots or AP.
+ * Returns { ok, method: 'cantrip'|'slot'|'ap', apSpent? }
+ */
+export function previewCastCost(character, spell, opts = {}) {
+  const slotLevel = spell.slotLevel ?? spell.level ?? 0;
+  if (slotLevel === 0) return { ok: true, method: "cantrip" };
+
+  const overflow = opts.overflow && spell.overflow;
+  const effectiveLevel = overflow ? slotLevel + (spell.overflow.slotBonus || 1) : slotLevel;
+  const apCost = overflow ? (spell.overflow.apCost ?? spell.apCost ?? 0) : (spell.apCost ?? 0);
+
+  if (hasSpellSlot(character, effectiveLevel)) {
+    return { ok: true, method: "slot" };
+  }
+
+  if (apCost > 0 && (character.ap ?? 0) >= apCost) {
+    return { ok: true, method: "ap", apSpent: apCost };
+  }
+
+  if (spell.apCost && (character.ap ?? 0) >= spell.apCost) {
+    return { ok: true, method: "ap", apSpent: spell.apCost };
+  }
+
+  return { ok: false, reason: "no_slot_or_ap" };
+}
+
 export function getSpellPowerMultiplier(character, slotLevelUsed = 1) {
   const key = getSpellcastingStat(character.classId);
   const mod = getEffectiveStatMod(character, key);

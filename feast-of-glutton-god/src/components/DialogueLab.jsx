@@ -16,6 +16,7 @@ import { renderIntimate } from "../textEngine/scenes/npc/intimate.js";
 import { renderGrowthScene } from "../textEngine/scenes/growthEvent/index.js";
 import { renderCombatBeat } from "../textEngine/scenes/combatText.js";
 import { renderCombatIntro, renderCombatOutro } from "../textEngine/scenes/dm/combat.js";
+import { renderCastFeedback } from "../textEngine/scenes/dm/cast.js";
 import { ENEMY_TYPES } from "../gameData/enemies.js";
 import { REGIONS } from "../gameData/regions.js";
 import { resolveGrowthZone } from "../textEngine/growthLexicon.js";
@@ -29,6 +30,11 @@ const POSES = ["standing", "sitting", "walking"];
 const FEED_TYPES = ["hand", "magical", "feast"];
 const BLESS_TYPES = ["minor", "major", "targeted"];
 const COMBAT_VICTORIES = ["win", "converted", "defeat"];
+const SPELL_SCHOOLS = ["abundance", "enchantment", "transmutation", "evocation", "conjuration"];
+const CAST_TYPES = ["action", "bonus"];
+const PAID_BY = ["slot", "ap", "cantrip"];
+const FAIL_CAUSES = ["no_resource", "no_action", "no_bonus"];
+const CAST_KINDS = ["invoke", "fizzle", "noaction", "nobonus"];
 const ENEMY_TYPE_IDS = Object.keys(ENEMY_TYPES);
 const REGION_IDS = REGIONS.map((r) => r.id);
 
@@ -161,6 +167,23 @@ const SECTIONS = {
       return renderCombatOutro(game, wrapup, { trace: opts.trace });
     },
   },
+  "dm.cast": {
+    params: ["castKind", "spellSchool", "castType", "paidBy", "failCause"],
+    fn: (s, opts) => {
+      const kind = opts.castKind === RANDOM ? pick(CAST_KINDS) : opts.castKind;
+      const school = opts.spellSchool === RANDOM ? pick(SPELL_SCHOOLS) : opts.spellSchool;
+      const castType = opts.castType === RANDOM ? pick(CAST_TYPES) : opts.castType;
+      const paidBy = opts.paidBy === RANDOM ? pick(PAID_BY) : opts.paidBy;
+      const failCause = opts.failCause === RANDOM ? pick(FAIL_CAUSES) : opts.failCause;
+      const spell = { name: "Test Spell", school, actionType: castType };
+      return renderCastFeedback(kind, s, spell, {
+        paidBy,
+        failCause: kind === "fizzle" ? failCause : undefined,
+        cost: { ok: true, method: paidBy === "cantrip" ? "cantrip" : paidBy },
+        trace: opts.trace,
+      });
+    },
+  },
   "char.desc": {
     params: STATE_PARAMS,
     fn: (s, opts) => render("{char.desc}", createContext({ subject: s, ref: MOCK_PLAYER, week: 3 }), { trace: opts.trace }),
@@ -185,6 +208,11 @@ const PARAM_DEFS = [
   { key: "region", label: "Region", options: REGION_IDS },
   { key: "enemyCount", label: "Enemy count", options: ["1", "2"] },
   { key: "victoryType", label: "Victory type", options: COMBAT_VICTORIES },
+  { key: "castKind", label: "Cast kind", options: CAST_KINDS },
+  { key: "spellSchool", label: "Spell school", options: SPELL_SCHOOLS },
+  { key: "castType", label: "Cast type", options: CAST_TYPES },
+  { key: "paidBy", label: "Paid by", options: PAID_BY },
+  { key: "failCause", label: "Fail cause", options: FAIL_CAUSES },
 ];
 
 function rollSample(params) {
@@ -229,6 +257,11 @@ function rollSample(params) {
     region: v.region,
     enemyCount: v.enemyCount,
     victoryType: v.victoryType,
+    castKind: v.castKind,
+    spellSchool: v.spellSchool,
+    castType: v.castType,
+    paidBy: v.paidBy,
+    failCause: v.failCause,
   };
   const text = SECTIONS[v.section].fn(student, opts);
   const nodes = trace.filter((t) => t.leaf && t.text.trim() && !t.key.startsWith("subject."));
