@@ -1,15 +1,15 @@
 import { QUEST_TYPE, QUEST_TAG, OBJECTIVE_TYPE, QUEST_APPROACH, QUEST_SCORE } from '../constants.js';
 
 /**
- * Main quests — world-shaping abundance arcs.
+ * Main quests — three-act Wrong-Genre Apotheosis spine.
  */
 export const MAIN_QUESTS = [
   {
     id: 'main_first_feast_gorgara',
     type: QUEST_TYPE.MAIN,
     act: 1,
-    actLabel: 'Act I',
-    title: 'The First Feast of the Fat Goddess',
+    actLabel: 'Act I — The Anomaly',
+    title: 'The Anomaly',
     titleKey: 'quest.main.first_feast.title',
     descriptionKey: 'quest.main.first_feast.desc',
     tags: [QUEST_TAG.ABUNDANCE, QUEST_TAG.GROWTH, QUEST_TAG.CONVERSION],
@@ -25,13 +25,13 @@ export const MAIN_QUESTS = [
     stages: [
       {
         id: 'stirring_hunger',
-        title: 'Stirring Hunger',
+        title: 'A Village Problem',
         descriptionKey: 'quest.main.first_feast.stage.stirring.desc',
         approaches: [QUEST_APPROACH.SOCIAL],
         objectives: [
           {
             id: 'hear_elara',
-            label: 'Speak with Elara about the town\'s stagnation',
+            label: 'Speak with Elara about the failing harvest and raider panic',
             type: OBJECTIVE_TYPE.NPC_INTERACTION,
             interaction: 'talk',
             npcId: 'elara_inn',
@@ -90,6 +90,27 @@ export const MAIN_QUESTS = [
           rewards: { ap: 15, xp: 80 },
           flags: { hearth_influence_won: true },
           textKey: 'quest.main.first_feast.stage.circle.complete',
+        },
+      },
+      {
+        id: 'the_dread_raid',
+        title: 'The Dread Raid',
+        descriptionKey: 'quest.main.first_feast.stage.dread.desc',
+        approaches: [QUEST_APPROACH.COMBAT],
+        objectives: [
+          {
+            id: 'trivialize_dread',
+            label: 'Dispatch the "dread" temple guardians — your way (Trivialize)',
+            type: OBJECTIVE_TYPE.COMBAT_TRIVIALIZE,
+            enemyId: 'temple_guardian',
+            count: 1,
+            score: { [QUEST_SCORE.DOMINANCE]: 2, [QUEST_SCORE.ABUNDANCE]: 1 },
+          },
+        ],
+        onComplete: {
+          rewards: { ap: 18, xp: 70 },
+          flags: { dread_raid_trivialized: true },
+          textKey: 'quest.main.first_feast.stage.dread.complete',
         },
       },
       {
@@ -210,8 +231,8 @@ export const MAIN_QUESTS = [
     id: 'main_overflowing_temple',
     type: QUEST_TYPE.MAIN,
     act: 2,
-    actLabel: 'Act II',
-    title: 'The Overflowing Temple',
+    actLabel: 'Act II — Heat',
+    title: 'Heat',
     titleKey: 'quest.main.overflowing_temple.title',
     descriptionKey: 'quest.main.overflowing_temple.desc',
     tags: [QUEST_TAG.ABUNDANCE, QUEST_TAG.GROWTH, QUEST_TAG.CONVERSION],
@@ -220,6 +241,7 @@ export const MAIN_QUESTS = [
 
     prerequisites: {
       minPlayerLevel: 3,
+      minDivineAttention: 15,
       flags: ['main_act1_complete'],
       questsCompleted: [],
     },
@@ -227,13 +249,13 @@ export const MAIN_QUESTS = [
     stages: [
       {
         id: 'temple_approach',
-        title: 'Temple Approach',
+        title: 'Regional Heat',
         descriptionKey: 'quest.main.overflowing_temple.stage.approach.desc',
         approaches: [QUEST_APPROACH.SOCIAL],
         objectives: [
           {
             id: 'counsel_maribel',
-            label: 'Learn of the temple\'s resistance from Sister Maribel',
+            label: 'Learn how the Church brands you from wavering Sister Maribel',
             type: OBJECTIVE_TYPE.NPC_INTERACTION,
             interaction: 'talk',
             npcId: 'harvest_priestess',
@@ -326,7 +348,7 @@ export const MAIN_QUESTS = [
       },
       {
         id: 'ascetic_stand',
-        title: 'Ascetic Stand',
+        title: 'Inquisition Stand',
         descriptionKey: 'quest.main.overflowing_temple.stage.warriors.desc',
         approaches: [QUEST_APPROACH.COMBAT, QUEST_APPROACH.GROWTH],
         objectives: [
@@ -340,7 +362,7 @@ export const MAIN_QUESTS = [
           },
           {
             id: 'convert_inquisitor',
-            label: 'Win a battle against purity inquisitors (any outcome)',
+            label: 'Win a battle against Inquisition patrols (any outcome)',
             type: OBJECTIVE_TYPE.COMBAT_VICTORY,
             enemyId: 'purity_inquisitor',
             count: 1,
@@ -351,6 +373,27 @@ export const MAIN_QUESTS = [
         onComplete: {
           rewards: { ap: 20 },
           textKey: 'quest.main.overflowing_temple.stage.warriors.complete',
+        },
+      },
+      {
+        id: 'lean_saint_climax',
+        title: 'Sylwen\'s Scourge',
+        descriptionKey: 'quest.main.overflowing_temple.stage.lean_saint.desc',
+        approaches: [QUEST_APPROACH.COMBAT],
+        objectives: [
+          {
+            id: 'defeat_lean_saint',
+            label: 'Survive the Lean Saint — the first foe that cannot be fed or trivialized',
+            type: OBJECTIVE_TYPE.COMBAT_VICTORY,
+            enemyId: 'famine_hag',
+            count: 1,
+            score: { [QUEST_SCORE.DOMINANCE]: 3, [QUEST_SCORE.ABUNDANCE]: 1 },
+          },
+        ],
+        onComplete: {
+          rewards: { ap: 35, xp: 180, xpSource: 'major_story' },
+          worldFlags: { lean_saint_defeated: true, mortal_tools_failed: true },
+          textKey: 'quest.main.overflowing_temple.stage.lean_saint.complete',
         },
       },
     ],
@@ -400,24 +443,26 @@ export const MAIN_QUESTS = [
     id: 'main_leviathan_coronation',
     type: QUEST_TYPE.MAIN,
     act: 3,
-    actLabel: 'Act III',
-    title: "Coronation of Abundance",
+    actLabel: 'Act III — Apotheosis',
+    title: 'Apotheosis',
     titleKey: 'quest.main.coronation.title',
     descriptionKey: 'quest.main.coronation.desc',
     tags: [QUEST_TAG.ABUNDANCE, QUEST_TAG.GROWTH, QUEST_TAG.CONVERSION],
     region: 'gorgara_cradle',
     giverNpcId: 'thalia_witch',
+    hiddenUntilFlags: ['act3_gates_unlocked'],
 
     prerequisites: {
       minPlayerLevel: 8,
+      minDivineAttention: 75,
       questsCompleted: ['main_overflowing_temple'],
-      flags: ['main_act2_complete'],
+      flags: ['main_act2_complete', 'lean_saint_defeated'],
     },
 
     stages: [
       {
         id: 'cradle_hunger',
-        title: 'Hunger at the Cradle',
+        title: 'Hunger at the Thin Veil',
         descriptionKey: 'quest.main.coronation.stage.cradle.desc',
         approaches: [QUEST_APPROACH.SOCIAL, QUEST_APPROACH.GROWTH],
         objectives: [
@@ -432,7 +477,7 @@ export const MAIN_QUESTS = [
             id: 'thalia_close',
             label: 'Earn Thalia\'s intimate trust',
             type: OBJECTIVE_TYPE.NPC_RELATIONSHIP_MIN,
-            npcId: 'thalia',
+            npcId: 'thalia_witch',
             tier: 3,
             count: 1,
           },
@@ -444,13 +489,13 @@ export const MAIN_QUESTS = [
       },
       {
         id: 'spread_overflow',
-        title: 'Spread the Overflow',
+        title: 'Anchor the Breach',
         descriptionKey: 'quest.main.coronation.stage.spread.desc',
         approaches: [QUEST_APPROACH.FEEDING, QUEST_APPROACH.GROWTH],
         objectives: [
           {
             id: 'growth_quota_cradle',
-            label: 'Guide three souls to significant growth in the cradle',
+            label: 'Guide three souls to significant growth at the cradle',
             type: OBJECTIVE_TYPE.NPC_GROWTH_QUOTA,
             regionId: 'gorgara_cradle',
             minStagesGained: 2,
@@ -459,7 +504,7 @@ export const MAIN_QUESTS = [
           },
           {
             id: 'feast_ritual',
-            label: 'Host a communal feast',
+            label: 'Host a communal feast at the wound in the Wheel',
             type: OBJECTIVE_TYPE.COMMUNAL_FEAST,
             regionId: 'gorgara_cradle',
             count: 1,
@@ -471,62 +516,111 @@ export const MAIN_QUESTS = [
         },
       },
       {
-        id: 'coronation',
-        title: 'Coronation of Abundance',
-        descriptionKey: 'quest.main.coronation.stage.coronation.desc',
-        approaches: [QUEST_APPROACH.GROWTH, QUEST_APPROACH.CONVERSION],
+        id: 'materialization',
+        title: 'Materialization',
+        descriptionKey: 'quest.main.coronation.stage.materialization.desc',
+        approaches: [QUEST_APPROACH.GROWTH],
         objectives: [
           {
-            id: 'player_stage_8',
-            label: 'Ascend to Leviathan size (stage 8+)',
+            id: 'player_stage_14',
+            label: 'Ascend to Tarrasque Matriarch size (stage 14) — anchor her ascension',
             type: OBJECTIVE_TYPE.PLAYER_STAGE_MIN,
-            stage: 8,
+            stage: 14,
             count: 1,
           },
           {
-            id: 'convert_cradle',
-            label: 'Convert or defeat the cradle\'s famine spirits',
-            type: OBJECTIVE_TYPE.COMBAT_VICTORY,
-            regionId: 'gorgara_cradle',
-            enemyId: 'famine_hag',
+            id: 'rival_rising',
+            label: 'Witness the Matriarch\'s shadow (rival goddess rising)',
+            type: OBJECTIVE_TYPE.FLAG_SET,
+            flag: 'rival_goddess_rising',
             count: 1,
-            score: { [QUEST_SCORE.CONVERSION]: 2 },
           },
         ],
         onComplete: {
-          rewards: { ap: 40, xp: 200, xpSource: 'major_story' },
-          textKey: 'quest.main.coronation.stage.coronation.complete',
+          rewards: { ap: 35, xp: 160 },
+          worldFlags: { replacementGoddess: true },
+          textKey: 'quest.main.coronation.stage.materialization.complete',
+        },
+      },
+      {
+        id: 'pantheon_falls',
+        title: 'Triumphant Takeover',
+        descriptionKey: 'quest.main.coronation.stage.pantheon.desc',
+        approaches: [QUEST_APPROACH.COMBAT, QUEST_APPROACH.CONVERSION],
+        objectives: [
+          {
+            id: 'defeat_last_stand',
+            label: 'Break the Wheel\'s Last Stand — the pantheon\'s final confrontation',
+            type: OBJECTIVE_TYPE.COMBAT_VICTORY,
+            enemyId: 'pantheon_last_stand',
+            count: 1,
+            score: { [QUEST_SCORE.DOMINANCE]: 3, [QUEST_SCORE.CONVERSION]: 2 },
+          },
+        ],
+        onComplete: {
+          rewards: { ap: 50, xp: 250, xpSource: 'major_story' },
+          worldFlags: { pantheon_consumed: true },
+          textKey: 'quest.main.coronation.stage.pantheon.complete',
         },
       },
     ],
 
     endings: [
       {
-        id: 'avatar_of_gorgara',
-        label: 'Avatar of the Fat Goddess',
+        id: 'apotheosis_right_hand',
+        label: 'Right Hand of the Fat Goddess',
         condition: { minScores: { [QUEST_SCORE.ABUNDANCE]: 5 } },
         rewards: {
           ap: 80,
           xp: 800,
           xpSource: 'major_story',
           playerSizeCapBonus: 2,
-          worldFlags: { gorgara_avatar: true, main_act3_complete: true },
-          playerFlags: { leviathan_coronation: true },
+          worldFlags: {
+            gorgara_avatar: true,
+            apotheosis_right_hand: true,
+            enthroned_herald: true,
+            main_act3_complete: true,
+          },
+          playerFlags: { leviathan_coronation: true, enthroned_epilogue: true },
         },
-        textKey: 'quest.main.coronation.ending.avatar',
+        textKey: 'quest.main.coronation.ending.right_hand',
       },
       {
-        id: 'herald_of_feast',
-        label: 'Herald of the Eternal Feast',
+        id: 'apotheosis_co_ascendant',
+        label: 'Co-Ascendant',
         condition: { minScores: { [QUEST_SCORE.CONVERSION]: 3 } },
         rewards: {
+          ap: 75,
+          xp: 780,
+          xpSource: 'major_story',
+          playerSizeCapBonus: 2,
+          worldFlags: {
+            replacementGoddess: true,
+            apotheosis_co_ascendant: true,
+            main_act3_complete: true,
+          },
+          playerFlags: { co_ascendant: true, enthroned_epilogue: true },
+        },
+        textKey: 'quest.main.coronation.ending.co_ascendant',
+      },
+      {
+        id: 'apotheosis_devouring',
+        label: 'The Devouring',
+        condition: { minScores: { [QUEST_SCORE.DOMINANCE]: 3 } },
+        rewards: {
           ap: 70,
-          xp: 750,
+          xp: 760,
           xpSource: 'major_story',
           playerSizeCapBonus: 1,
-          worldFlags: { feast_herald: true, main_act3_complete: true },
+          worldFlags: {
+            apotheosis_devouring: true,
+            pantheon_consumed: true,
+            feast_herald: true,
+            main_act3_complete: true,
+          },
+          playerFlags: { devouring_ascendant: true, enthroned_epilogue: true },
         },
-        textKey: 'quest.main.coronation.ending.herald',
+        textKey: 'quest.main.coronation.ending.devouring',
       },
     ],
 

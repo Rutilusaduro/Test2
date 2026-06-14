@@ -205,7 +205,7 @@ export default function WorldView({ game, onUpdate, onEncounter, onHostilityEnco
         </span>
         {commandMode.active && (
           <span className="stat" title={commandMode.message} style={{ color: 'var(--gold-bright)' }}>
-            Command Mode
+            {commandMode.enthroned ? 'Enthroned' : 'Command Mode'}
           </span>
         )}
         <span className="stat" title={abundance.current.desc}>
@@ -292,13 +292,14 @@ export default function WorldView({ game, onUpdate, onEncounter, onHostilityEnco
 
       {commandMode.active && (
         <div className="panel" style={{ borderColor: 'var(--gold)' }}>
-          <h2>Command & Presence</h2>
+          <h2>{commandMode.enthroned ? 'Enthroned Epilogue' : 'Command & Presence'}</h2>
           <p className="prose" style={{ fontSize: '0.9rem' }}>
-            {stageMech.label} — {getMobilityLabel(stageMech.stageId)}. You rule through decree, ritual, and devoted followers.
+            {commandMode.message || `${stageMech.label} — ${getMobilityLabel(stageMech.stageId)}. You rule through decree, ritual, and devoted followers.`}
           </p>
           <p style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>
             Travel via companions ({commandMode.canDelegate ? 'available' : 'recruit party first'})
             {commandMode.canRitualProject ? ' · Ritual projection available' : ''}
+            {commandMode.canFeastDecree ? ' · Feast decrees available' : ''}
           </p>
         </div>
       )}

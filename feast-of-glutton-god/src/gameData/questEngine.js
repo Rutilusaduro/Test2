@@ -16,6 +16,7 @@ import { getRegion } from './regions.js';
 import { renderGrowthProse } from '../textEngine/scenes/growth/index.js';
 import { renderQuestText } from '../textEngine/scenes/quests/index.js';
 import { onRedemptionQuestComplete } from '../hooks/questHooks.js';
+import { getDivineAttention } from './divineAttention.js';
 
 const DEFAULT_UNLOCKED_REGIONS = [
   'harvest_hearth',
@@ -139,6 +140,9 @@ function meetsPrerequisites(game, questDef) {
   }
   for (const qid of pre.questsCompleted ?? []) {
     if (!game.quests.completed.includes(qid)) return false;
+  }
+  if (pre.minDivineAttention != null) {
+    if (getDivineAttention(game) < pre.minDivineAttention) return false;
   }
   if (questDef.hiddenUntilFlags?.length) {
     const visible = questDef.hiddenUntilFlags.some(
@@ -513,6 +517,10 @@ export function notifyQuestEvent(game, event = {}) {
         matched = event.type === 'combat_end'
           && (!obj.victoryType || event.victoryType === obj.victoryType)
           && (!obj.enemyId || (event.defeatedEnemyIds ?? []).includes(obj.enemyId));
+      } else if (obj.type === OBJECTIVE_TYPE.COMBAT_TRIVIALIZE) {
+        matched = event.type === 'combat_end'
+          && event.trivialized
+          && (!obj.enemyId || (event.defeatedEnemyIds ?? []).includes(obj.enemyId));
       } else if (obj.type === OBJECTIVE_TYPE.COMMUNAL_FEAST) {
         matched = event.type === 'npc_interaction'
           && event.interaction === 'feast'
@@ -541,6 +549,7 @@ export function notifyQuestEvent(game, event = {}) {
       if (matched && [
         OBJECTIVE_TYPE.NPC_INTERACTION,
         OBJECTIVE_TYPE.COMBAT_VICTORY,
+        OBJECTIVE_TYPE.COMBAT_TRIVIALIZE,
         OBJECTIVE_TYPE.COMMUNAL_FEAST,
         OBJECTIVE_TYPE.PUZZLE_SOLVED,
         OBJECTIVE_TYPE.FEATURE_EXAMINED,

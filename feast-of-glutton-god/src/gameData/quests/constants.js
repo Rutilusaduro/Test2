@@ -22,6 +22,8 @@ export const OBJECTIVE_TYPE = {
   NPC_CORRUPTION_MIN: 'npc_corruption_min',
   NPC_STAGE_MIN: 'npc_stage_min',
   COMBAT_VICTORY: 'combat_victory',
+  /** Win by trivializing a mundane foe (OPM gag). */
+  COMBAT_TRIVIALIZE: 'combat_trivialize',
   FLAG_SET: 'flag_set',
   /** Cumulative: N distinct NPCs gained minStagesGained since quest start. */
   NPC_GROWTH_QUOTA: 'npc_growth_quota',
@@ -59,4 +61,7 @@ export const QUEST_NPC_ALIASES = {
   lira: ['lira', 'lira_priestess'],
   sylvie: ['sylvie', 'sylvie_scholar', 'baker_sylvie'],
   greta: ['greta', 'greta_smith'],
+  cael: ['cael', 'lumen_diviner'],
+  verity: ['verity', 'measured_inquisitor'],
+  maribel: ['maribel', 'harvest_priestess'],
 };

@@ -2,7 +2,15 @@ import { getStage, getTileSize, getMovement, getHpBonus } from "./stages.js";
 import { advanceStageUniversal } from "./growthPresentation.js";
 import { addCorruption } from "./corruption.js";
 import { getCombatModifiers } from "./stagePerks.js";
-import { createEnemy, getEnemyThreatTier } from "./enemies.js";
+import {
+  createEnemy,
+  getEnemyThreatTier,
+  getEnemyTypeDef,
+  getCosmicGrowthResist,
+  isConversionImmune,
+  isCosmicThreat,
+} from "./enemies.js";
+import { ensureFavor, spendFavor } from "./favor.js";
 import {
   initCombatTurnState, beginTurn, endTurn, getActiveEntry, getEconomy,
   canSpendMovement, spendMovement, canUseAction, spendAction, onUnitGrew,
@@ -42,7 +50,9 @@ function prepareCombatUnit(unit, team, index) {
 
 export function createCombatState(player, party, enemyTypeId, regionId) {
   const enemies = [];
-  const count = enemyTypeId === "famine_hag" ? 1 : 1 + Math.floor(Math.random() * 2);
+  const cosmicSolo = enemyTypeId && isCosmicThreat(enemyTypeId)
+    && getEnemyTypeDef(enemyTypeId)?.role === "boss";
+  const count = cosmicSolo || enemyTypeId === "famine_hag" ? 1 : 1 + Math.floor(Math.random() * 2);
   for (let i = 0; i < count; i++) {
     const e = enemyTypeId ? createEnemy(enemyTypeId) : createEnemy("harvest_harpy");
     e.typeId = enemyTypeId || e.id;
@@ -250,14 +260,23 @@ function maybeAwardFatteningXp(combat, caster, target, growth) {
   }
 }
 
-export function applyGrowth(unit, stages = 1) {
-  const result = advanceStageUniversal(unit, stages);
+export function applyGrowth(unit, stages = 1, opts = {}) {
+  const respectCosmic = opts.respectCosmicResist ?? Boolean(unit?.isEnemy);
+  let effectiveStages = stages;
+  if (respectCosmic && isCosmicThreat(unit) && stages > 0) {
+    const resist = getCosmicGrowthResist(unit);
+    effectiveStages = Math.max(0, Math.floor(stages * (1 - resist)));
+    if (effectiveStages < stages && effectiveStages === 0 && stages > 0) {
+      effectiveStages = 1;
+    }
+  }
+  const result = advanceStageUniversal(unit, effectiveStages);
   const endStage = getStage(unit.lbs).id;
   const hpMult = getHpBonus(endStage) + 0.15;
-  const hpBonus = Math.floor(unit.maxHp * hpMult * stages);
+  const hpBonus = Math.floor(unit.maxHp * hpMult * effectiveStages);
   unit.maxHp += hpBonus;
   unit.hp = Math.min(unit.maxHp, unit.hp + hpBonus);
-  return result;
+  return { ...result, resisted: effectiveStages < stages, stagesApplied: effectiveStages };
 }
 
 export function useBonusAction(combat, unit, actionId, target = null) {
@@ -511,7 +530,12 @@ export function castSpell(combat, caster, spell, target, opts = {}) {
 }
 
 export function checkConversion(enemy) {
-  return (enemy.hunger >= 80 || enemy.corruption >= 50) && !enemy.converted;
+  if (!enemy || enemy.converted) return false;
+  if (isConversionImmune(enemy)) return false;
+  if (isCosmicThreat(enemy)) {
+    return (enemy.hunger >= 95 || enemy.corruption >= 90);
+  }
+  return enemy.hunger >= 80 || enemy.corruption >= 50;
 }
 
 export function convertEnemy(combat, enemy) {
@@ -571,9 +595,61 @@ export function advanceTurn(combat) {
   return combat;
 }
 
+function checkCosmicPhases(combat, enemy) {
+  const def = getEnemyTypeDef(enemy);
+  if (!def?.phases?.length || enemy.hp <= 0) return;
+  const hpPct = enemy.hp / Math.max(1, enemy.maxHp);
+  enemy.phaseFlags = enemy.phaseFlags || {};
+  for (const phase of def.phases) {
+    if (hpPct > phase.hpPct || enemy.phaseFlags[phase.id]) continue;
+    enemy.phaseFlags[phase.id] = true;
+    combat.log.push(`★ ${enemy.name} enters ${phase.label} — the Wheel fights back in earnest.`);
+  }
+}
+
+function runCosmicAbility(combat, enemy, target) {
+  const def = getEnemyTypeDef(enemy);
+  const ability = def?.cosmicAbility;
+  if (!ability || !target) return;
+
+  const player = combat.allies.find((a) => a.isPlayer) || target;
+
+  if (ability === "famine_drain" || ability === "lantern_deny" || ability === "pantheon_denial") {
+    ensureFavor(player);
+    const drain = ability === "pantheon_denial" ? 3 : 2;
+    player.favor = Math.max(0, (player.favor || 0) - drain);
+    combat.log.push(`${enemy.name} spikes famine-light through your favor — the goddess's gift runs thin.`);
+  } else if (ability === "law_binding" || ability === "contract_tax") {
+    target.tempFlags = target.tempFlags || {};
+    target.tempFlags.growthSuppressed = (target.tempFlags.growthSuppressed || 0) + 1;
+    combat.log.push(`${enemy.name} binds your abundance — growth magic struggles against measured law.`);
+  } else if (ability === "measured_harvest" || ability === "fate_weight") {
+    addCorruption(target, 4);
+    target.hunger = Math.max(0, (target.hunger || 0) - 10);
+    combat.log.push(`${enemy.name} reverses the harvest — your body remembers austerity for a heartbeat.`);
+  } else if (ability === "valor_surge") {
+    enemy.tempFlags = enemy.tempFlags || {};
+    enemy.tempFlags.damageBonus = (enemy.tempFlags.damageBonus || 0) + 2;
+    combat.log.push(`${enemy.name} burns with frontier valor — steel blessed against excess.`);
+  } else if (ability === "wheel_judgment") {
+    ensureFavor(player);
+    spendFavor(player, Math.min(player.favor || 0, 2));
+    for (const ally of combat.allies.filter((a) => a.hp > 0)) {
+      addCorruption(ally, 3);
+    }
+    combat.log.push(`The Wheel's avatar judges the field — favor spent, flesh reminded of limits.`);
+  }
+}
+
 function runEnemyAction(combat, enemy) {
   const target = combat.allies.find((a) => a.hp > 0);
   if (!target) return;
+
+  checkCosmicPhases(combat, enemy);
+  if (isCosmicThreat(enemy) && Math.random() < 0.45) {
+    runCosmicAbility(combat, enemy, target);
+  }
+
   const dist = Math.abs(enemy.x - target.x) + Math.abs(enemy.y - target.y);
   const size = getTileSize(getStage(enemy.lbs).id);
   if (dist <= size + 2) {

@@ -10,130 +10,226 @@ function registerQuestCopy(key, lines) {
   ]);
 }
 
-// ─── Main: The First Feast of the Fat Goddess ─────────────────────────────────────────
+// ─── Main: Act I — The Anomaly ───────────────────────────────────────────────
 
-registerQuestCopy('quest.main.first_feast.title', ['The First Feast of the Fat Goddess']);
+registerQuestCopy('quest.main.first_feast.title', ['The Anomaly']);
 registerQuestCopy('quest.main.first_feast.desc', [
-  'Harvest\'s Hearth has grown stagnant and repressed — bellies pinched, laughter muted. Awaken the Fat Goddess\'s first major node by befriending the town\'s influential women, hosting a communal feast, and softening its stern noblewoman.',
-  'Spread abundance until the entire settlement visibly flourishes. Growth, feeding, blessing, and conversion are all paths to glory.',
+  'Harvest\'s Hearth faces an ordinary frontier crisis — raiders, failing harvest, frightened villagers. Solve it your way: by feeding. The earnest world will be baffled, then delighted; Lumen\'s diviners may register the first faint wrongness.',
+  'Win the town through abundance, trivializing a "dread" mundane threat, and softening its stern noblewoman. The DM narrator watches with bemused affection.',
 ]);
 
 registerQuestCopy('quest.main.first_feast.stage.stirring.desc', [
-  'Speak with Elara Warmbelly at the inn. The town\'s warmth has gone thin — someone must remind it how good fullness feels.',
+  'Speak with Elara at the inn. Raiders and lean harvests have the village pinched — they expect steel, not supper.',
 ]);
 registerQuestCopy('quest.main.first_feast.stage.stirring.complete', [
-  'Elara\'s eyes glisten with hope and hunger. The hearth stirs — the Fat Goddess\'s influence prickles at the edges of every loaf and every waistline.',
+  'Elara listens, puzzled and hopeful. The hearth stirs — your off-genre answer to a very normal problem.',
 ]);
 
 registerQuestCopy('quest.main.first_feast.stage.circle.desc', [
-  'Win the trust of three influential women: Elara the innkeeper, Grikka the feast-queen, and Sylvie the baker. Friendship or conversion — abundance accepts both.',
+  'Win the trust of Elara, Grikka, and Sylvie. Friendship or conversion — the village\'s circle bends toward fullness.',
 ]);
 registerQuestCopy('quest.main.first_feast.stage.circle.complete', [
-  'The town\'s circle bends toward you. Laughter returns to kitchens and market stalls alike — softer, fuller, hungrier.',
+  'Laughter returns to kitchens. The town does not understand your methods; it enjoys the results.',
+]);
+
+registerQuestCopy('quest.main.first_feast.stage.dread.desc', [
+  'Temple guardians are called a dread threat. Trivialize them — one-action OPM pacification on the mundane tier.',
+]);
+registerQuestCopy('quest.main.first_feast.stage.dread.complete', [
+  'Dread becomes dessert. The village cheers; somewhere, a lantern gutters without wind — the first portent.',
 ]);
 
 registerQuestCopy('quest.main.first_feast.stage.feast.desc', [
-  'Host a grand communal feast and help at least four townsfolk advance two size stages through feeding, blessing, intimacy, or combat conversion.',
+  'Host a grand communal feast and help at least four townsfolk advance two size stages. Local gag complete; regional heat not yet.',
 ]);
 registerQuestCopy('quest.main.first_feast.stage.feast.complete', [
-  'Tables groan. Bellies bloom. The settlement sighs in collective satisfaction — a living testament to the Fat Goddess\'s gospel.',
+  'Tables groan. Bellies bloom. Harvest\'s Hearth sighs in collective satisfaction — a living testament to wrong-genre victory.',
 ]);
 
 registerQuestCopy('quest.main.first_feast.stage.crown.desc', [
-  'Lady Vesperia still clings to austerity and poise. Break her resistance through feeding, flattery, and glorious growth until authority kneels to abundance.',
+  'Lady Vesperia still clings to austerity. Break her resistance through feeding and growth until authority kneels to abundance.',
 ]);
 registerQuestCopy('quest.main.first_feast.stage.crown.complete', [
-  'The noblewoman\'s corset surrenders. Vesperia blushes, moans, and smiles — stern no longer, splendidly soft.',
+  'The noblewoman\'s corset surrenders. Vesperia blushes and smiles — stern no longer, splendidly soft.',
 ]);
 
 registerQuestCopy('quest.main.first_feast.ending.abundant', [
-  'An Aura of Plenty settles over Harvest\'s Hearth. Wheat fattens, folk glow, and the Fat Goddess\'s first feast echoes through the land. Your own limits swell in answer.',
+  'An Aura of Plenty settles over Harvest\'s Hearth. The first act ends as local gag — OP on the mundane, portents on the wind.',
 ]);
 registerQuestCopy('quest.main.first_feast.ending.converted', [
-  'Hearts convert faster than waistlines — yet both swell together. The town\'s authority bends, and a new region opens to your pilgrimage.',
+  'Hearts convert faster than waistlines. The town bends; the Wheel has not yet struck back.',
 ]);
 registerQuestCopy('quest.main.first_feast.complete.default', [
-  'The First Feast of the Fat Goddess is complete. The town will never be repressed again — and neither will you.',
+  'Act I complete — The Anomaly. The village will never be repressed again, and the gods have begun to notice.',
 ]);
 
-// ─── Main: The Overflowing Temple ────────────────────────────────────────────
+// ─── Main: Act II — Heat ─────────────────────────────────────────────────────
 
-registerQuestCopy('quest.main.overflowing_temple.title', ['The Overflowing Temple']);
+registerQuestCopy('quest.main.overflowing_temple.title', ['Heat']);
 registerQuestCopy('quest.main.overflowing_temple.desc', [
-  'An ancient temple of restraint and denial resists the Fat Goddess\'s awakening. Transform it into a sanctuary of indulgence — convert the priestess circle, bloom the halls with ritual abundance, and face ascetic warriors who would stop you.',
+  'As you flip regions, the Inquisition of the Measured Hand mobilizes — checkpoints, purges, propaganda branding you heretic-anomaly. Divine Attention climbs; the gods act through mortals.',
+  'Transform the ancient temple, face Church opposition, and survive the Lean Saint — the first foe that cannot be trivialized or fed.',
 ]);
 
 registerQuestCopy('quest.main.overflowing_temple.stage.approach.desc', [
-  'Sister Maribel knows the temple\'s fanatics. Learn their weaknesses, then reach the crumbling ruins where denial still holds power.',
+  'Sister Maribel wavers between Sylwen\'s measured vows and your fullness. Learn how the Church hunts you, then reach the temple ruins.',
 ]);
 registerQuestCopy('quest.main.overflowing_temple.stage.approach.complete', [
-  'Marble halls loom ahead, inscribed with fasting rites. You carry sweeter scripture in your hands and your hips.',
+  'Marble halls loom ahead. You carry sweeter scripture — and the Inquisition carries warrants.',
 ]);
 
 registerQuestCopy('quest.main.overflowing_temple.stage.circle.desc', [
-  'Convert Maribel and Rootmother Ash through personal growth encounters. Win the high priestess\'s devoted trust.',
+  'Convert Maribel and Rootmother Ash. Win the wavering priestess\'s devoted trust while the world heats around you.',
 ]);
 registerQuestCopy('quest.main.overflowing_temple.stage.circle.complete', [
-  'The inner circle softens. Vows of denial melt into moans of pleasure — holy hunger replaces hollow restraint.',
+  'The inner circle softens. Holy hunger replaces hollow restraint — regional takeover accelerates.',
 ]);
 
 registerQuestCopy('quest.main.overflowing_temple.stage.ritual.desc', [
-  'Hold a feast within the temple and help Maribel bloom to plump abundance. Let the sanctuary swell with visible, divine indulgence.',
+  'Hold a feast within the temple and help Maribel bloom. Let the sanctuary swell while the Church sharpens its knives.',
 ]);
 registerQuestCopy('quest.main.overflowing_temple.stage.ritual.complete', [
-  'The temple blooms — vines heavy with fruit, halls warm with steam and sighs. Abundance consecrates every stone.',
+  'The temple blooms — vines heavy with fruit, halls warm with steam. Abundance consecrates every stone.',
 ]);
 
 registerQuestCopy('quest.main.overflowing_temple.stage.warriors.desc', [
-  'Ascetic guardians rush to stop the ritual. Defeat or convert them — Growth Damage and conventional valor both serve the Fat Goddess.',
+  'Inquisition patrols and temple guardians rush to stop you. Defeat or convert them — mortal tools of divine moderation.',
 ]);
 registerQuestCopy('quest.main.overflowing_temple.stage.warriors.complete', [
-  'Armor clatters. The last ascetic kneels — converted or conquered — and the sanctuary is yours to fill.',
+  'Armor clatters. Mortal opposition breaks — but the gods are watching, and they are alarmed.',
+]);
+
+registerQuestCopy('quest.main.overflowing_temple.stage.lean_saint.desc', [
+  'The pantheon sends the Lean Saint — Sylwen\'s scourge, cosmic tier, conversion-immune. A real fight. Win it, and the gods learn mortal tools will not suffice.',
+]);
+registerQuestCopy('quest.main.overflowing_temple.stage.lean_saint.complete', [
+  'the Lean Saint falls. The DM\'s voice shakes — not with fear of you, but with respect for what comes next. Act II climax earned.',
 ]);
 
 registerQuestCopy('quest.main.overflowing_temple.ending.mercy', [
-  'You transform the temple with loving mercy. It becomes a sanctuary where indulgence is worship, and new clerical and warlock gifts flow to the faithful.',
+  'You transform the temple with loving mercy. Sanctuary and new clerical gifts flow — the Church fractures, unable to stop you gently.',
 ]);
 registerQuestCopy('quest.main.overflowing_temple.ending.dominance', [
-  'You claim the temple through glorious dominance. Its halls belong to appetite now — and so do powerful new spells for Cleric and Warlock.',
+  'You claim the temple through dominance. Its halls belong to appetite — and the Inquisition learns fear.',
 ]);
 registerQuestCopy('quest.main.overflowing_temple.complete.default', [
-  'The Overflowing Temple stands transformed. Denial is memory; abundance is eternal.',
+  'Act II complete — Heat. Mortal opposition failed; cosmic escalation is inevitable.',
 ]);
 
-// ─── Main: Coronation of Abundance (Act III) ─────────────────────────────────
+// ─── Main: Act III — Apotheosis ──────────────────────────────────────────────
 
-registerQuestCopy('quest.main.coronation.title', ["Coronation of Abundance"]);
+registerQuestCopy('quest.main.coronation.title', ['Apotheosis']);
 registerQuestCopy('quest.main.coronation.desc', [
-  'At Shrine of the Thin Veil, Thalia whispers of a final rite — crown your abundance and awaken the goddess fully.',
-  'The world has been softened. Now it must be transformed. Your body, your gospel, your feast become legend.',
+  'At Shrine of the Thin Veil — the wound in the Wheel — your feeding has fattened the Fat Goddess toward materialization. She breaches the divine plane; the pantheon intervenes directly.',
+  'Reach apotheotic size, anchor her ascension, and break the Wheel\'s Last Stand. Triumphant takeover awaits.',
 ]);
 registerQuestCopy('quest.main.coronation.stage.cradle.desc', [
-  'Seek Thalia Blackfeast where the cradle breathes hunger. Earn her intimate trust before the rite begins.',
+  'Seek Thalia where the Thin Veil breathes hunger. Earn her trust before the gods arrive in person.',
 ]);
 registerQuestCopy('quest.main.coronation.stage.cradle.complete', [
-  'Thalia\'s eyes burn with pact-fire and want. "You are ready," she purrs. "Let us make a god of your softness."',
+  'Thalia\'s eyes burn with pact-fire. "They are coming," she whispers. "Make them dinner."',
 ]);
 registerQuestCopy('quest.main.coronation.stage.spread.desc', [
-  'Spread overflow through the cradle — grow three souls, host a communal feast, let abundance become climate.',
+  'Anchor the breach — grow three souls at the cradle, host a communal feast. Let abundance become climate at the wound in the Wheel.',
 ]);
 registerQuestCopy('quest.main.coronation.stage.spread.complete', [
-  'The cradle swells with shared appetite. Steam, moans, and jiggling flesh sanctify the land.',
+  'The cradle swells with shared appetite. Reality thins; your patron presses against the divine plane.',
 ]);
-registerQuestCopy('quest.main.coronation.stage.coronation.desc', [
-  'Ascend to enormous size and break the famine spirits that cling to old hunger. Crown yourself in flesh and faith.',
+registerQuestCopy('quest.main.coronation.stage.materialization.desc', [
+  'Ascend to Tarrasque Matriarch size and witness the Matriarch\'s shadow. Stage 14 anchors her ascension — replacementGoddess stirs.',
 ]);
-registerQuestCopy('quest.main.coronation.stage.coronation.complete', [
-  'You stand vast and radiant — a living throne of abundance. the Fat Goddess\'s voice thunders: "More."',
+registerQuestCopy('quest.main.coronation.stage.materialization.complete', [
+  'You stand vast enough to be a throne. the Fat Goddess materializes — hungry, real, and ready to devour the Wheel.',
 ]);
-registerQuestCopy('quest.main.coronation.ending.avatar', [
-  '★ Avatar of the Fat Goddess — you are the goddess made walkable, kissable, infinitely feastable.',
+registerQuestCopy('quest.main.coronation.stage.pantheon.desc', [
+  'Break the Wheel\'s Last Stand — the pantheon\'s final confrontation. Cosmic-tier boss design; no trivializing, no easy feeding.',
 ]);
-registerQuestCopy('quest.main.coronation.ending.herald', [
-  '★ Herald of the Eternal Feast — your gospel converts nations; your body is the scripture.',
+registerQuestCopy('quest.main.coronation.stage.pantheon.complete', [
+  'The Last Stand shatters. Triumphant takeover — the gods\' plane is yours to consume. Choose how you reign.',
+]);
+registerQuestCopy('quest.main.coronation.ending.right_hand', [
+  '★ Right Hand of the Fat Goddess — enthroned herald and consort. The Reach is hers; you rule at her side, awed and adored.',
+]);
+registerQuestCopy('quest.main.coronation.ending.co_ascendant', [
+  '★ Co-Ascendant — you rise alongside her. Two hungers, one apotheosis; the Wheel digested together.',
+]);
+registerQuestCopy('quest.main.coronation.ending.devouring', [
+  '★ The Devouring — you savor the pantheon\'s fall personally. Triumphant villainy from heaven\'s perspective.',
 ]);
 registerQuestCopy('quest.main.coronation.complete.default', [
-  'Act III complete. The world will never be thin again — and every soul is grateful.',
+  'Act III complete — Apotheosis. The earnest world ends; the eternal feast begins. Command mode awaits the enthroned.',
+]);
+
+// ─── Divine opposition chain ───────────────────────────────────────────────────
+
+registerQuestCopy('quest.divine.omen.title', ['Lantern Omen']);
+registerQuestCopy('quest.divine.omen.desc', [
+  'Brother Cael of Lumen\'s temple reads a blank hunger on the star-charts. Hear his warning — the first divine response to your anomaly.',
+]);
+registerQuestCopy('quest.divine.omen.stage.read.desc', [
+  'Seek the diviner in the Gilded Citadel. Learn what the lantern omen means for a native who feeds the wrong god.',
+]);
+registerQuestCopy('quest.divine.omen.stage.read.complete', [
+  'Cael\'s hands tremble on the charts. "You are not in the story we were told," he says — and the Wheel creaks.',
+]);
+registerQuestCopy('quest.divine.omen.complete', [
+  'The omen is heeded. Divine Attention has a face now — yours, reflected in Lumen\'s frightened lantern-light.',
+]);
+
+registerQuestCopy('quest.divine.inquisition.title', ['The Measured Hand Strikes']);
+registerQuestCopy('quest.divine.inquisition.desc', [
+  'The Inquisition mobilizes — checkpoints, purges, Sister Verity\'s indictment. Survive the crackdown and break a patrol.',
+]);
+registerQuestCopy('quest.divine.inquisition.stage.crackdown.desc', [
+  'Reach the Ember Duchy, defeat Inquisition patrols, and face Verity\'s measured wrath.',
+]);
+registerQuestCopy('quest.divine.inquisition.stage.crackdown.complete', [
+  'You survive the crackdown. Propaganda calls you heretic-anomaly; the folk you fed call you salvation.',
+]);
+registerQuestCopy('quest.divine.inquisition.complete', [
+  'The Measured Hand strikes and bruises its knuckles. Mortal opposition escalates — divine opposition follows.',
+]);
+
+registerQuestCopy('quest.divine.sylwen.title', ['Sylwen\'s Tragic Foil']);
+registerQuestCopy('quest.divine.sylwen.desc', [
+  'Sister Maribel embodies Sylwen\'s tragedy — measured plenty against your limitless excess. Hear her lament before the Lean Saint falls.',
+]);
+registerQuestCopy('quest.divine.sylwen.stage.tears.desc', [
+  'Sit with Maribel\'s conflict. She loves Sylwen; she loves fullness too. The Church schism runs through her tears.',
+]);
+registerQuestCopy('quest.divine.sylwen.stage.tears.complete', [
+  'Maribel weeps and smiles. "She sent the Lean Saint," she whispers. "I prayed it would be enough." It will not.',
+]);
+registerQuestCopy('quest.divine.sylwen.complete', [
+  'Sylwen\'s foil confronted. Tragedy deepens the genre clash — earnest faith against your hungry apotheosis.',
+]);
+
+registerQuestCopy('quest.divine.champions.title', ['God-Champion Trials']);
+registerQuestCopy('quest.divine.champions.desc', [
+  'The pantheon sends god-champions — Aurelan\'s law, Lumen\'s denial, Korthak\'s valor. Cosmic-tier fights that resist your usual tricks.',
+]);
+registerQuestCopy('quest.divine.champions.stage.fall.desc', [
+  'Defeat the Scale-Bearer of Aurelan and the Lantern Ascetic of Lumen. Optional: break the War-Saint of Korthak.',
+]);
+registerQuestCopy('quest.divine.champions.stage.fall.complete', [
+  'Champions fall. The gods learn you cannot be swelled like a farm-girl raider. The avatar is next.',
+]);
+registerQuestCopy('quest.divine.champions.complete', [
+  'God-champion trials complete. The Wheel has fewer swords — and more fear.',
+]);
+
+registerQuestCopy('quest.divine.council.title', ['The Divine Council Answers']);
+registerQuestCopy('quest.divine.council.desc', [
+  'The divine council convenes. Shatter the Avatar of the Measured Wheel before the Last Stand.',
+]);
+registerQuestCopy('quest.divine.council.stage.avatar.desc', [
+  'Face the Wheel\'s shared avatar — six domains braided into one radiant executor. Real tactics required.',
+]);
+registerQuestCopy('quest.divine.council.stage.avatar.complete', [
+  'The avatar shatters. Starlight rains. Act III\'s finale draws near — the enthroned feast waits.',
+]);
+registerQuestCopy('quest.divine.council.complete', [
+  'The divine council answered — and lost. The pantheon has one shape left: desperation.',
 ]);
 
 // ─── Side: The Baker's Indulgence ────────────────────────────────────────────

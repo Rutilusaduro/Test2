@@ -9,7 +9,8 @@ import { getStage } from '../../../gameData/stages.js';
 import { getRegion } from '../../../gameData/regions.js';
 import { getLocaleKey } from '../../../gameData/regionLocales.js';
 import { getRegionTransformation } from '../../../gameData/worldTransformation.js';
-import { ENEMY_TYPES } from '../../../gameData/enemies.js';
+import { ENEMY_TYPES, isCosmicThreat } from '../../../gameData/enemies.js';
+import { renderCosmicIntro, renderCosmicOutro } from './cosmic.js';
 
 // ── helpers ────────────────────────────────────────────────────
 
@@ -248,11 +249,29 @@ const APPEARANCE_BY_TYPE = {
   ],
   famine_hag: [
     'ancient malice unfolding from the shadows — all angles, cruel hunger, air gone thin',
-    'rail-thin crone flesh wrapped in curse-smoke, beauty refused, appetite perverted',
-    'a famine hag\'s silhouette bending the light, starvation made sentient',
-    'bones sharp beneath curse-weathered skin, hatred older than the temple stones',
-    'the hag unfolds like a wound in the world — gaunt, terrible, starving wrong',
+    'rail-thin saint flesh wrapped in Church sanction, beauty refused, appetite perverted',
+    'the Lean Saint\'s silhouette bending the light, famine made sentient and blessed',
+    'bones sharp beneath holy skin, hatred older than the temple stones',
+    'the scourge unfolds like a wound in the world — gaunt, terrible, starving wrong',
     'withered power stepping forward, every rib a sermon against abundance',
+  ],
+  champion_aurelan: [
+    'burning scales and crown-light braiding through armored lines — Aurelan\'s answer',
+    'law incarnate in plate and poise, waist cinched, mercy nowhere on offer',
+    'the Scale-Bearer descends, oath-fire rimming her shield',
+    'high-king justice given a champion\'s body and a harder stare',
+  ],
+  wheel_avatar: [
+    'six colors of divinity braiding into one radiant executor — the Wheel\'s shared fist',
+    'domains align in a single terrible silhouette, light too bright to be kind',
+    'the avatar manifests where law, harvest, war, death, knowledge, and trade converge',
+    'god-stuff given armor — the pantheon speaks with one voice now',
+  ],
+  pantheon_last_stand: [
+    'the Last Stand takes shape — desperation made luminous, the Wheel\'s final argument',
+    'every god\'s fear collapsed into one vast, burning form',
+    'starlight and law and famine braided for the last time against your feast',
+    'apotheosis weather given teeth — the boss fight the genre promised',
   ],
 };
 
@@ -598,15 +617,29 @@ export function renderCombatOutro(game, wrapup, opts = {}) {
   const coda = render('{dm.combat.outro.victory_coda}', codaCtx, opts).trim();
   if (coda) paragraphs.push(coda);
 
+  const primaryType = enemies[0]?.type;
+  if (primaryType && isCosmicThreat(primaryType) && victoryType !== 'defeat') {
+    const cosmicCoda = renderCosmicOutro(game, wrapup, opts).trim();
+    if (cosmicCoda) paragraphs.push(cosmicCoda);
+  }
+
   return paragraphs.filter(Boolean).join('\n\n');
 }
 
 export function buildCombatIntro(game, combat) {
+  const primary = combat.enemies?.[0];
+  const enemyType = primary?.typeId || primary?.type || primary?.id;
+  const cosmicBeat = primary && isCosmicThreat(primary)
+    ? renderCosmicIntro(game, combat)
+    : '';
+  const mundaneBeat = renderCombatIntro(game, combat);
+  const prose = [cosmicBeat, mundaneBeat].filter(Boolean).join('\n\n');
   return {
-    prose: renderCombatIntro(game, combat),
+    prose,
     region: combat.regionId ?? game.region,
-    enemyType: combat.enemies?.[0]?.type,
+    enemyType,
     enemyCount: combat.enemies?.length ?? 0,
+    cosmic: Boolean(cosmicBeat),
   };
 }
 

@@ -31,6 +31,7 @@ import './dm/favor.js';
 import './dm/genre.js';
 import './dm/combat_gag.js';
 import './dm/portent.js';
+import './dm/cosmic.js';
 import './player/indulge.js';
 
 export { renderUnmetDescriptor } from './npc/unmet.js';

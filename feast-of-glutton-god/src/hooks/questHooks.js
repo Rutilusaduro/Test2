@@ -54,13 +54,14 @@ export function recordCombatEndForQuests(game, combat) {
   ensureQuestState(game);
   const victoryType = combat.victory === 'converted' ? 'converted' : 'win';
   const defeatedEnemyIds = (combat.enemies ?? [])
-    .map((e) => e.id)
+    .map((e) => e.typeId || e.type || e.id)
     .filter(Boolean);
   const { lines, growthSnippets } = notifyQuestEvent(game, {
     type: 'combat_end',
     victoryType,
     regionId: game.region,
     defeatedEnemyIds,
+    trivialized: Boolean(combat.trivialized),
   });
   return { questMessages: formatQuestMessages(lines, growthSnippets) };
 }
