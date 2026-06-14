@@ -757,6 +757,15 @@ function runCosmicAbility(combat, enemy, target) {
       addCorruption(ally, 3);
     }
     combat.log.push(`The Wheel's avatar judges the field — favor spent, flesh reminded of limits.`);
+  } else if (ability === "siren_feast") {
+    addCorruption(target, 8);
+    target.hunger = Math.min(100, (target.hunger || 0) + 20);
+    combat.log.push(`${enemy.name} exhales shrine-mist — appetite blooms hot between your thighs.`);
+  } else if (ability === "blood_hunger") {
+    ensureFavor(player);
+    player.favor = Math.max(0, (player.favor || 0) - 1);
+    addCorruption(target, 5);
+    combat.log.push(`${enemy.name} tastes your gospel on the air — cold lips parting, thirst dressed as disdain.`);
   }
 }
 

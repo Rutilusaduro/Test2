@@ -22,6 +22,7 @@ const {
 } = await import(pathToFileURL(path.join(ROOT, 'src/textEngine/engine.js')).href);
 
 const { ENEMY_TYPES } = await import(pathToFileURL(path.join(ROOT, 'src/gameData/enemies.js')).href);
+const { APPEARANCE_BY_TYPE } = await import(pathToFileURL(path.join(ROOT, 'src/textEngine/scenes/dm/enemyAppearance.js')).href);
 const { REGIONS } = await import(pathToFileURL(path.join(ROOT, 'src/gameData/regions.js')).href);
 const {
   renderCombatIntro,
@@ -118,6 +119,20 @@ function assertCleanRender(label, text) {
   }
 }
 
+function appearanceKeywords(enemyId) {
+  const lines = APPEARANCE_BY_TYPE[enemyId];
+  const nameWords = (ENEMY_TYPES[enemyId]?.name ?? '')
+    .toLowerCase()
+    .replace(/^the /, '')
+    .split(/\s+/)
+    .filter((w) => w.length > 3);
+  const idParts = enemyId.split('_').filter((p) => p.length > 3);
+  const fromAppearance = lines
+    ? (lines.join(' ').toLowerCase().match(/\b[a-z]{4,}\b/g) ?? []).slice(0, 10)
+    : [];
+  return [...new Set([...nameWords, ...idParts, ...fromAppearance])];
+}
+
 function sweepCombatIntro(iterations = 200) {
   let bespokeHits = new Set();
   for (let i = 0; i < iterations; i++) {
@@ -142,17 +157,7 @@ function sweepCombatIntro(iterations = 200) {
         bespokeHits.add(id);
       }
     }
-    // appearance pool fires via reveal beat — check type-specific vocabulary
-    const typeWords = {
-      harvest_harpy: ['wings', 'talons', 'harpy', 'loft'],
-      vinebound_dryad: ['vine', 'dryad', 'grove'],
-      gluttonous_goblin: ['goblin', 'green'],
-      temple_guardian: ['temple', 'guardian', 'armor'],
-      rival_adventurer: ['rival', 'adventurer'],
-      purity_inquisitor: ['inquisitor', 'purity'],
-      famine_hag: ['hag', 'famine'],
-    };
-    const words = typeWords[enemyType] || [];
+    const words = appearanceKeywords(enemyType);
     if (words.some((w) => text.toLowerCase().includes(w))) bespokeHits.add(enemyType);
   }
   for (const id of ENEMY_IDS) {

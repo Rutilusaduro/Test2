@@ -37,7 +37,7 @@ export const REGIONS = [
     zone: 'sacred',
     desc: 'Your hidden shrine — a thin place where the Measured Wheel leaks and your patron listens closest.',
     connections: ['fertile_heartlands', 'ancient_temple', 'iron_peak_hold', 'divine_plane_vestibule'],
-    encounters: ['temple_guardian', 'purity_inquisitor'],
+    encounters: ['temple_guardian', 'purity_inquisitor', 'velvet_succubus'],
     transformKey: 'cradle',
   },
   {
@@ -65,7 +65,7 @@ export const REGIONS = [
     zone: 'coastal',
     desc: 'Prim coastal nobility — salt air, spice markets, and courtly intrigue behind gilded balconies.',
     connections: ['market_square', 'ember_duchy'],
-    encounters: ['rival_adventurer', 'vinebound_dryad'],
+    encounters: ['rival_adventurer', 'vinebound_dryad', 'crimson_vampire'],
     transformKey: 'coast',
     unlockFlag: 'unlock_sapphire_coast',
   },

@@ -11,6 +11,7 @@ import { getLocaleKey } from '../../../gameData/regionLocales.js';
 import { getRegionTransformation } from '../../../gameData/worldTransformation.js';
 import { ENEMY_TYPES, isCosmicThreat } from '../../../gameData/enemies.js';
 import { renderCosmicIntro, renderCosmicOutro } from './cosmic.js';
+import { APPEARANCE_BY_TYPE } from './enemyAppearance.js';
 
 // ── helpers ────────────────────────────────────────────────────
 
@@ -197,83 +198,7 @@ registerPool('dm.combat.intro.sizeNote', [
 ]);
 
 // ── INTRO: enemy appearance (PARTICIPLE CLAUSE) ────────────────
-
-const APPEARANCE_BY_TYPE = {
-  harvest_harpy: [
-    'wings folding from the loft, feathered accents catching dust-moted light',
-    'talons clicking on tired boards, athletic curves taut with predatory grace',
-    'a farm-girl silhouette gone feral — lean waist, hungry eyes, laughter sharp as wind',
-    'feathers ruffled, hips swaying, the scent of wheat and raw appetite',
-    'dropping from the rafters with a groan of stressed wood and spread wings',
-    'circling low with greedy grace, farm-bred beauty turned weapon',
-  ],
-  vinebound_dryad: [
-    'living vines coiling around pear-soft hips, petals stuck to damp skin',
-    'rising from the undergrowth with fertility magic dripping from every leaf',
-    'bark and blossom braided through a body already swelling with grove-blessing',
-    'territorial grace in every vine-laced step, belly rounded beneath woven leaves',
-    'nature spirit and appetite braided together, pollen-sweet and dangerous',
-    'dryad flesh blooming through green restraint, the grove watching behind her',
-  ],
-  gluttonous_goblin: [
-    'green skin split by padded hips, belly jiggling with every greedy breath',
-    'curvy goblin flesh sprawled across the path, honey-stew scent rolling off them',
-    'short, rotund, and shameless — a grin like dessert walked in uninvited',
-    'pudgy hands already reaching, hips wide, eyes wider',
-    'goblin curves packed tight into too-small leather, hunger audible',
-    'a greedy green silhouette waddling forward with delighted malice',
-  ],
-  temple_guardian: [
-    'armored priestess-knights standing stoic, halos bright, bodies still disciplined and slim',
-    'plate mail creaking over athletic lines — purity polished to a blade\'s edge',
-    'temple steel and incense rolling forward in formation, unyielding posture',
-    'disciplined bodies behind blessed shields, waists narrow, resolve narrower',
-    'guardian armor catching candle-flame, every inch still fighting softness',
-    'holy warriors in ordered ranks, hunger nowhere — yet — on their faces',
-  ],
-  rival_adventurer: [
-    'proud steel and athletic fury blocking the road, jaw set, hips still narrow',
-    'a rival\'s glare hot enough to burn — slim, furious, envious of your curves',
-    'adventurer\'s leathers straining only from muscle, not yet from feast',
-    'narrow-waisted defiance stepping into your path with shaking bravado',
-    'competitive hunger masked as contempt, body still all hard angles',
-    'a mirror of who you were — angry, athletic, terrified of becoming glorious',
-  ],
-  purity_inquisitor: [
-    'fanatical paladins in white trim advancing, hard bodies and harder stares',
-    'incense and judgment rolling off lean armored lines in perfect unison',
-    'purity made militant — slim, armored, convinced your softness is sin',
-    'cold eyes above corseted discipline, every inch denying appetite',
-    'inquisitor steel catching harsh light, bodies untouched by the Fat Goddess\'s gift',
-    'righteous fury in formation, waists cinched, mercy nowhere on offer',
-  ],
-  famine_hag: [
-    'ancient malice unfolding from the shadows — all angles, cruel hunger, air gone thin',
-    'rail-thin saint flesh wrapped in Church sanction, beauty refused, appetite perverted',
-    'the Lean Saint\'s silhouette bending the light, famine made sentient and blessed',
-    'bones sharp beneath holy skin, hatred older than the temple stones',
-    'the scourge unfolds like a wound in the world — gaunt, terrible, starving wrong',
-    'withered power stepping forward, every rib a sermon against abundance',
-  ],
-  champion_aurelan: [
-    'burning scales and crown-light braiding through armored lines — Aurelan\'s answer',
-    'law incarnate in plate and poise, waist cinched, mercy nowhere on offer',
-    'the Scale-Bearer descends, oath-fire rimming her shield',
-    'high-king justice given a champion\'s body and a harder stare',
-  ],
-  wheel_avatar: [
-    'six colors of divinity braiding into one radiant executor — the Wheel\'s shared fist',
-    'domains align in a single terrible silhouette, light too bright to be kind',
-    'the avatar manifests where law, harvest, war, death, knowledge, and trade converge',
-    'god-stuff given armor — the pantheon speaks with one voice now',
-  ],
-  pantheon_last_stand: [
-    'the Last Stand takes shape — desperation made luminous, the Wheel\'s final argument',
-    'every god\'s fear collapsed into one vast, burning form',
-    'starlight and law and famine braided for the last time against your feast',
-    'apotheosis weather given teeth — the boss fight the genre promised',
-  ],
-};
+// Full per-type clauses live in enemyAppearance.js (Author pass).
 
 const appearanceVariants = [];
 for (const [enemyType, texts] of Object.entries(APPEARANCE_BY_TYPE)) {
@@ -322,6 +247,24 @@ registerPool('dm.combat.enemy.appearance', appearanceVariants);
 // ── INTRO: threat (DIALOGUE BEAT) ──────────────────────────────
 
 registerPool('dm.combat.intro.threat', [
+  { when: { role: 'social' }, text: [
+    '"How dare you," the noblewoman breathes — silk clinging, outrage sounding like foreplay.',
+    '"Guards," she calls, but her eyes linger on your curves with scandalous hunger.',
+    '"This is indecent," she insists, thighs pressing together. She does not step back.',
+    '"I will ruin you," she promises — voice too low, lips too wet to be convincing.',
+  ]},
+  { when: { role: 'disruptor' }, text: [
+    '"Denial is devotion," the ascetic chants — robes gaping, flush betraying her.',
+    '"Your abundance is profane," she warns, breath shaking. Her aura flickers.',
+    '"I will suppress this heresy," she vows — hips narrow, nipples hard against linen.',
+    '"Fasting is virtue," she insists, staring at your belly like it is a confession.',
+  ]},
+  { when: { role: 'debuffer' }, text: [
+    '"Lean is holy," the cultist moans — hunger-reversal crackling, thighs trembling.',
+    '"the Lean Saint accepts you," she whispers, emaciated beauty terrifying and arousing.',
+    '"I will unwind your excess," she promises, voice breaking on the last word.',
+    '"Famine is love," she breathes — and sounds, for one heartbeat, like she believes you instead.',
+  ]},
   { when: { role: 'boss' }, text: [
     '"You spread heresy like butter on bread," the Lean Saint hisses. "I will starve it out of you."',
     '"Abundance is a lie," she breathes, voice like cracked ice. "I am the truth that hurts."',

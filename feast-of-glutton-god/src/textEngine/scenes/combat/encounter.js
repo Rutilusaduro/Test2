@@ -27,8 +27,31 @@ registerPool('combat.encounter', [
     'Church steel blocks the road in {regionName}: incense, warrants, and horror that does not wink.',
   ]},
   { when: { enemyId: 'famine_hag' }, text: [
-    'the Lean Saint unfolds — Sylwen\'s scourge, famine blessed and sent. The air thins; your belly protests anyway.',
-    'She is all angles and holy hatred: the Lean Saint, sent because mortal inquisitors were not enough.',
+    'the Lean Saint unfolds — Sylwen\'s scourge, famine blessed and sent. The air thins; your belly protests anyway, nipples aching at her terrible elegance.',
+    'She is all angles and holy hatred: the Lean Saint, rail-thin beauty that should never swell — and yet your magic makes her shiver.',
+  ]},
+  { when: { enemyId: 'velvet_succubus' }, text: [
+    'Shrine-mist curls into a velvet succubus — horns, tail, lacework straining over hourglass curves. She smiles like consent and corruption share a bed.',
+    'A patron-leak temptation steps through the thin veil in {regionName}: infernal hips rolling, breasts spilling, voice promising ruinous, willing pleasure.',
+  ]},
+  { when: { enemyId: 'crimson_vampire' }, text: [
+    'A crimson countess drifts from shadow — pale throat offered, corset laced, fangs peeking. Cold skin already warming where your abundance touches the air.',
+    'Undead nobility blocks the moon in {regionName}: pear-pale curves, velvet cape parting, hunger older than the Church and far more intimate.',
+  ]},
+  { when: { enemyId: 'cathedral_golem' }, text: [
+    'Marble grinds alive — cathedral golem mass reshaping, sacred reliefs stretching over curves that should not exist in stone. Law made voluptuous, terrifying, edible.',
+  ]},
+  { when: { enemyId: 'korthak_titan' }, text: [
+    'A frontier titan fills the field — war-plate straining over siege-tower thighs, honest fury softening into honest feast-day curiosity.',
+  ]},
+  { when: { enemyId: 'void_appetite' }, text: [
+    'the Inverted Hunger resolves wrong — absence bulging into slick, obscene curves where emptiness used to be. Appetite eating appetite.',
+  ]},
+  { when: { enemyId: 'avatar_aurelan' }, text: [
+    'Aurelan Incarnate manifests — law-goddess curves burning with crown-light, scales tipping as her belly rounds despite cosmic restraint.',
+  ]},
+  { when: { enemyId: 'bloom_sovereign' }, text: [
+    'the Bloom Sovereign rises — rival goddess voluptuous, mirror-hunger devouring light, every curve a theft of your patron\'s dream.',
   ]},
   { when: {}, text: [
     'Combat finds you in {regionName} — foes ahead, abundance in the air, and the DM whispers that this will get messy in the best way.',

@@ -37,6 +37,8 @@ export const ENEMY_GROWTH_KIND = {
   sylwen_revenant: 'divine_avatar_grief',
   veshanne_unbound: 'divine_avatar_death',
   bloom_sovereign: 'rival_goddess',
+  velvet_succubus: 'succubus',
+  crimson_vampire: 'vampire',
 };
 
 /** NPC role → growthKind when not an enemy type */

@@ -94,14 +94,19 @@ registerPool('dm.cosmic.intro', [
     '★ Cosmic Veshanne — she has read your story and intends to close the book.',
   ]},
   { when: { enemyType: 'bloom_sovereign' }, text: [
-    '★ the Bloom Sovereign rises — wrong abundance, rival goddess, mirror-hunger made sovereign.',
-    '★ She steals your growth and mirrors it at full power. Your patron\'s antithesis walks.',
-    '★ Cosmic rival — conversion-immune, legendary, hungry for your genre itself.',
+    '★ the Bloom Sovereign rises — voluptuous rival goddess, mirror-hunger devouring light, every curve a theft of your patron\'s wettest dream.',
+    '★ She steals your growth and mirrors it at full power — breasts crowned, hips sovereign, smile promising consumption dressed as seduction.',
+    '★ Cosmic rival — conversion-immune, legendary, hungry for your genre and your gasps.',
   ]},
   { when: { enemyType: 'wheel_incarnate' }, text: [
-    '★ The Wheel Incarnate — six domains compressed into one desperate god-shape.',
-    '★ Each turn a different divine law activates. This is the pre-final boss the pantheon prayed would never be needed.',
-    '★ Cosmic culmination — legendary resistances stacked, growth nearly futile, story at maximum heat.',
+    '★ The Wheel Incarnate — six domains compressed into one desperate, radiant body, curves stacked like theology, hunger too unified to deny.',
+    '★ Each turn a different divine law activates across slick skin and trembling thighs. Pre-final boss energy — the pantheon prayed; you purr.',
+    '★ Cosmic culmination — legendary resistances, growth nearly futile, story at maximum heat and maximum blush.',
+  ]},
+  { when: { enemyType: 'crimson_vampire' }, text: [
+    '★ Crimson Countess unfolds — mythic undead elegance, corset laced, throat offered, cold skin warming where your gospel brushes her.',
+    '★ Barrow-night nobility given fangs and pear-pale curves — hunger older than the Church, arousal she calls doom.',
+    '★ Mythic vampire opposition — not cosmic, but intimate enough to feel like apotheosis anyway.',
   ]},
   { when: { threatTier: 'mythic', escalationTierMin: 2 }, text: [
     '★ Mythic opposition — gods send avatars\' heralds now. Growth resists; tactics matter.',

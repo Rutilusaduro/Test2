@@ -38,6 +38,24 @@ registerPool('dm.gag.trivialize', [
     'She thought she was the hungry one. Cute mistake.',
     'Green skin, greener envy: you eat better than monsters now.',
   ]},
+  { when: { enemyType: 'velvet_succubus' }, text: [
+    'The succubus offers sin — you offer seconds. Genre rules blush and leave the room.',
+    'Temptation meant to drain you instead swells her — horns dipping, tail curling, moan sincere.',
+    'Velvet skin, velvet victory: she ends the fight rounder than her contract allowed.',
+  ]},
+  { when: { enemyType: 'crimson_vampire' }, text: [
+    'The countess hisses — then sighs as crumbs win. Undead elegance, very alive appetite.',
+    'She came for blood. You brought dessert. The night belongs to abundance.',
+    'Fangs flash, then falter. Crimson pride melts into plush, grateful curves.',
+  ]},
+  { when: { enemyType: 'cathedral_golem' }, text: [
+    'Stone softens where you touch — law-construct becoming idol. Aurelan was not consulted.',
+    'Marble curves creak into surrender. Even geometry learns to jiggle.',
+  ]},
+  { when: { enemyType: 'korthak_titan' }, text: [
+    'The titan expected war. You served feast. Frontier honor never tasted so soft.',
+    'Siege-scale mass, banquet-scale aftermath — she blushes through the harness.',
+  ]},
   { when: { escalationTierMin: 2 }, text: [
     'Another dread foe, another snack. The gods are taking notes; you are taking seconds.',
     'The Wheel groans. You pat your belly. Fair exchange.',
