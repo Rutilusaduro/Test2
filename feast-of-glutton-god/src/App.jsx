@@ -19,6 +19,8 @@ import { ensurePartyUniversalSize } from "./gameData/universalSize.js";
 import { recordCombatEndForQuests } from "./hooks/questHooks.js";
 import { recordPuzzleSolvedForQuests } from "./hooks/puzzleHooks.js";
 import { applySolutionImmediate } from "./gameData/puzzleEngine.js";
+import { recordCombatVictory } from "./gameData/obstacleUnlocks.js";
+import { syncGateUnlocks } from "./gameData/regionObstacles.js";
 import { ensureSpellState, getCharacterSpells } from "./gameData/spellLearning.js";
 import { autoPrepareSpells } from "./gameData/spellPreparation.js";
 import { completePendingLevelUp as completeLevelUpChoice } from "./gameData/levelUpChoices.js";
@@ -146,6 +148,17 @@ export default function App() {
       const quest = recordCombatEndForQuests(next, combat);
       if (quest.questMessages) {
         next.lastQuestMessage = quest.questMessages;
+      }
+
+      if (combat.victory === 'win' || combat.victory === 'converted') {
+        for (const enemy of combat.enemies ?? []) {
+          const enemyId = enemy.typeId ?? enemy.enemyTypeId ?? enemy.id;
+          if (enemyId) recordCombatVictory(next, enemyId);
+        }
+        const gateMsgs = syncGateUnlocks(next, { regionId: next.region });
+        if (gateMsgs.length) {
+          next.lastQuestMessage = [next.lastQuestMessage, ...gateMsgs].filter(Boolean).join('\n\n---\n\n');
+        }
       }
 
       const pending = prev.pendingPuzzleCombat;

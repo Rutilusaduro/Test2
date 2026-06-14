@@ -91,6 +91,7 @@ export function buildGrowthNarrative(character, game, params) {
       stagesJumped,
       regionId,
       growthMethod,
+      raisedBy: opts.raisedBy ?? (character?.id === game.player?.id ? 'self' : 'player'),
     });
     persistentReactionLines = reaction.lines ?? [];
   }

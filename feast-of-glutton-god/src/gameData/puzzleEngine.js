@@ -23,6 +23,10 @@ import { getTightSpacePenalty } from './stageMechanics.js';
 import { renderPuzzleText } from '../textEngine/scenes/puzzles/index.js';
 import { awardAbundanceSpreadWithEvents } from './worldEvents.js';
 import { getSpell, getSpellEnvironmentTags } from './spells.js';
+import { getLandmarksInRegion } from './worldReactivity.js';
+import { getRegionTransformation } from './worldTransformation.js';
+import { syncGateUnlocks } from './regionObstacles.js';
+import { tryClearObstacle, isAnyUnlockSatisfied } from './obstacleUnlocks.js';
 
 function resolveNpcAliases(npcId) {
   if (!npcId) return [];
@@ -57,7 +61,12 @@ export function isPuzzleSolved(game, puzzleId) {
   ensureQuestState(game);
   const def = getPuzzleDefinition(puzzleId);
   if (!def) return false;
-  return Boolean(game.worldFlags?.[def.stateFlag]);
+  if (Boolean(game.worldFlags?.[def.stateFlag])) return true;
+  if (def.unlocks?.length && isAnyUnlockSatisfied(game, def.unlocks, { regionId: def.regionId })) {
+    tryClearObstacle(game, { ...def, solvedFlag: def.stateFlag, puzzleId: def.id });
+    return true;
+  }
+  return false;
 }
 
 export function isFeatureExamined(game, featureId) {
@@ -182,6 +191,46 @@ function evaluateSolutionKind(game, solution, puzzle, context = {}) {
         available: true,
         hint: solution.hint ?? 'Win the encounter — conversion or victory both count.',
       };
+
+    case SOLUTION_KIND.PLACE_GIANT: {
+      const regionId = puzzle.regionId ?? game.region;
+      const minStage = solution.minStage ?? solution.stage ?? 11;
+      const landmarks = getLandmarksInRegion(game, regionId);
+      const who = solution.characterId;
+      const ok = landmarks.some((l) => {
+        if (who && l.characterId !== who) return false;
+        return l.stage >= minStage;
+      });
+      return {
+        available: ok,
+        hint: ok ? null : `Requires a stage-${minStage}+ landmark in this region`,
+      };
+    }
+
+    case SOLUTION_KIND.FEED_NPC_STAGE: {
+      const npcId = solution.npcId;
+      const need = solution.stage ?? 1;
+      const template = findNpc(npcId, game);
+      const stage = template
+        ? getStage(getNpcState(game, template).lbs).id
+        : getStage((game.party ?? []).find((c) => c.id === npcId)?.lbs ?? 0).id;
+      return {
+        available: stage >= need,
+        hint: stage >= need ? null : `Grow ${template?.name ?? npcId} to stage ${need}+`,
+      };
+    }
+
+    case SOLUTION_KIND.BLESS_REGION: {
+      const regionId = solution.regionId ?? puzzle.regionId ?? game.region;
+      const transform = getRegionTransformation(game, regionId);
+      const need = solution.transformationMin ?? solution.level ?? 2;
+      const ok = transform.level.level >= need
+        || (solution.abundanceMin != null && getAbundanceSpread(game) >= solution.abundanceMin);
+      return {
+        available: ok,
+        hint: ok ? null : `Requires greater regional transformation in ${regionId}`,
+      };
+    }
 
     default:
       return { available: false, hint: 'Unknown approach.' };
@@ -405,6 +454,7 @@ export function applySolutionImmediate(game, puzzleId, solutionId, opts = {}) {
   }
 
   awardAbundanceSpreadWithEvents(game, 'puzzle_solved');
+  syncGateUnlocks(game, { regionId: puzzle.regionId, puzzleId });
 
   const textKey = solution.onSolve?.textKey ?? 'puzzle.solve.default';
   const prose = renderPuzzleText(textKey, game, {

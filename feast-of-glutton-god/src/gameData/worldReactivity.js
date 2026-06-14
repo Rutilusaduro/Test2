@@ -212,6 +212,7 @@ function applyLandmarkBirth(game, event, lines, effects) {
     lastGrowthDay: game.day ?? 1,
     settleState: 0,
     cult: tier >= 2,
+    raisedBy: event.raisedBy ?? existing?.raisedBy ?? (characterId === 'player' ? 'self' : 'player'),
     flags: { ...(existing?.flags ?? {}) },
   };
 
@@ -481,5 +482,62 @@ export function getRegionReactivitySummary(game, regionId) {
     })),
     factionPurityWeakened: Boolean(game.worldFlags?.faction_purity_weakened),
     livingLandmarkCount: getLivingLandmarkCount(game, regionId),
+    ecology: getGiantEcologySummary(game, regionId),
   };
+}
+
+/**
+ * Multi-giant ecology — who grew whom, regional power balance.
+ */
+export function getGiantEcologySummary(game, regionId) {
+  const fp = getRegionFootprint(game, regionId);
+  const landmarks = getLandmarksInRegion(game, regionId);
+  const playerRaised = landmarks.filter((l) => l.raisedBy === 'player' || l.raisedBy === game.player?.name);
+  const selfLandmarks = landmarks.filter((l) => l.characterId === 'player');
+  const npcLandmarks = landmarks.filter((l) => l.characterId !== 'player');
+  const cultLandmarks = landmarks.filter((l) => l.cult);
+
+  let dominance = 'balanced';
+  if (playerRaised.length >= 2 || selfLandmarks.length > 0) dominance = 'player_ascendant';
+  else if (npcLandmarks.length >= 2 && cultLandmarks.length >= 1) dominance = 'cult_swelling';
+  else if (fp.footprint >= FOOTPRINT_BLOCK_EXIT) dominance = 'crowded_giants';
+
+  const powerScore = playerRaised.length * 3
+    + selfLandmarks.length * 5
+    + cultLandmarks.length * 2
+    + Math.floor(fp.footprint / 4);
+
+  return {
+    dominance,
+    powerScore,
+    livingLandmarkCount: landmarks.length,
+    playerRaisedCount: playerRaised.length,
+    cultCount: cultLandmarks.length,
+    giants: (fp.giants ?? []).map((id) => {
+      const lm = game.worldFlags?.landmarks?.[id];
+      return {
+        id,
+        name: lm?.name ?? id,
+        stage: lm?.stage ?? fp.maxStage,
+        raisedBy: lm?.raisedBy ?? 'unknown',
+      };
+    }),
+    narrative: describeEcologyDominance(dominance, landmarks, regionId),
+  };
+}
+
+function describeEcologyDominance(dominance, landmarks, regionId) {
+  const region = getRegion(regionId);
+  switch (dominance) {
+    case 'player_ascendant':
+      return `Your gospel reshapes ${region.name} — the giants here bear your touch.`;
+    case 'cult_swelling':
+      return `Cults multiply in ${region.name}; every landmark draws pilgrims and hungry politics.`;
+    case 'crowded_giants':
+      return `${region.name} groans under titanic presence — power balances on a knife of appetite.`;
+    default:
+      return landmarks.length
+        ? `${region.name} hosts ${landmarks.length} living landmark${landmarks.length > 1 ? 's' : ''} — the world learns new shapes.`
+        : null;
+  }
 }

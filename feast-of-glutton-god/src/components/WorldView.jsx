@@ -17,6 +17,7 @@ import { getVisibleFeatures } from "../gameData/puzzleEngine.js";
 import { getAbundanceProgress } from "../gameData/abundanceSpread.js";
 import { recordRegionVisitForQuests } from "../hooks/questHooks.js";
 import { advanceWorldSettling, getRegionReactivitySummary } from "../gameData/worldReactivity.js";
+import { syncGateUnlocks } from "../gameData/regionObstacles.js";
 import NpcModal from "./NpcModal.jsx";
 import FeatureModal from "./FeatureModal.jsx";
 import QuestLog from "./QuestLog.jsx";
@@ -43,8 +44,10 @@ export default function WorldView({ game, onUpdate, onEncounter, onPuzzleCombat,
 
   const applySettling = (g) => {
     const settled = advanceWorldSettling(g);
-    if (settled.lines?.length) {
-      return { ...g, lastQuestMessage: settled.lines.join('\n\n') };
+    const gateMsgs = syncGateUnlocks(g, { regionId: g.region });
+    const lines = [...(settled.lines ?? []), ...gateMsgs];
+    if (lines.length) {
+      return { ...g, lastQuestMessage: lines.join('\n\n') };
     }
     return g;
   };
@@ -373,6 +376,16 @@ export default function WorldView({ game, onUpdate, onEncounter, onPuzzleCombat,
             </p>
           ) : (
             <p style={{ fontSize: '0.85rem', color: 'var(--text-dim)' }}>All roads open — for now.</p>
+          )}
+          {reactivity.ecology?.narrative && (
+            <p style={{ fontSize: '0.85rem', color: 'var(--gold)', marginTop: '0.5rem' }}>
+              {reactivity.ecology.narrative}
+            </p>
+          )}
+          {reactivity.ecology?.giants?.length > 0 && (
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)', marginTop: '0.35rem' }}>
+              Giants: {reactivity.ecology.giants.map((g) => `${g.name} (${g.raisedBy})`).join(' · ')}
+            </div>
           )}
           {(game.worldFlags?.livingLedger ?? []).slice(-3).reverse().map((entry) => (
             <p key={entry.id} style={{ fontSize: '0.8rem', color: 'var(--gold)', marginTop: '0.35rem' }}>

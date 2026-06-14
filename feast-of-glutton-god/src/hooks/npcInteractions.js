@@ -29,6 +29,7 @@ import { awardInfluence, getRelationshipInfluenceBonus } from '../gameData/influ
 import { awardRegionTransformation } from '../gameData/worldTransformation.js';
 import { appendPuzzleHintToTalk } from '../gameData/puzzleHints.js';
 import { getReactivityGlobals } from '../gameData/worldReactivity.js';
+import { syncGateUnlocks } from '../gameData/regionObstacles.js';
 
 function withQuestProgress(game, npc, interaction, meta, result) {
   const quest = recordNpcInteractionForQuests(game, {
@@ -111,11 +112,13 @@ function growNpc(npc, game, baseStages, method = 'feed') {
   const bonus = getGrowthStageBonus(npc, method);
   const stages = baseStages + bonus;
   const startStage = getStage(npc.lbs).id;
-  const presentation = applyGrowthWithPresentation(npc, game, stages, { growthMethod: method });
+  const presentation = applyGrowthWithPresentation(npc, game, stages, { growthMethod: method, raisedBy: 'player' });
+  const gateMsgs = syncGateUnlocks(game, { regionId: game.region });
   return {
     ...presentation,
     startStage: presentation.startStage ?? startStage,
     bonusStages: bonus,
+    gateMsgs,
   };
 }
 
@@ -261,10 +264,17 @@ export function doFeast(npc, player, game) {
   const text = renderFeast(npc, player, { history: getTextHistory(game) });
   addCorruption(npc, 15);
   const relResult = applyRelationshipGain(npc, 'feast');
+  game.day += 1;
+  game.worldFlags = game.worldFlags ?? {};
+  game.worldFlags[`feast_held_${game.region}`] = true;
+  game.worldFlags.communal_feast_done = true;
+  const gateMsgs = syncGateUnlocks(game, { regionId: game.region });
   let result = appendTierUp({
     text: text + '\n\n' + (growth.text || ''), npc, growth, ok: true,
   }, npc, relResult);
-  game.day += 1;
+  if (gateMsgs.length) {
+    result.text = `${result.text}\n\n${gateMsgs.join('\n\n')}`;
+  }
   return withQuestProgress(game, npc, 'feast', null, result);
 }
 
