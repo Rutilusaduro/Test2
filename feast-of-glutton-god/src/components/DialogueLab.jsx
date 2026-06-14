@@ -20,6 +20,9 @@ import { renderCastFeedback } from "../textEngine/scenes/dm/cast.js";
 import { renderSatiationRefusal } from "../textEngine/scenes/npc/satiation.js";
 import { renderForcedGrowth, renderWillingRapture } from "../textEngine/scenes/npc/consentGrowth.js";
 import { renderSpecial } from "../textEngine/scenes/npc/special.js";
+import { renderRegionHostilityBeat } from "../textEngine/scenes/dm/region.js";
+import { renderFavorWarning, renderSpecialCooldown } from "../textEngine/scenes/dm/favor.js";
+import { renderIndulge } from "../textEngine/scenes/player/indulge.js";
 import { ENEMY_TYPES } from "../gameData/enemies.js";
 import { REGIONS } from "../gameData/regions.js";
 import { resolveGrowthZone } from "../textEngine/growthLexicon.js";
@@ -38,6 +41,8 @@ const CAST_TYPES = ["action", "bonus"];
 const PAID_BY = ["slot", "ap", "cantrip"];
 const FAIL_CAUSES = ["no_resource", "no_action", "no_bonus"];
 const CONSENT_STATES = ["willing", "forced"];
+const FAVOR_STATES = ["flush", "low", "empty"];
+const HOSTILITY_TIERS = ["0", "1", "2", "3"];
 const SATIATION_TIER_IDS = ["0", "1", "2", "3"];
 const ENEMY_TYPE_IDS = Object.keys(ENEMY_TYPES);
 const REGION_IDS = REGIONS.map((r) => r.id);
@@ -218,6 +223,55 @@ const SECTIONS = {
       consentState: opts.consentState === RANDOM ? pick(CONSENT_STATES) : opts.consentState,
       severity: 1,
       gainDesire: s.gainDesire ?? 40,
+      trace: opts.trace,
+    }),
+  },
+  "dm.region.wary": {
+    params: ["region", "hostilityTier"],
+    fn: (s, opts) => renderRegionHostilityBeat(
+      { player: MOCK_PLAYER, region: opts.region === RANDOM ? pick(REGION_IDS) : opts.region },
+      opts.region === RANDOM ? pick(REGION_IDS) : opts.region,
+      {
+        hostilityTier: Number(opts.hostilityTier === RANDOM ? pick(HOSTILITY_TIERS) : opts.hostilityTier),
+        crackdown: false,
+        trace: opts.trace,
+      },
+    ),
+  },
+  "dm.region.crackdown": {
+    params: ["region"],
+    fn: (s, opts) => renderRegionHostilityBeat(
+      { player: MOCK_PLAYER, region: opts.region === RANDOM ? pick(REGION_IDS) : opts.region },
+      opts.region === RANDOM ? pick(REGION_IDS) : opts.region,
+      { hostilityTier: 3, crackdown: true, trace: opts.trace },
+    ),
+  },
+  "dm.favor.low": {
+    params: ["favorState"],
+    fn: (s, opts) => renderFavorWarning(MOCK_PLAYER, { region: "harvest_hearth" }, {
+      favorState: opts.favorState === RANDOM ? pick(FAVOR_STATES) : opts.favorState,
+      action: "growth",
+      trace: opts.trace,
+    }),
+  },
+  "dm.favor.empty": {
+    params: ["favorState"],
+    fn: (s, opts) => renderFavorWarning(MOCK_PLAYER, { region: "harvest_hearth" }, {
+      favorState: "empty",
+      action: "growth",
+      trace: opts.trace,
+    }),
+  },
+  "dm.special.cooldown": {
+    params: ["girl"],
+    fn: (s, opts) => renderSpecialCooldown(s, MOCK_PLAYER, { region: "harvest_hearth" }, { trace: opts.trace }),
+  },
+  "player.indulge": {
+    params: ["stage", "region"],
+    fn: (s, opts) => renderIndulge(MOCK_PLAYER, {
+      region: opts.region === RANDOM ? pick(REGION_IDS) : opts.region,
+    }, {
+      stage: Number(opts.stage === RANDOM ? pick(["2", "5", "8", "11"]) : opts.stage),
       trace: opts.trace,
     }),
   },

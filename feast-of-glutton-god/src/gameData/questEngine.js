@@ -15,6 +15,7 @@ import { findNpc, WORLD_NPCS, createNpc } from './npcs.js';
 import { getRegion } from './regions.js';
 import { renderGrowthProse } from '../textEngine/scenes/growth/index.js';
 import { renderQuestText } from '../textEngine/scenes/quests/index.js';
+import { onRedemptionQuestComplete } from '../hooks/questHooks.js';
 
 const DEFAULT_UNLOCKED_REGIONS = [
   'harvest_hearth',
@@ -631,6 +632,10 @@ export function completeQuest(game, questId, opts = {}) {
   const rewardMsgs = applyRewardBundle(game, rewardBundle);
   delete game.quests.active[questId];
   game.quests.completed.push(questId);
+
+  if (questId === 'side_hostility_redemption') {
+    onRedemptionQuestComplete(game);
+  }
 
   const textKey = ending?.textKey ?? rewardBundle.textKey ?? 'quest.complete';
   const completionMessage = opts.stageMessage

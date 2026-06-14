@@ -14,6 +14,16 @@ import { getTier } from "../gameData/relationships.js";
 import { getCorruptionTier } from "../gameData/corruption.js";
 import { getXpProgress, longRest } from "../gameData/leveling.js";
 import { decaySatiationForGame } from "../gameData/satiation.js";
+import {
+  doIndulge,
+  ensureFavor,
+} from "../gameData/favor.js";
+import {
+  getRegionTensionLabel,
+  rollHostilityTravelEncounter,
+  tickRegionHostility,
+} from "../gameData/regionHostility.js";
+import { renderRegionHostilityBeat } from "../textEngine/scenes/dm/region.js";
 import { getPlayerDerivedStats } from "../gameData/player.js";
 import { getTravelOptions } from "../gameData/regionObstacles.js";
 import { getVisibleFeatures } from "../gameData/puzzleEngine.js";
@@ -40,13 +50,14 @@ const ARCHETYPE_GLYPH = {
   chosen: "★",
 };
 
-export default function WorldView({ game, onUpdate, onEncounter, onPuzzleCombat, onSave, onDebugContext }) {
+export default function WorldView({ game, onUpdate, onEncounter, onHostilityEncounter, onPuzzleCombat, onSave, onDebugContext }) {
   const [npcModal, setNpcModal] = useState(null);
   const [featureModal, setFeatureModal] = useState(null);
   const [showSheet, setShowSheet] = useState(false);
   const [showInfluence, setShowInfluence] = useState(false);
   const [showRegionDash, setShowRegionDash] = useState(false);
   const player = game.player;
+  ensureFavor(player);
   const regionPresent = getRegionPresentation(game, game.region);
   const regionTransform = getRegionTransformation(game, game.region);
   const commandMode = getCommandMode(game);
@@ -57,6 +68,7 @@ export default function WorldView({ game, onUpdate, onEncounter, onPuzzleCombat,
   const derived = getPlayerDerivedStats(player);
   const abundance = getAbundanceProgress(game);
   const reactivity = getRegionReactivitySummary(game, game.region);
+  const tensionLabel = getRegionTensionLabel(game, game.region);
 
   const applySettling = (g) => {
     const settled = advanceWorldSettling(g);
@@ -81,6 +93,7 @@ export default function WorldView({ game, onUpdate, onEncounter, onPuzzleCombat,
     onUpdate((g) => {
       clearTransient(g);
       if (method.apCost) spendAP(g, method.apCost);
+      const fromRegion = g.region;
       const next = applySettling({ ...g, region: regionId });
       narrate(next, 'arrival', { regionId });
       if (method.flavor) narrateEvent(next, method.flavor, 'quest');
@@ -89,6 +102,13 @@ export default function WorldView({ game, onUpdate, onEncounter, onPuzzleCombat,
         narrateEvent(next, quest.questMessages, 'quest');
       }
       tickDmAction(next, 'travel');
+      tickRegionHostility(next);
+      const hostilityEnemy = rollHostilityTravelEncounter(next, fromRegion, regionId);
+      if (hostilityEnemy && onHostilityEncounter) {
+        const beat = renderRegionHostilityBeat(next, regionId, { hostilityTier: 2 });
+        if (beat) narrateEvent(next, beat, 'quest');
+        setTimeout(() => onHostilityEncounter(hostilityEnemy), 0);
+      }
       return next;
     });
   };
@@ -190,6 +210,14 @@ export default function WorldView({ game, onUpdate, onEncounter, onPuzzleCombat,
         </span>
         <span className="stat">AC <strong>{derived.ac}</strong></span>
         <span className="stat">AP: <strong>{player.ap}</strong>/{derived.maxAp}</span>
+        <span className="stat" title="Gorgara's daily favor for overworld growth magic">
+          Favor: <strong>{player.favor}/{player.favorMax}</strong>
+        </span>
+        {tensionLabel && (
+          <span className="stat" title="Regional tension from forced growth" style={{ color: 'var(--rose)' }}>
+            Tension: <strong>{tensionLabel}</strong>
+          </span>
+        )}
         <span className="stat">HP: <strong>{player.hp}/{player.maxHp}</strong></span>
         <span className="stat">Party: <strong>{game.party.length}</strong></span>
       </div>
@@ -211,6 +239,9 @@ export default function WorldView({ game, onUpdate, onEncounter, onPuzzleCombat,
         <h2>{regionPresent.name}</h2>
         <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)', marginBottom: '0.35rem' }}>
           Regional transformation: <strong>{regionTransform.level.label}</strong>
+          {tensionLabel && (
+            <> · Tension: <strong style={{ color: 'var(--rose)' }}>{tensionLabel}</strong></>
+          )}
           {regionTransform.next && ` — ${regionTransform.points} pts toward ${regionTransform.next.label}`}
         </p>
         {regionTransform.next && (
@@ -361,12 +392,22 @@ export default function WorldView({ game, onUpdate, onEncounter, onPuzzleCombat,
           <button onClick={() => setShowInfluence((v) => !v)}>Influence & Power</button>
           <button onClick={onEncounter}>Seek Encounter</button>
           <button onClick={() => onUpdate((g) => {
-            longRest(g.player);
+            longRest(g.player, g);
             decaySatiationForGame(g, { longRest: true });
             const next = applySettling({ ...g, day: g.day + 1, lastLevelUpMessage: null });
+            tickRegionHostility(next, { dayAdvance: true, longRest: true });
             return next;
           })}>
             Rest & Feast (long rest)
+          </button>
+          <button onClick={() => onUpdate((g) => {
+            ensureFavor(g.player);
+            const result = doIndulge(g.player, g);
+            if (result.text) narrateEvent(g, result.text, 'growth');
+            tickDmAction(g, 'indulge');
+            return g;
+          })}>
+            Eat / Indulge (restore Favor)
           </button>
           <button onClick={onSave}>Save Game</button>
         </div>

@@ -26,6 +26,9 @@ import './leveling/index.js';
 import './dm/index.js';
 import './dm/combat.js';
 import './dm/cast.js';
+import './dm/region.js';
+import './dm/favor.js';
+import './player/indulge.js';
 
 export { renderUnmetDescriptor } from './npc/unmet.js';
 export { renderObserve, POSES } from './npc/observe.js';

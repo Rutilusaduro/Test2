@@ -11,6 +11,9 @@ import { getSubclass, getDefaultSubclassId } from "./subclasses.js";
 import { getStartLbsWithRace } from "./raceFeatures.js";
 import { ensureGainDesire } from "./gainDesire.js";
 import { ensureSatiation } from "./satiation.js";
+import { ensureFavor } from "./favor.js";
+import { drainForcedGrowthLog, tickRegionHostility } from "./regionHostility.js";
+import { flushHostilityPending } from "../hooks/questHooks.js";
 
 /**
  * @param {string} name
@@ -68,11 +71,12 @@ export function createPlayer(name, classId, options = {}) {
     spells: [],
     levelUpsPending: [],
     tempFlags: {},
-    restFlags: { hungerForMoreUsed: false },
+    restFlags: { hungerForMoreUsed: false, indulgeUsed: false },
   };
 
   initSpellSlots(player);
   initializeStartingSpells(player);
+  ensureFavor(player);
   player.ap = Math.min(player.ap, getMaxAbundancePoints(player));
   return player;
 }
@@ -120,6 +124,15 @@ export function createNewGame(name, classId, options = {}) {
     },
   };
   return ensurePartyUniversalSize(game);
+}
+
+/** Migrate / hydrate scarcity + hostility state on load. */
+export function ensureScarcityState(game) {
+  if (!game?.player) return game;
+  ensureFavor(game.player);
+  tickRegionHostility(game);
+  flushHostilityPending(game);
+  return game;
 }
 
 export function ensureDmState(game) {

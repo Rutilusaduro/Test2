@@ -29,6 +29,9 @@ const {
   getEnemySizeBand,
 } = await import(pathToFileURL(path.join(ROOT, 'src/textEngine/scenes/dm/combat.js')).href);
 const { renderCastFeedback } = await import(pathToFileURL(path.join(ROOT, 'src/textEngine/scenes/dm/cast.js')).href);
+const { renderRegionHostilityBeat } = await import(pathToFileURL(path.join(ROOT, 'src/textEngine/scenes/dm/region.js')).href);
+const { renderFavorWarning, renderSpecialCooldown } = await import(pathToFileURL(path.join(ROOT, 'src/textEngine/scenes/dm/favor.js')).href);
+const { renderIndulge } = await import(pathToFileURL(path.join(ROOT, 'src/textEngine/scenes/player/indulge.js')).href);
 
 const MAX_VARIANT_CHARS = 200;
 const errors = [];
@@ -67,7 +70,7 @@ function collectTexts(variant) {
   return [];
 }
 
-const DM_POOL_PREFIXES = ['dm.combat.', 'dm.cast.', 'npc.satiation.', 'npc.growth.', 'npc.bless.forced', 'npc.refusal', 'npc.special.'];
+const DM_POOL_PREFIXES = ['dm.combat.', 'dm.cast.', 'dm.region.', 'dm.favor.', 'dm.special.', 'npc.satiation.', 'npc.growth.', 'npc.bless.forced', 'npc.refusal', 'npc.special.', 'player.indulge.'];
 const STRICT_POOL = (key) => DM_POOL_PREFIXES.some((p) => key.startsWith(p));
 
 // ── static: pool variant length + when keys (combat DM pools) ──
@@ -231,10 +234,40 @@ function sweepCastFeedback(iterations = 150) {
   }
 }
 
+function sweepRepercussions(iterations = 200) {
+  const HOSTILITY_TIERS = [0, 1, 2, 3];
+  const FAVOR_STATES = ['flush', 'low', 'empty'];
+  const STAGES = [2, 5, 8, 11];
+  for (let i = 0; i < iterations; i++) {
+    const region = REGION_IDS[i % REGION_IDS.length];
+    const hostilityTier = HOSTILITY_TIERS[i % HOSTILITY_TIERS.length];
+    const crackdown = hostilityTier >= 3;
+    const game = { player: MOCK_PLAYER, region };
+    const regionText = renderRegionHostilityBeat(game, region, { hostilityTier, crackdown, seed: `region_${i}` });
+    assertCleanRender(`dm.region #${i}`, regionText);
+
+    const favorState = FAVOR_STATES[i % FAVOR_STATES.length];
+    const favorText = renderFavorWarning(MOCK_PLAYER, game, { favorState, action: 'growth', seed: `favor_${i}` });
+    assertCleanRender(`dm.favor #${i}`, favorText);
+
+    const stage = STAGES[i % STAGES.length];
+    const indulgeText = renderIndulge({ ...MOCK_PLAYER, lbs: 120 + stage * 40 }, game, { stage, seed: `indulge_${i}` });
+    assertCleanRender(`player.indulge #${i}`, indulgeText);
+  }
+
+  const cooldownText = renderSpecialCooldown(
+    { name: 'Test NPC', archetype: 'performer', pronouns: 'they' },
+    MOCK_PLAYER,
+    { region: 'harvest_hearth' },
+  );
+  assertCleanRender('dm.special.cooldown', cooldownText);
+}
+
 const SWEEPS = [
   { name: 'dm.combat.intro', run: sweepCombatIntro },
   { name: 'dm.combat.outro', run: sweepCombatOutro },
   { name: 'dm.cast', run: sweepCastFeedback },
+  { name: 'repercussions', run: sweepRepercussions },
 ];
 
 for (const sweep of SWEEPS) {

@@ -7,6 +7,9 @@ import {
   ensureQuestState,
 } from '../gameData/questEngine.js';
 import { QUEST_TYPE } from '../gameData/quests/constants.js';
+import { narrateEvent } from '../gameData/narrator.js';
+import { renderRegionHostilityBeat } from '../textEngine/scenes/dm/region.js';
+import { clearCrackdown } from '../gameData/regionHostility.js';
 
 /**
  * Record an NPC interaction for quest objective progress.
@@ -85,4 +88,35 @@ function formatQuestMessages(lines, growthSnippets) {
   if (lines?.length) parts.push(lines.join('\n'));
   if (growthSnippets?.length) parts.push(growthSnippets.join('\n\n'));
   return parts.join('\n\n');
+}
+
+/** Narrate hostility tier beats and auto-start redemption quest when crackdown triggers. */
+export function flushHostilityPending(game) {
+  ensureQuestState(game);
+  const pending = game.worldFlags?.pending_hostility_narration;
+  if (pending) {
+    const beat = renderRegionHostilityBeat(game, pending.regionId, pending);
+    if (beat) narrateEvent(game, beat, 'quest');
+    delete game.worldFlags.pending_hostility_narration;
+  }
+  if (game.worldFlags?.pending_redemption_quest) {
+    game.worldFlags.pending_redemption_quest = false;
+    const already = game.quests.active?.side_hostility_redemption
+      || game.quests.completed?.includes('side_hostility_redemption');
+    if (!already) {
+      const quest = startQuest(game, 'side_hostility_redemption');
+      if (quest.ok && quest.message) narrateEvent(game, quest.message, 'quest');
+    }
+  }
+}
+
+export function onRedemptionQuestComplete(game) {
+  const regionId = game.worldFlags?.redemptionRegion ?? game.region;
+  clearCrackdown(game, regionId);
+  game.worldFlags.pending_hostility_narration = {
+    regionId,
+    hostilityTier: 1,
+    crackdown: false,
+  };
+  flushHostilityPending(game);
 }
