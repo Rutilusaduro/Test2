@@ -9,6 +9,7 @@
 import './helpers.js';
 import './corePools.js';
 import './contextPools.js';
+import './speciesCombatGrowth.js';
 
 import { createContext, render } from '../../engine.js';
 import { getStage } from '../../../gameData/stages.js';

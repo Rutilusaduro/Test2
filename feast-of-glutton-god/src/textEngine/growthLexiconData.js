@@ -2,6 +2,9 @@
 // GROWTH LEXICON DATA — mined prose by body type × body zone
 // Source: Grow corpus. "Her …" → "{subject.name}'s …" for subject binding.
 // Zones: belly | lower_body | curves | full | bust
+//
+// Species-specific physique prose lives in enemyGrowthLexiconData.js
+// (routed by growthKind: harpy, dryad, stone_golem, dragon…).
 // ═══════════════════════════════════════════════════════════════
 
 /** @typedef {{ bodyTypes: string[], zone: string, texts: string[] }} GrowthLexiconChunk */

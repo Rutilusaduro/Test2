@@ -2,6 +2,7 @@ import { getStage } from '../../gameData/stages.js';
 import { getCorruptionTier } from '../../gameData/corruption.js';
 import { getTier } from '../../gameData/relationships.js';
 import { getGainDesire, getGainDesireTier } from '../../gameData/gainDesire.js';
+import { resolveGrowthKind } from '../../gameData/enemyGrowthKinds.js';
 import { getSatiationTier } from '../../gameData/satiation.js';
 import { getHungerTier, getAddictionLevel, isInWithdrawal } from '../../gameData/hungerAddiction.js';
 import {
@@ -25,6 +26,7 @@ export function registerWeightGainDimensions() {
     satiationTier: { derive: (s) => getSatiationTier(s.satiation || 0).id, range: true },
     attitude:      { derive: attitudeOf, range: true },
     bodyType:      { derive: (s) => s.bodyType || null },
+    growthKind:    { derive: (s) => resolveGrowthKind(s) },
     archetype:     { derive: (s) => s.archetype || null },
     mood:          { derive: (s) => s.mood || null },
     characterId:   { derive: (s) => s.numericId ?? s.id ?? null },

@@ -10,7 +10,7 @@ registerSelectors(
   'enemyType', 'enemySizeBand', 'victoryType', 'regionTransformation', 'sceneVariant',
   'outcomeKind', 'partySize', 'regionName', 'role', 'archetype',
   'spellSchool', 'castType', 'paidBy', 'failCause', 'spellName',
-  'consentState', 'playerClass', 'severity', 'levelTier',
+  'consentState', 'playerClass', 'severity', 'levelTier', 'growthKind',
   'hostilityTier', 'favorState', 'crackdown', 'action', 'escalationTier',
   'divineAttentionTier', 'portentId', 'threatTier', 'act', 'heraldId',
   'escalationTierMin', 'escalationTierMax', 'consentState', 'gainDesireMin',

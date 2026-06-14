@@ -1,4 +1,5 @@
 import { MAX_STAGE_ID } from "./stages.js";
+import { getEnemyGrowthKind } from "./enemyGrowthKinds.js";
 
 const MUNDANE = { threatTier: "mundane" };
 const MYTHIC = {
@@ -560,6 +561,7 @@ export function createEnemy(typeId) {
   return {
     ...t,
     typeId: t.id,
+    growthKind: t.growthKind || getEnemyGrowthKind(t.id),
     lbs: t.startLbs,
     corruption: 0,
     hunger: 0,
@@ -573,6 +575,7 @@ export function createEnemy(typeId) {
     isEnemy: true,
     sizeCap: MAX_STAGE_ID,
     phaseFlags: {},
+    legendaryResistances: t.legendaryResistances ?? undefined,
   };
 }
 

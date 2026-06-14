@@ -563,11 +563,128 @@ export function checkVictory(combat) {
   return combat;
 }
 
+function legendaryDamage(total, damageType = DAMAGE_TYPES.PHYSICAL) {
+  return { total, damageType, growthConversion: 0 };
+}
+
+function executeLegendaryAction(combat, enemy, player, actionId) {
+  const def = getEnemyTypeDef(enemy);
+  const resist = enemy.legendaryResistances ?? def?.legendaryResistances ?? 0;
+  if (resist > 0 && Math.random() < 0.35) {
+    enemy.legendaryResistances = resist - 1;
+    combat.log.push(`★ ${enemy.name} resists your abundance (${resist - 1} legendary resistances left).`);
+    return;
+  }
+
+  switch (actionId) {
+    case 'scales_of_judgment':
+      ensureFavor(player);
+      player.favor = Math.max(0, (player.favor || 0) - 2);
+      combat.log.push(`★ ${enemy.name} tips the Scales of Judgment — favor drains under divine law.`);
+      break;
+    case 'crown_of_order':
+      player.tempFlags = player.tempFlags || {};
+      player.tempFlags.growthSuppressed = (player.tempFlags.growthSuppressed || 0) + 2;
+      combat.log.push(`★ ${enemy.name} lowers the Crown of Order — growth magic falters.`);
+      break;
+    case 'law_made_manifest':
+      applyCombatDamage(player, legendaryDamage(4 + Math.floor(Math.random() * 4)));
+      combat.log.push(`★ ${enemy.name} manifests law as force — austerity strikes your frame.`);
+      break;
+    case 'barren_shriek':
+      addCorruption(player, 6);
+      player.hunger = Math.max(0, (player.hunger || 0) - 15);
+      combat.log.push(`★ ${enemy.name} shrieks barren grief — appetite stutters in your belly.`);
+      break;
+    case 'harvest_inversion':
+      player.tempFlags = player.tempFlags || {};
+      player.tempFlags.growthSuppressed = (player.tempFlags.growthSuppressed || 0) + 1;
+      combat.log.push(`★ ${enemy.name} inverts the harvest — abundance twists backward for a heartbeat.`);
+      break;
+    case 'thorned_plenty':
+      applyCombatDamage(player, legendaryDamage(3, DAMAGE_TYPES.ABUNDANCE_OVERLOAD));
+      combat.log.push(`★ ${enemy.name} lashes with thorned plenty — measured pain, measured denial.`);
+      break;
+    case 'barrow_wail':
+      applyCombatDamage(player, legendaryDamage(5, DAMAGE_TYPES.ABUNDANCE_OVERLOAD));
+      combat.log.push(`★ ${enemy.name} wails from the barrow — fate itself bruises your favor.`);
+      break;
+    case 'fate_revision':
+      ensureFavor(player);
+      spendFavor(player, Math.min(player.favor || 0, 3));
+      combat.log.push(`★ ${enemy.name} revises fate — the goddess of endings taxes your miracle.`);
+      break;
+    case 'unwritten_end':
+      applyCombatDamage(player, legendaryDamage(6, DAMAGE_TYPES.PLEASURABLE_PRESSURE));
+      combat.log.push(`★ ${enemy.name} writes an ending in pain — your story hesitates.`);
+      break;
+    case 'rival_bloom':
+      applyGrowth(player, 1, { respectCosmicResist: false });
+      combat.log.push(`★ ${enemy.name} mirrors your bloom — growth stolen and redirected at you.`);
+      break;
+    case 'appetite_redirect':
+      ensureFavor(player);
+      spendFavor(player, Math.min(player.favor || 0, 2));
+      combat.log.push(`★ ${enemy.name} redirects appetite — your patron's gift flows wrong for a moment.`);
+      break;
+    case 'sovereign_hunger':
+      applyCombatDamage(player, legendaryDamage(8, DAMAGE_TYPES.ABUNDANCE_OVERLOAD));
+      combat.log.push(`★ ${enemy.name} unleashes sovereign hunger — antithesis abundance as weapon.`);
+      break;
+    case 'domain_shift':
+      runCosmicAbility(combat, enemy, player);
+      combat.log.push(`★ ${enemy.name} shifts divine domain — the Wheel rotates its answer.`);
+      break;
+    case 'wheel_crush':
+      applyCombatDamage(player, legendaryDamage(10));
+      combat.log.push(`★ ${enemy.name} crushes the field with Wheel-mass — cosmic law made impact.`);
+      break;
+    case 'pantheon_roar':
+      for (const ally of combat.allies.filter((a) => a.hp > 0)) addCorruption(ally, 4);
+      combat.log.push(`★ ${enemy.name} roars with pantheon unity — every ally tastes denial.`);
+      break;
+    default:
+      runCosmicAbility(combat, enemy, player);
+      combat.log.push(`★ ${enemy.name} acts with legendary force.`);
+  }
+}
+
+function resolveLegendaryActions(combat) {
+  if (combat.victory) return;
+  const player = combat.allies.find((a) => a.isPlayer);
+  if (!player || player.hp <= 0) return;
+
+  const round = combat.turnState?.round ?? 1;
+  if (combat.legendaryRound !== round) {
+    combat.legendaryRound = round;
+    combat.legendaryUsed = {};
+  }
+  combat.legendaryUsed = combat.legendaryUsed || {};
+
+  for (const enemy of combat.enemies) {
+    if (enemy.hp <= 0 || enemy.converted) continue;
+    const def = getEnemyTypeDef(enemy);
+    if (!def?.legendaryActions?.length) continue;
+
+    const eid = enemy.combatId || enemy.id || enemy.typeId;
+    const used = combat.legendaryUsed[eid] ?? 0;
+    const max = def.legendaryActionCount ?? 1;
+    if (used >= max) continue;
+
+    const actionId = def.legendaryActions[Math.floor(Math.random() * def.legendaryActions.length)];
+    executeLegendaryAction(combat, enemy, player, actionId);
+    combat.legendaryUsed[eid] = used + 1;
+    checkCosmicPhases(combat, enemy);
+  }
+}
+
 /** End active unit's turn and run AI for enemies until next player turn or combat end */
 export function advanceTurn(combat) {
   if (combat.victory) return combat;
 
+  const endingPlayer = getActiveEntry(combat.turnState)?.unit?.isPlayer;
   endTurn(combat.turnState, combat.allies, combat.enemies);
+  if (endingPlayer) resolveLegendaryActions(combat);
   combat.turn = combat.turnState.round;
   if (combat.turnState.log?.length) {
     combat.log.push(...combat.turnState.log);
