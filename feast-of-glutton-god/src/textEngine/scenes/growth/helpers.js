@@ -12,7 +12,6 @@
  *   distant 0–1 · warm 2–3 · intimate 4–5
  */
 import { registerPool, registerModule } from '../../engine.js';
-import { WEIGHT_STAGES } from '../../../gameData/stages.js';
 
 export const REL_BANDS = [
   { name: 'distant', when: { relationship: [0, 1] } },
@@ -24,21 +23,27 @@ export const START_BANDS = [
   { name: 'lean', when: { startStageMax: 2 } },
   { name: 'mid', when: { startStageMin: 3, startStageMax: 5 } },
   { name: 'heavy', when: { startStageMin: 6, startStageMax: 8 } },
-  { name: 'extreme', when: { startStageMin: 9 } },
+  { name: 'vast', when: { startStageMin: 9, startStageMax: 11 } },
+  { name: 'world', when: { startStageMin: 12 } },
 ];
 
-function stageLabel(id) {
-  return WEIGHT_STAGES[Math.min(Math.max(0, id ?? 0), 11)]?.label ?? 'larger';
+/** Physical scale phrase — never a mechanical stage name. */
+function physicalScalePhrase(id) {
+  const phrases = [
+    'slender', 'softly curved', 'pleasantly plump', 'voluptuously full',
+    'magnificently massive', 'towering and plush', 'giant-soft',
+    'dragon-vast', 'hall-filling', 'behemoth-heavy', 'chamber-spanning',
+    'immobile and immense', 'titanic', 'world-scale', 'beyond all measure',
+  ];
+  return phrases[Math.min(Math.max(0, id ?? 0), phrases.length - 1)];
 }
 
-// ─── Dynamic slots for growth templates ─────────────────────────────────────
-
 registerModule('growth.endLabel', [
-  { when: {}, text: [(ctx) => stageLabel(ctx.globals?.endStage ?? ctx.d?.stage ?? 0)] },
+  { when: {}, text: [(ctx) => physicalScalePhrase(ctx.globals?.endStage ?? ctx.d?.stage ?? 0)] },
 ]);
 
 registerModule('growth.startLabel', [
-  { when: {}, text: [(ctx) => stageLabel(ctx.globals?.startStage ?? ctx.d?.stage ?? 0)] },
+  { when: {}, text: [(ctx) => physicalScalePhrase(ctx.globals?.startStage ?? ctx.d?.stage ?? 0)] },
 ]);
 
 registerModule('growth.stagesJumped', [
@@ -116,7 +121,7 @@ export function registerStageCrossingPool(key, byEndStage, fallback = []) {
     when: {},
     text: fallback.length
       ? fallback
-      : ['{subject.first} crosses into {growth.endLabel} — softer, fuller, radiant.'],
+      : ['{subject.first} crosses a new threshold — softer, fuller, radiant.'],
   });
 
   registerPool(key, variants);

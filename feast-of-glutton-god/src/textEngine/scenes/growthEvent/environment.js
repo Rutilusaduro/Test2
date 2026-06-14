@@ -30,21 +30,13 @@ registerPool('ge.furnitureEvent', [
     'There\'s nothing in the room built to hold her anymore, and the floor will have to do.',
     'Furniture stopped being an option for her a while ago; she lowers herself carefully to the reinforced floor.',
   ] },
-  // locale: stream gaming chair (Destiny et al.)
-  { when: { locale: 'stream_setup', endStageMin: 4, endStageMax: 7 }, weight: 3, text: [
-    'The gaming chair shrieks under her, armrests bowing outward, hydraulics whining in defeat.',
-    'Her stream chair bottoms out with a hydraulic hiss and refuses to rise again.',
+  // locale: feast hall (harvest contest)
+  { when: { locale: 'feast_hall', endStageMin: 5 }, weight: 2, text: [
+    'The contest bench groans, then buckles, and the hall erupts in delighted shouting.',
   ] },
-  { when: { locale: 'stream_setup', endStageMin: 8 }, weight: 3, text: [
-    'The gaming chair finally explodes under her on camera — the clip will outlive the channel.',
-  ] },
-  // locale: dining hall (contest)
-  { when: { locale: 'dining_hall', endStageMin: 5 }, weight: 2, text: [
-    'The contest bench groans, then buckles, and the crowd loses its mind.',
-  ] },
-  // locale: kitchen (cultivator)
-  { when: { locale: 'kitchen', endStageMin: 5 }, weight: 2, text: [
-    'The prep stool gives out under her, and Reneé just slides over a reinforced one without comment.',
+  // locale: village kitchen (inn / nurturing)
+  { when: { locale: 'village_kitchen', endStageMin: 5 }, weight: 2, text: [
+    'The prep stool gives out under her; Elara slides a reinforced one into place without breaking stride.',
   ] },
   // bodyType flavor at break bands
   { when: { bodyType: 'pear', endStageMin: 6 }, weight: 2, text: [
@@ -52,6 +44,28 @@ registerPool('ge.furnitureEvent', [
   ] },
   { when: { bodyType: 'apple', endStageMin: 6 }, weight: 2, text: [
     'Her belly settles into her lap heavy enough that the chair simply folds beneath the load.',
+  ] },
+  // locale: Glutton God regions
+  { when: { locale: 'village_inn', endStageMin: 6, endStageMax: 8 }, weight: 3, text: [
+    'The taproom bench splinters; kegs wobble on the shelf behind her as the floor dips.',
+  ] },
+  { when: { locale: 'village_inn', endStageMin: 9 }, weight: 3, text: [
+    'The bar itself cracks under her — bottles cascade, and the hearth stones grind against new weight.',
+  ] },
+  { when: { locale: 'coastal_manor', endStageMin: 5, endStageMax: 7 }, weight: 3, text: [
+    'An antique settee collapses beneath her; velvet tears with a sound like a sigh.',
+  ] },
+  { when: { locale: 'coastal_manor', endStageMin: 8 }, weight: 3, text: [
+    'The dining table buckles when she leans — servants catch silverware mid-air and do not dare scold.',
+  ] },
+  { when: { locale: 'marble_hall', endStageMin: 6 }, weight: 2, text: [
+    'A stone bench crumbles under her; dust blooms in the pillar light like incense.',
+  ] },
+  { when: { locale: 'grand_cathedral', endStageMin: 8 }, weight: 2, text: [
+    'A carved pew snaps; hymnals slide across the nave in a papery whisper.',
+  ] },
+  { when: { locale: 'stone_hall', endStageMin: 6 }, weight: 2, text: [
+    'The forge-side stool collapses; no one stops working, but everyone grins.',
   ] },
 ]);
 
@@ -71,7 +85,45 @@ registerPool('ge.spaceEvent', [
   { when: { endStageMin: 9 }, weight: 2, text: [
     'The room itself feels smaller around her now — walls closer, doorways theoretical.',
   ] },
-  { when: { locale: 'stream_setup', endStageMin: 7 }, weight: 2, text: [
-    'She has to angle herself to keep her whole frame in the camera, and gives up halfway.',
+  // ── Feast of the Glutton God locales ───────────────────────────
+  { when: { locale: 'village_inn', endStageMin: 5, endStageMax: 7 }, weight: 3, text: [
+    'The taproom bench cracks; ale sloshes as she settles heavier on boards that were never meant for this.',
+  ] },
+  { when: { locale: 'village_inn', endStageMin: 8 }, weight: 3, text: [
+    'Hanging mugs rattle from their hooks; the bar rail bows as she takes up the whole common room aisle.',
+  ] },
+  { when: { locale: 'crowded_market', endStageMin: 5 }, weight: 2, text: [
+    'A stall awning tears on her shoulder; apples scatter and the vendor curses, then laughs, then stares.',
+  ] },
+  { when: { locale: 'coastal_manor', endStageMin: 6, endStageMax: 8 }, weight: 3, text: [
+    'A gilt chair splinters beneath her; servants freeze with trays still in hand, unsure where to stand now.',
+  ] },
+  { when: { locale: 'frontier_road', endStageMin: 9 }, weight: 3, text: [
+    'Timber walls crack on both sides — she is wedged in the lane, and escape is a theory.',
+  ] },
+  { when: { locale: 'marble_hall', endStageMin: 7 }, weight: 2, text: [
+    'Dust rains from the coffered ceiling; marble tiles spiderweb under her spreading weight.',
+  ] },
+  { when: { locale: 'sacred_grotto', endStageMin: 8 }, weight: 2, text: [
+    'The ritual pool overflows as she swells; standing stones hum against her hips.',
+  ] },
+  { when: { locale: 'grand_cathedral', endStageMin: 9 }, weight: 2, text: [
+    'Pews snap like kindling; stained glass rattles but holds — for now.',
+  ] },
+  { when: { locale: 'ducal_court', endStageMin: 8 }, weight: 2, text: [
+    'Polished marble scars under her; courtiers press flat against tapestries to stay out of the swell.',
+  ] },
+  { when: { locale: 'stone_hall', endStageMin: 7 }, weight: 2, text: [
+    'An ale bench collapses; miners cheer and slide another across the stone floor without comment.',
+  ] },
+  { when: { locale: 'open_field', endStageMin: 8 }, weight: 2, text: [
+    'Wheat lies flat in a widening circle; fence posts lean outward where she kneels.',
+  ] },
+  { when: { endStageMin: 11 }, weight: 2, text: [
+    'She cannot leave without negotiating with architecture that has already surrendered.',
+    'Doorways are memories; the building\'s purpose is now to hold her.',
+  ] },
+  { when: { endStageMin: 13 }, weight: 2, text: [
+    'The settlement rearranges around her stillness — roads detour, bells change their ring.',
   ] },
 ]);

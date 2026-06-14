@@ -5,12 +5,12 @@ import { getSubclass } from './subclasses.js';
 export const CANTRIPS = [
   { id: 'gentle_plump', name: 'Gentle Plump', slotLevel: 0, school: 'abundance', desc: 'Softly swell a willing target by one stage with a pleasurable surge.', effect: { growth: 1 } },
   { id: 'indulgent_touch', name: 'Indulgent Touch', slotLevel: 0, school: 'abundance', desc: 'Touch a willing creature and cause a small, pleasurable growth surge.', effect: { growth: 1, corruption: 1 } },
-  { id: 'feasts_whisper', name: "Feast's Whisper", slotLevel: 0, school: 'enchantment', desc: 'Whisper temptations that make a target crave indulgence.', effect: { charm: 1, corruption: 2 } },
+  { id: 'feasts_whisper', name: "Feast's Whisper", slotLevel: 0, school: 'enchantment', desc: 'Whisper temptations that make a target crave indulgence.', effect: { charm: 1, corruption: 2 }, environment: { charm: true } },
   { id: 'gorgaras_spark', name: "Gorgara's Spark", slotLevel: 0, school: 'abundance', desc: 'A minor divine spark of growth — can be upcast with higher slots.', effect: { growth: 1 } },
-  { id: 'rich_cream', name: 'Rich Cream', slotLevel: 0, school: 'conjuration', desc: 'Conjure slippery, creamy abundance. Contact causes minor pleasurable weight gain.', effect: { growth: 1, corruption: 2, feed: 1 } },
-  { id: 'flavor_burst', name: 'Flavor Burst', slotLevel: 0, school: 'abundance', desc: 'Conjure delicious food that tempts and feeds.', effect: { feed: 1, corruption: 3 } },
-  { id: 'jiggle_charm', name: 'Jiggle Charm', slotLevel: 0, school: 'enchantment', desc: 'Hypnotic sway that charms and distracts.', effect: { charm: 1 } },
-  { id: 'softening_ray', name: 'Softening Ray', slotLevel: 0, school: 'abundance', desc: 'A ray of plush caloric energy.', effect: { growth: 1, corruption: 2 } },
+  { id: 'rich_cream', name: 'Rich Cream', slotLevel: 0, school: 'conjuration', desc: 'Conjure slippery, creamy abundance. Contact causes minor pleasurable weight gain.', effect: { growth: 1, corruption: 2, feed: 1 }, environment: { soften: true, slick: true } },
+  { id: 'flavor_burst', name: 'Flavor Burst', slotLevel: 0, school: 'abundance', desc: 'Conjure delicious food that tempts and feeds.', effect: { feed: 1, corruption: 3 }, environment: { fertile: true, soften: true } },
+  { id: 'jiggle_charm', name: 'Jiggle Charm', slotLevel: 0, school: 'enchantment', desc: 'Hypnotic sway that charms and distracts.', effect: { charm: 1 }, environment: { charm: true } },
+  { id: 'softening_ray', name: 'Softening Ray', slotLevel: 0, school: 'abundance', desc: 'A ray of plush caloric energy.', effect: { growth: 1, corruption: 2 }, environment: { soften: true, swell: true } },
 ];
 
 /** Spells granted by specific subclasses or shared across classes. */
@@ -44,16 +44,19 @@ export const BONUS_SPELLS = {
     id: 'feast_of_the_goddess', name: 'Feast of the Goddess', slotLevel: 2, school: 'abundance',
     desc: 'A magical banquet that swells all who partake.',
     effect: { growth: 1, feed: 2, aoe: true, corruption: 4 },
+    environment: { fertile: true, ritual: true },
   },
   form_of_abundance: {
     id: 'form_of_abundance', name: 'Form of Abundance', slotLevel: 2, school: 'transmutation',
     desc: 'Major growth toward higher size stages. Concentration. Pleasurable and powerful.',
     effect: { growth: 2, corruption: 4 },
+    environment: { swell: true, crush: true },
   },
   pleasurable_pressure: {
     id: 'pleasurable_pressure', name: 'Pleasurable Pressure', slotLevel: 3, school: 'evocation',
     desc: 'Crushing but euphoric force that causes growth instead of harm.',
     effect: { growth: 2, corruption: 6 },
+    environment: { crush: true, swell: true },
   },
   overflow_cascade: {
     id: 'overflow_cascade', name: 'Overflow Cascade', slotLevel: 4, school: 'abundance',
@@ -71,19 +74,55 @@ export const BONUS_SPELLS = {
     effect: { growth: 2, corruption: 5, charm: 1 },
   },
   true_overflow: {
-    id: 'true_overflow', name: 'True Overflow', slotLevel: 7, school: 'abundance',
+    id: 'true_overflow', name: 'True Overflow', slotLevel: 7, school: 'abundance', minSizeStage: 6,
     desc: 'Permanent or very long-term size stage increases through divine excess.',
     effect: { growth: 3, corruption: 8 },
   },
   mass_indulgence: {
-    id: 'mass_indulgence', name: 'Mass Indulgence', slotLevel: 8, school: 'abundance',
+    id: 'mass_indulgence', name: 'Mass Indulgence', slotLevel: 8, school: 'abundance', minSizeStage: 7,
     desc: 'A huge growth ritual affecting many — the town itself seems to swell.',
     effect: { growth: 2, aoe: true, party: true, corruption: 6 },
   },
   gorgaras_awakening: {
-    id: 'gorgaras_awakening', name: "Gorgara's Awakening", slotLevel: 9, school: 'abundance',
+    id: 'gorgaras_awakening', name: "Gorgara's Awakening", slotLevel: 9, school: 'abundance', minSizeStage: 8,
     desc: 'Massive area growth event. Multiple characters may leap several size stages.',
     effect: { growth: 4, aoe: true, corruption: 10 },
+  },
+  honeyed_overflow: {
+    id: 'honeyed_overflow', name: 'Honeyed Overflow', slotLevel: 1, school: 'enchantment',
+    desc: 'Sweet magic drips from your lips — targets swell as they listen, helpless and happy.',
+    effect: { charm: 1, growth: 1, corruption: 4 },
+  },
+  swell_kiss: {
+    id: 'swell_kiss', name: 'Swell Kiss', slotLevel: 1, school: 'abundance',
+    desc: 'A kiss that transfers caloric blessing lip to lip, belly to belly.',
+    effect: { growth: 1, corruption: 3, feed: 1 },
+  },
+  banquet_mist: {
+    id: 'banquet_mist', name: 'Banquet Mist', slotLevel: 3, school: 'conjuration',
+    desc: 'Perfumed fog of impossible feasts — all who breathe it grow drunk on fullness.',
+    effect: { growth: 1, aoe: true, corruption: 5, feed: 1 },
+    environment: { fertile: true, soften: true, ritual: true, slick: true },
+  },
+  divine_plump: {
+    id: 'divine_plump', name: 'Divine Plump', slotLevel: 6, school: 'abundance',
+    desc: 'Holy light concentrates flesh into sacred, jiggling abundance.',
+    effect: { growth: 2, heal: 15, corruption: 6 },
+  },
+  cascade_of_curves: {
+    id: 'cascade_of_curves', name: 'Cascade of Curves', slotLevel: 5, school: 'transmutation',
+    desc: 'Rippling transmutation rolls through the body — hip to thigh to belly in waves.',
+    effect: { growth: 2, corruption: 5 },
+  },
+  lovers_feast: {
+    id: 'lovers_feast', name: "Lover's Feast", slotLevel: 3, school: 'abundance',
+    desc: 'An intimate spell for two — shared growth, shared pleasure, shared devotion.',
+    effect: { growth: 2, feed: 1, corruption: 4 },
+  },
+  matrons_blessing: {
+    id: 'matrons_blessing', name: "Matron's Blessing", slotLevel: 4, school: 'abundance',
+    desc: 'Motherly warmth swells the target safely — nurturing, vast, adored.',
+    effect: { growth: 2, heal: 20, corruption: 3 },
   },
 };
 
@@ -197,6 +236,16 @@ export function getSpellForCast(spell, overflow = false) {
     apCost: spell.overflow.apCost ?? spell.apCost,
     effect: { ...spell.effect, ...spell.overflow.effect },
   };
+}
+
+export function getSpellEnvironmentTags(spell) {
+  const env = spell?.environment ?? {};
+  return Object.keys(env).filter((k) => env[k]);
+}
+
+export function spellHasEnvironmentUse(spell) {
+  return getSpellEnvironmentTags(spell).length > 0
+    || spell.effect?.growth || spell.effect?.charm || spell.effect?.feed;
 }
 
 export function getCastableSpells(character) {

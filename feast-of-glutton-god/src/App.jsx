@@ -3,16 +3,49 @@ import TitleScreen from "./components/TitleScreen.jsx";
 import CharacterCreation from "./components/CharacterCreation.jsx";
 import WorldView from "./components/WorldView.jsx";
 import CombatView from "./components/CombatView.jsx";
+import LevelUpModal from "./components/LevelUpModal.jsx";
 import GameDebugShell from "./components/GameDebugShell.jsx";
 import { createNewGame, addAbundancePoints, syncPlayerFromCombat } from "./gameData/player.js";
 import { saveGame, loadGame } from "./gameData/save.js";
 import { createCombatState, getCombatRewards } from "./gameData/combat.js";
 import { pickEncounter } from "./gameData/enemies.js";
-import { awardCombatXp } from "./gameData/leveling.js";
+import { awardCombatXp, initializeStartingSpells } from "./gameData/leveling.js";
 import { initSpellSlots } from "./gameData/spellSlots.js";
 import { ensureQuestState } from "./gameData/questEngine.js";
+import { ensureInfluenceState } from "./gameData/influence.js";
+import { ensureTransformationState } from "./gameData/worldTransformation.js";
+import { ensurePartyUniversalSize } from "./gameData/universalSize.js";
 import { recordCombatEndForQuests } from "./hooks/questHooks.js";
+import { recordPuzzleSolvedForQuests } from "./hooks/puzzleHooks.js";
+import { applySolutionImmediate } from "./gameData/puzzleEngine.js";
+import { ensureSpellState, getCharacterSpells } from "./gameData/spellLearning.js";
+import { autoPrepareSpells } from "./gameData/spellPreparation.js";
+import { completePendingLevelUp as completeLevelUpChoice } from "./gameData/levelUpChoices.js";
 import "./textEngine/scenes/index.js";
+
+function migratePlayerSpells(player) {
+  ensureSpellState(player);
+  if (!player.spellsKnown?.length && player.spells?.length) {
+    player.spellsKnown = player.spells.map((s) => s.id).filter(Boolean);
+  }
+  if (!player.spells?.length && player.spellsKnown?.length) {
+    player.spells = getCharacterSpells(player);
+  }
+  if (!player.spellsKnown?.length) {
+    initializeStartingSpells(player);
+  }
+  if (player.classId === 'wizard' && !player.spellsPrepared?.length) {
+    autoPrepareSpells(player);
+  }
+}
+
+function applyLevelUpResults(game, levelUps) {
+  if (!levelUps?.length) return game;
+  const last = levelUps[levelUps.length - 1];
+  game.lastLevelUpResult = last;
+  game.lastLevelUpMessage = levelUps.map((lu) => lu.narrative || `Level ${lu.level}! ${lu.flavor}`).join("\n\n---\n\n");
+  return game;
+}
 
 export default function App() {
   const [screen, setScreen] = useState("title");
@@ -21,6 +54,7 @@ export default function App() {
 
   const startNewGame = useCallback((name, classId, options = {}) => {
     const g = createNewGame(name, classId, options);
+    ensurePartyUniversalSize(g);
     setGame(g);
     setScreen("world");
   }, []);
@@ -29,10 +63,14 @@ export default function App() {
     const g = loadGame();
     if (g) {
       if (!g.player.spellSlots) initSpellSlots(g.player);
-      if (!g.player.sizeCap) g.player.sizeCap = 5;
+      if (!g.player.sizeCap) g.player.sizeCap = 3;
+      ensureInfluenceState(g);
+      ensureTransformationState(g);
       if (!g.player.raceId) g.player.raceId = 'human';
       if (!g.player.raceName) g.player.raceName = 'Human';
+      migratePlayerSpells(g.player);
       ensureQuestState(g);
+      ensurePartyUniversalSize(g);
       setGame(g);
       setScreen("world");
     }
@@ -41,6 +79,28 @@ export default function App() {
   const updateGame = useCallback((updater) => {
     setGame((prev) => {
       const next = typeof updater === "function" ? updater(prev) : updater;
+      saveGame(next);
+      return next;
+    });
+  }, []);
+
+  const handleLevelUpComplete = useCallback((payload = {}) => {
+    setGame((prev) => {
+      const next = { ...prev };
+      const result = completeLevelUpChoice(next.player, payload);
+      if (result?.learned?.length) {
+        const names = result.learned.map((s) => s.name).join(', ');
+        next.lastQuestMessage = (next.lastQuestMessage || '') + `\n\nLearned: ${names}`;
+      }
+      if (result?.asi) {
+        next.lastLevelUpMessage = (next.lastLevelUpMessage || '') + `\n\n${result.asi.label} +2`;
+      }
+      const pending = next.player.levelUpsPending?.[0];
+      if (pending) {
+        next.lastLevelUpResult = { level: pending.level, narrative: pending.narrative };
+      } else {
+        next.lastLevelUpResult = null;
+      }
       saveGame(next);
       return next;
     });
@@ -56,19 +116,51 @@ export default function App() {
     setScreen("combat");
   }, []);
 
+  const startPuzzleCombat = useCallback((pending) => {
+    setGame((prev) => {
+      const combat = createCombatState(prev.player, prev.party, pending.enemyId, prev.region);
+      const next = {
+        ...prev,
+        combat,
+        pendingPuzzleCombat: pending,
+      };
+      saveGame(next);
+      return next;
+    });
+    setScreen("combat");
+  }, []);
+
   const endCombat = useCallback((combat) => {
     setGame((prev) => {
       let next = syncPlayerFromCombat(prev, combat);
       const rewards = getCombatRewards(combat);
       next = addAbundancePoints(next, rewards.ap);
       const { levelUps } = awardCombatXp(next.player, combat);
-      if (levelUps.length) {
-        next.lastLevelUpMessage = levelUps.map((lu) => `Level ${lu.level}! ${lu.flavor}`).join("\n");
-      }
+      applyLevelUpResults(next, levelUps);
       const quest = recordCombatEndForQuests(next, combat);
       if (quest.questMessages) {
         next.lastQuestMessage = quest.questMessages;
       }
+
+      const pending = prev.pendingPuzzleCombat;
+      if (pending && (combat.victory === 'win' || combat.victory === 'converted')) {
+        const solveResult = applySolutionImmediate(next, pending.puzzleId, pending.solutionId);
+        const puzzleQuest = recordPuzzleSolvedForQuests(next, {
+          puzzleId: pending.puzzleId,
+          solutionId: pending.solutionId,
+        });
+        const puzzleNote = solveResult.text || 'The obstacle yields to your victory.';
+        next.lastQuestMessage = [next.lastQuestMessage, puzzleNote, puzzleQuest.questMessages]
+          .filter(Boolean)
+          .join('\n\n---\n\n');
+        next.pendingPuzzleCombat = null;
+      } else if (pending) {
+        next.pendingPuzzleCombat = null;
+        next.lastQuestMessage = [next.lastQuestMessage, 'The obstacle remains — but you live to try another delicious approach.']
+          .filter(Boolean)
+          .join('\n\n---\n\n');
+      }
+
       next.combat = null;
       saveGame(next);
       return next;
@@ -85,6 +177,30 @@ export default function App() {
   const updateDebugContext = useCallback((patch) => {
     setDebugContext((prev) => ({ ...prev, ...patch }));
   }, []);
+
+  const levelUpPending = game?.player?.levelUpsPending?.[0] ?? null;
+  const showLevelUp = game && (levelUpPending || game.lastLevelUpResult);
+
+  const worldContent = game ? (
+    <>
+      <WorldView
+        game={game}
+        onUpdate={updateGame}
+        onEncounter={randomEncounter}
+        onPuzzleCombat={startPuzzleCombat}
+        onSave={() => saveGame(game)}
+        onDebugContext={updateDebugContext}
+      />
+      {showLevelUp && (
+        <LevelUpModal
+          game={game}
+          pending={levelUpPending}
+          levelUpResult={game.lastLevelUpResult}
+          onComplete={handleLevelUpComplete}
+        />
+      )}
+    </>
+  ) : null;
 
   if (screen === "combat" && game?.combat) {
     return (
@@ -103,13 +219,7 @@ export default function App() {
   if (screen === "world" && game) {
     return (
       <GameDebugShell game={game} onUpdateGame={updateGame} screen="world" debugContext={debugContext}>
-        <WorldView
-          game={game}
-          onUpdate={updateGame}
-          onEncounter={randomEncounter}
-          onSave={() => saveGame(game)}
-          onDebugContext={updateDebugContext}
-        />
+        {worldContent}
       </GameDebugShell>
     );
   }

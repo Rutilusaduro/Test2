@@ -50,9 +50,9 @@ const COMBAT_SELF = {
       'You fatten {subject.name} mid-fight until victory and worship blur.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'Leviathan Growth Damage — {subject.first} reshapes the battlefield with new mass.',
+      'Mythic Growth Damage — {subject.first} reshapes the battlefield with new mass.',
       '{subject.name} swells mythically from combat; enemies stare, hungry.',
     ],
     warm: [
@@ -109,9 +109,9 @@ const COMBAT_TARGET = {
       'You fatten {subject.name} until {they} can barely stand, blissful.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      '{subject.first} leaps toward leviathan from Growth Damage — you witness myth.',
+      '{subject.first} leaps toward immense from Growth Damage — you witness myth.',
       'Combat reshapes {subject.name}; you kneel inside the tremor.',
     ],
     warm: [
@@ -172,9 +172,9 @@ const SPELL_SELF = {
       'You weave {subject.name} larger; moans harmonize with mana.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'Leviathan spell — {subject.first} reshapes under cataclysmic softness.',
+      'Mythic spell — {subject.first} reshapes under cataclysmic softness.',
       '{subject.name} becomes myth from one casting; you tremble, proud.',
     ],
     warm: [
@@ -231,9 +231,9 @@ const SPELL_TARGET = {
       '{subject.name} grows in your spell until words fail.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'You cast leviathan growth on {subject.first} — myth answers.',
+      'You cast immense growth on {subject.first} — myth answers.',
       '{subject.name} becomes continent from your weave.',
     ],
     warm: [
@@ -242,7 +242,7 @@ const SPELL_TARGET = {
     ],
     intimate: [
       'You and {subject.first} drown in spell-growth — sacred, sloppy, vast.',
-      'Lover leviathan from your casting; devotion eternal.',
+      'Lover immense from your casting; devotion eternal.',
     ],
   },
 };
@@ -294,9 +294,9 @@ const FEEDING_SELF = {
       'You fatten {subject.name} until devotion drips with frosting.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'Leviathan feast — {subject.first} grows with every cauldron emptied.',
+      'Mythic feast — {subject.first} grows with every cauldron emptied.',
       '{subject.name} becomes the meal and the eater; myth fed.',
     ],
     warm: [
@@ -304,7 +304,7 @@ const FEEDING_SELF = {
       'You witness {subject.name} eat toward infinity.',
     ],
     intimate: [
-      '{subject.first} swells leviathan from your devotion-feeding — sacred gluttony.',
+      '{subject.first} swells immense from your devotion-feeding — sacred gluttony.',
       'Lover and banquet merge; you kiss frosting from {subject.name}.',
     ],
   },
@@ -353,9 +353,9 @@ const FEEDING_TARGET = {
       '{subject.name} grows in your arms between bites.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'You feed {subject.first} toward leviathan — gospel of calories.',
+      'You feed {subject.first} toward immense — gospel of calories.',
       '{subject.name} swells mythic from your table.',
     ],
     warm: [
@@ -364,7 +364,7 @@ const FEEDING_TARGET = {
     ],
     intimate: [
       'You feed {subject.first} past limits — apotheosis of appetite.',
-      'Lover leviathan from your hands; tears of bliss.',
+      'Lover immense from your hands; tears of bliss.',
     ],
   },
 };
@@ -416,9 +416,9 @@ const INTIMATE_SELF = {
       'Intimacy reshapes {subject.name}; moans gospel.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'Leviathan love swells {subject.first} — myth made tender.',
+      'Mythic love swells {subject.first} — myth made tender.',
       '{subject.name} grows from worship at impossible scale.',
     ],
     warm: [
@@ -475,9 +475,9 @@ const INTIMATE_TARGET = {
       '{subject.name} overflows your arms; devotion infinite.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'You witness {subject.first} fatten toward leviathan in love\'s grip.',
+      'You witness {subject.first} fatten toward immense in love\'s grip.',
       '{subject.name} becomes myth from your tenderness.',
     ],
     warm: [
@@ -485,7 +485,7 @@ const INTIMATE_TARGET = {
       'You grow {subject.name} like gospel.',
     ],
     intimate: [
-      '{subject.first} leviathan in your embrace — sacred intimacy.',
+      '{subject.first} immense in your embrace — sacred intimacy.',
       'Lover and god merge; you kiss infinity.',
     ],
   },
@@ -538,9 +538,9 @@ const BLESSING_SELF = {
       'Blessing through devotion; {subject.name} moans amen.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'Leviathan blessing — {subject.first} becomes living hymn.',
+      'Mythic blessing — {subject.first} becomes living hymn.',
       '{subject.name} ascends in golden fat; world kneels.',
     ],
     warm: [
@@ -597,9 +597,9 @@ const BLESSING_TARGET = {
       '{subject.name} grows in your blessing until tears fall.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'You bless {subject.first} leviathan — myth obedient.',
+      'You bless {subject.first} immense — myth obedient.',
       '{subject.name} becomes continent of grace.',
     ],
     warm: [
@@ -608,7 +608,7 @@ const BLESSING_TARGET = {
     ],
     intimate: [
       'You bless {subject.first} past limits — sacred apotheosis.',
-      'Lover leviathan from your prayer; eternity jiggles.',
+      'Lover immense from your prayer; eternity jiggles.',
     ],
   },
 };
@@ -660,9 +660,9 @@ registerGrowthPool('growth.crit', {
       'Lover balloons from critical devotion; bliss blinding.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'Leviathan crit growth — {subject.first} rewrites scale in one roll.',
+      'Mythic crit growth — {subject.first} rewrites scale in one roll.',
       '{subject.name} becomes weather from critical fortune.',
     ],
     warm: [
@@ -719,9 +719,9 @@ registerGrowthPool('growth.self.crit', {
       '{ref.first} worships your critical mass.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'Leviathan crit — you become more myth per second.',
+      'Mythic crit — you become more myth per second.',
       'Critical roll, critical godhood.',
     ],
     warm: [
@@ -778,9 +778,9 @@ registerGrowthPool('growth.target.crit', {
       'You swell {subject.name} past plan; tears happy.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      '{subject.first} crit-leviathan — you witness apocalypse of softness.',
+      '{subject.first} crit-immense — you witness apocalypse of softness.',
       '{subject.name} becomes gospel from your roll.',
     ],
     warm: [
@@ -840,9 +840,9 @@ registerSelfTargetPair('concentration_break',
         'Lover unraveled your focus into fat.',
       ],
     },
-    extreme: {
+    vast: {
       distant: [
-        'Leviathan focus melts; you swell like weather.',
+        'Mythic focus melts; you swell like weather.',
         'Concentration was never the point.',
       ],
       warm: [
@@ -898,9 +898,9 @@ registerSelfTargetPair('concentration_break',
         '{subject.name} grows because you win attention.',
       ],
     },
-    extreme: {
+    vast: {
       distant: [
-        '{subject.first} forgets leviathan spell and balloons — myth amused.',
+        '{subject.first} forgets immense spell and balloons — myth amused.',
         'You witness focus fail into gospel fat.',
       ],
       warm: [

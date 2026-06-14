@@ -49,9 +49,9 @@ registerCheckPoolAliases(['check.fumble.strength', 'check.fumble.str'], {
       'You fall together, vast and giggling; devotion absorbs the fumble into another inch gained.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'Even Leviathans misstep — you settle with a seismic wobble, unhurt, grander, while {ref.first} cheers the spectacle.',
+      'Even immensity missteps — you settle with a seismic wobble, unhurt, grander, while {ref.first} cheers the spectacle.',
       'The world shakes; you are merely more plush afterward, pleased with yourself despite everything.',
     ],
     warm: [
@@ -61,6 +61,20 @@ registerCheckPoolAliases(['check.fumble.strength', 'check.fumble.str'], {
     intimate: [
       'You topple like a loving avalanche over {ref.first} — critical failure that still worships with flesh.',
       'Your devoted lover disappears under you and resurfaces softer, kissing the blush on your vast cheek.',
+    ],
+  },
+  world: {
+    distant: [
+      'Even immensity missteps — you settle with a seismic wobble, unhurt, grander, while {ref.first} cheers the spectacle',
+      'The world shakes; you are merely more plush afterward, pleased with yourself despite everything',
+    ],
+    warm: [
+      '{ref.first} clings to you through the fumble like a ride; both of you emerge larger, laughing at physics',
+      'Too much abundance to aim straight — {ref.name} doesn\'t mind the extra you that stuck around.',
+    ],
+    intimate: [
+      'You topple like a loving avalanche over {ref.first} — critical failure that still worships with flesh',
+      'Your devoted lover disappears under you and resurfaces softer, kissing the blush on your vast cheek',
     ],
   },
 });
@@ -110,18 +124,32 @@ registerCheckPoolAliases(['check.fumble.dexterity', 'check.fumble.dex'], {
       'You miss the move and hit the feast instead; {ref.first} moans, rounder, forgiving everything.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
       'A continent trips — the tremor is comedy, the aftermath is more you, and {ref.first} is thrilled to witness it.',
       'Impossible mass, possible stumble; you end softer, still legendary.',
     ],
     warm: [
-      '{ref.first} rides the wobble like a festival — Leviathan clumsiness becomes community growth.',
+      '{ref.first} rides the wobble like a festival — Continental clumsiness becomes community growth.',
       'You are too vast to be elegant always; {ref.name} wouldn\'t trade a pound of you.',
     ],
     intimate: [
       'Your lover is buried in the fumble and reborn plush — devotion turns missteps into blessings.',
       'Critical miss, critical avalanche of affection; {ref.first} swells singing your name.',
+    ],
+  },
+  world: {
+    distant: [
+      'A the realm trips — the tremor is comedy, the aftermath is more you, and {ref.first} is thrilled to witness it.',
+      'World-breaking mass, possible stumble; you end softer, still legendary.',
+    ],
+    warm: [
+      '{ref.first} rides the wobble like a festival — The realmal clumsiness becomes community growth.',
+      'You are too vast to be elegant always; {ref.name} wouldn\'t trade a pound of you.',
+    ],
+    intimate: [
+      'Your lover is buried in the fumble and reborn plush — devotion turns missteps into blessings',
+      'Critical miss, critical avalanche of affection; {ref.first} swells singing your name',
     ],
   },
 });
@@ -171,9 +199,9 @@ registerCheckPoolAliases(['check.fumble.constitution', 'check.fumble.con'], {
       'Critical miss means critical fullness; {ref.first} worships every new roll.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'Leviathan appetite outpaces Leviathan poise — you grow grander in one sloppy, splendid wave.',
+      'Sacred appetite outpaces poise — you grow grander in one sloppy, splendid wave.',
       'The goddess pours too fast; you catch what you can and wear the rest proudly.',
     ],
     warm: [
@@ -183,6 +211,20 @@ registerCheckPoolAliases(['check.fumble.constitution', 'check.fumble.con'], {
     intimate: [
       'Devotion and digestion collide — you and {ref.first} swell together messily, laughing through moans.',
       'Your critical fumble is a critical feast; your lover emerges larger from beneath you, blissful.',
+    ],
+  },
+  world: {
+    distant: [
+      'Sacred appetite outpaces poise — you grow grander in one sloppy, splendid wave',
+      'The goddess pours too fast; you catch what you can and wear the rest proudly',
+    ],
+    warm: [
+      '{ref.first} cheers the obscene haste of your swelling — community feast energy at titan scale',
+      'You become more the realm than composure; {ref.name} loves the show.',
+    ],
+    intimate: [
+      'Devotion and digestion collide — you and {ref.first} swell together messily, laughing through moans',
+      'Your critical fumble is a critical feast; your lover emerges larger from beneath you, blissful',
     ],
   },
 });
@@ -232,18 +274,32 @@ registerCheckPoolAliases(['check.fumble.intelligence', 'check.fumble.int'], {
       '{ref.first} solves you instead of the puzzle; both of you swell, smug and satisfied.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
       'Continental intellect, continental distraction — you ponder abundance and become more of it, pleased.',
       '{ref.first} witnesses a titan forget {their} own name and applauds the jiggle.',
     ],
     warm: [
-      'You lose the thread at Leviathan scale; {ref.name} ties it around your waist instead, friendly and fattening.',
+      'You lose the thread at impossible scale; {ref.name} ties it around your waist instead, friendly and fattening.',
       'Critical fumble of thought, critical success of feast.',
     ],
     intimate: [
       'Devotion deletes your thesis — you and {ref.first} swell through the mistake like prayer.',
       'Your lover prefers you dumb with desire; the growth spurt agrees.',
+    ],
+  },
+  world: {
+    distant: [
+      'The realmal intellect, the realmal distraction — you ponder abundance and become more of it, pleased.',
+      '{ref.first} witnesses a titan forget {their} own name and applauds the jiggle',
+    ],
+    warm: [
+      'You lose the thread at world-breaking scale; {ref.name} ties it around your waist instead, friendly and fattening.',
+      'Critical fumble of thought, critical success of feast',
+    ],
+    intimate: [
+      'Devotion deletes your thesis — you and {ref.first} swell through the mistake like prayer',
+      'Your lover prefers you dumb with desire; the growth spurt agrees',
     ],
   },
 });
@@ -293,9 +349,9 @@ registerCheckPoolAliases(['check.fumble.wisdom', 'check.fumble.wis'], {
       '{ref.first} worships through your mistake until devotion and pounds align.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'Leviathan mysticism trips over Leviathan appetite — you grow, luminous and amused.',
+      'Mysticism trips over sacred appetite — you grow, luminous and amused.',
       '{ref.first} receives accidental prophecy in the form of your jiggle; {they} swell, thankful.',
     ],
     warm: [
@@ -305,6 +361,20 @@ registerCheckPoolAliases(['check.fumble.wisdom', 'check.fumble.wis'], {
     intimate: [
       'Devotion outshines omens — you and {ref.first} swell together, the goddess laughing kindly.',
       'Your lover is the answer you mislaid; flesh remembers what mind forgot.',
+    ],
+  },
+  world: {
+    distant: [
+      'Mysticism trips over sacred appetite — you grow, luminous and amused',
+      '{ref.first} receives accidental prophecy in the form of your jiggle; {they} swell, thankful',
+    ],
+    warm: [
+      'You mishear the goddess and throw a party instead — {ref.name} fattens cheering',
+      'Critical fumble of wisdom, critical success of community softness',
+    ],
+    intimate: [
+      'Devotion outshines omens — you and {ref.first} swell together, the goddess laughing kindly',
+      'Your lover is the answer you mislaid; flesh remembers what mind forgot',
     ],
   },
 });
@@ -354,9 +424,9 @@ registerCheckPoolAliases(['check.fumble.charisma', 'check.fumble.cha'], {
       'You meant to woo and became a pillow instead; {ref.first} swells gratefully atop you.',
     ],
   },
-  extreme: {
+  vast: {
     distant: [
-      'Leviathan charm trips over Leviathan shyness — impossible, adorable, effective; {ref.first} grows watching.',
+      'Vast charm trips over immensity shyness — impossible, adorable, effective; {ref.first} grows watching.',
       'You blush at your own mythic presence; the crowd softens anyway.',
     ],
     warm: [
@@ -366,6 +436,20 @@ registerCheckPoolAliases(['check.fumble.charisma', 'check.fumble.cha'], {
     intimate: [
       'Devotion deletes your performance — you and {ref.first} swell through the mistake like wedding cake.',
       'Your lover hushes you with hands and hunger; critical charisma was never about words.',
+    ],
+  },
+  world: {
+    distant: [
+      'Vast charm trips over immensity shyness — impossible, adorable, effective; {ref.first} grows watching',
+      'You blush at your own apotheotic presence; the crowd softens anyway.',
+    ],
+    warm: [
+      '{ref.name} declares your fumble the best sermon on abundance they\'ve heard — community swells.',
+      'You forget your name, remember the feast; titans and friends alike rounder',
+    ],
+    intimate: [
+      'Devotion deletes your performance — you and {ref.first} swell through the mistake like wedding cake',
+      'Your lover hushes you with hands and hunger; critical charisma was never about words',
     ],
   },
 });

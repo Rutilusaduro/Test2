@@ -122,6 +122,7 @@ export const SIDE_QUESTS = [
           ap: 25,
           xp: 120,
           playerFlags: { sylvie_romance: true, sylvie_vendor_unlocked: true },
+          npcRelationship: { npcId: 'baker_sylvie', source: 'quest_romance', amount: 20 },
         },
         textKey: 'quest.side.baker.ending.romance',
       },
@@ -379,6 +380,7 @@ export const SIDE_QUESTS = [
       ap: 25,
       xp: 110,
       playerFlags: { elara_romance_advanced: true, shared_abundance_complete: true },
+      npcRelationship: { npcId: 'elara', source: 'quest_romance', amount: 15 },
       textKey: 'quest.side.night.complete.default',
     },
   },
@@ -507,6 +509,76 @@ export const SIDE_QUESTS = [
       xp: 150,
       playerFlags: { vesperia_converted: true, vesperia_political_ally: true },
       textKey: 'quest.side.noblewoman.complete.default',
+    },
+  },
+  {
+    id: 'side_paths_of_abundance',
+    type: QUEST_TYPE.SIDE,
+    title: 'Paths of Abundance',
+    titleKey: 'quest.side.paths.title',
+    descriptionKey: 'quest.side.paths.desc',
+    tags: [QUEST_TAG.ABUNDANCE, QUEST_TAG.GROWTH],
+    region: 'harvest_hearth',
+    giverNpcId: 'elara_inn',
+
+    prerequisites: {
+      minPlayerLevel: 2,
+    },
+
+    stages: [
+      {
+        id: 'discover_mysteries',
+        title: 'Discover the Mysteries',
+        descriptionKey: 'quest.side.paths.stage.discover.desc',
+        approaches: [QUEST_APPROACH.SOCIAL, QUEST_APPROACH.GROWTH],
+        objectives: [
+          {
+            id: 'examine_cellar',
+            label: 'Examine the Abundance Cellar door',
+            type: OBJECTIVE_TYPE.FEATURE_EXAMINED,
+            featureId: 'hearth_cellar_door',
+            regionId: 'harvest_hearth',
+            count: 1,
+            score: { [QUEST_SCORE.ABUNDANCE]: 1 },
+          },
+          {
+            id: 'solve_one_puzzle',
+            label: 'Solve any regional mystery with clever abundance',
+            type: OBJECTIVE_TYPE.PUZZLE_SOLVED,
+            count: 1,
+            score: { [QUEST_SCORE.ABUNDANCE]: 2 },
+          },
+        ],
+        onComplete: {
+          rewards: { ap: 10, xp: 40 },
+          textKey: 'quest.side.paths.stage.discover.complete',
+        },
+      },
+      {
+        id: 'master_problem_solver',
+        title: 'Master Problem-Solver',
+        descriptionKey: 'quest.side.paths.stage.master.desc',
+        objectives: [
+          {
+            id: 'solve_three',
+            label: 'Solve three regional mysteries',
+            type: OBJECTIVE_TYPE.PUZZLE_SOLVED,
+            count: 3,
+            score: { [QUEST_SCORE.ABUNDANCE]: 3 },
+          },
+        ],
+        onComplete: {
+          rewards: { ap: 20, xp: 80, abundanceSpread: 'quest_complete_side' },
+          textKey: 'quest.side.paths.stage.master.complete',
+        },
+      },
+    ],
+
+    rewards: {
+      ap: 25,
+      xp: 120,
+      playerFlags: { abundance_problem_solver: true },
+      textKey: 'quest.side.paths.complete',
     },
   },
 ];

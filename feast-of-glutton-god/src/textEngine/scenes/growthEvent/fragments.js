@@ -1,110 +1,83 @@
 // ═══════════════════════════════════════════════════════════════
 // GROWTH EVENT — fragment pools (cause, sensation, surge, clothing,
 // reaction, settle). Environment lives in environment.js, the
-// per-stage crossing lexicon in stageCrossings.js, per-girl dialogue
+// per-stage crossing lexicon in stageCrossings.js, companion dialogue
 // in personas.js. Every pool carries a tone-neutral wildcard.
 //
-// Tone rule: device-risk register rides growthIntensity / malfunctionTier
-// (gradual/steady = warm, rapid = urgent, violent/critical = unsettling);
-// corruption register rides the dialogue/reaction pools.
+// Tone: sensual abundance, Gorgara's blessing, high fantasy — no
+// modern/college register. Ritual overflow uses malfunctionTier when
+// a spell or relic exceeds its intended strength.
 // ═══════════════════════════════════════════════════════════════
 import { registerPool } from '../../engine.js';
 
 // ── ge.causeAction ─────────────────────────────────────────────
-// Shape: FULL SENTENCE. The mechanism/cause kicking in. Keyed per
-// deviceId (specific) with growthMethod and featureId fallbacks.
 registerPool('ge.causeAction', [
   { when: {}, text: [
     'It begins the way these things always do now — quietly, then all at once.',
     'Whatever was set in motion takes hold.',
     'The change starts before {subject.first} is quite ready for it.',
   ] },
-  // method fallbacks
   { when: { growthMethod: 'feed' }, text: [
-    'The feed runs steady, calories arriving faster than her body can file them away.',
-    'Food keeps coming, and {subject.first}\'s body keeps finding room.',
+    'The feed runs steady, delicacies arriving faster than her body can file them away.',
+    'Food keeps coming, and {subject.first}\'s body keeps finding room — blessed, eager, grateful.',
+  ] },
+  { when: { growthMethod: 'blessing' }, text: [
+    'Golden light pours into {subject.first}, and abundance answers like a prayer finally heard.',
+    'Gorgara\'s warmth settles over her skin; the blessing does not ask permission before it swells.',
+  ] },
+  { when: { growthMethod: 'spell' }, text: [
+    'Arcane sweetness coils through {subject.first} — a spell cast in hunger, not malice.',
+    'The working lands all at once; magic and appetite braid together until flesh obeys both.',
+  ] },
+  { when: { growthMethod: 'feast' }, text: [
+    'Course after course finds her, and the feast refuses the idea of stopping.',
+    'The hall fills with steam and moans; {subject.first} eats like devotion made appetite.',
+  ] },
+  { when: { growthMethod: 'intimate' }, text: [
+    'Pleasure and fullness arrive together — touch becoming weight, weight becoming worship.',
+    'What began as closeness deepens into swelling; {subject.first} gasps and does not pull away.',
+  ] },
+  { when: { growthMethod: 'combat' }, text: [
+    'Growth Damage ripples through {subject.first} mid-clash — violence transmuted into plush abundance.',
+    'Each blow leaves softness behind; the battlefield itself seems to feed her.',
+  ] },
+  { when: { growthMethod: 'quest' }, text: [
+    'The ritual completes, and the promised abundance cashes out at once.',
+    'Whatever oath or quest bound this moment, {subject.first} feels it settle into flesh.',
   ] },
   { when: { growthMethod: 'bloat' }, text: [
-    'Pressure builds at her middle, patient and relentless.',
-    'The bloat cycle kicks up a notch, and her stomach answers.',
+    'Pressure builds at her middle, patient and relentless as rising dough.',
+    'The bloat cycle kicks up a notch, and her stomach answers with sacred fullness.',
   ] },
   { when: { growthMethod: 'infuse' }, text: [
-    'The infusion runs warm into her, dense and deliberate.',
-    'Slurry pumps in, far heavier than anything she drank by choice.',
-  ] },
-  { when: { growthMethod: 'serum' }, text: [
-    'The serum hits her bloodstream and goes to work immediately.',
-    'Compound floods through {subject.first}, rewriting the rules of the next few minutes.',
-  ] },
-  { when: { growthMethod: 'radiation' }, text: [
-    'The chamber seals with a hiss and the acceleration field spins up around her.',
-    'Light floods the pod, and the field starts folding weeks of gaining into minutes.',
-  ] },
-  { when: { growthMethod: 'gas' }, text: [
-    'The canister hisses open and the expansion gas finds her in a heartbeat.',
-    'Gas blooms around {subject.first}, and her body drinks it in whether she likes it or not.',
-  ] },
-  { when: { growthMethod: 'sculpt' }, text: [
-    'The rig hums to life, coaxing fat to migrate where it\'s told.',
-    'Pressure nodes wake against her skin and start moving her softness around.',
-  ] },
-  { when: { growthMethod: 'stimulate' }, text: [
-    'The collar pulses warm against her throat, and the loop closes.',
-    'The stimulator fires, and every coming pound is wired straight into pleasure.',
-  ] },
-  { when: { growthMethod: 'limit_break' }, text: [
-    'The override takes hold, and somewhere deep a ceiling simply lifts away.',
-    'A switch she didn\'t know she had clicks off, and her body forgets its own limits.',
-  ] },
-  // deviceId specifics (marquee + key)
-  { when: { deviceId: 'growth_accelerator_chamber' }, weight: 3, text: [
-    'The chamber door locks. Through the fogging glass, {subject.first} is already starting to change.',
-    'Fields ramp inside the pod, and she feels herself begin to swell against the curved walls.',
-  ] },
-  { when: { deviceId: 'growth_serum_sprayer' }, weight: 3, text: [
-    'A fine mist settles over {subject.first}\'s skin and sinks in like it belongs there.',
-    'The sprayer mists once, sweet and harmless-smelling, and then her body answers.',
-  ] },
-  { when: { deviceId: 'bloating_gas_canister' }, weight: 3, text: [
-    'The canister empties in one long hiss and {subject.first} starts to round out fast.',
-    'Gas floods the space and her middle begins to swell like something being filled.',
-  ] },
-  { when: { deviceId: 'growth_limit_remover' }, weight: 3, text: [
-    'The limiter releases. {subject.first} feels the floor drop out from under her body\'s rules.',
-    'The override fires, and there is suddenly no upper bound left to push against.',
-  ] },
-  { when: { deviceId: 'erogenous_growth_stimulator' }, weight: 3, text: [
-    'The collar warms, and the first wave of feedback rolls through {subject.first} before a single pound lands.',
-  ] },
-  { when: { deviceId: 'growth_serum_injector' }, weight: 3, text: [
-    'The injector empties into her and the volatile serum goes to work all at once.',
-  ] },
-  // feature causes
-  { when: { causeType: 'feature', featureId: 'stream' }, weight: 3, text: [
-    'The binge stream runs long past where it should have stopped, chat egging her on.',
-    'On camera, plate after plate disappears, and the numbers — both kinds — keep climbing.',
-  ] },
-  { when: { causeType: 'feature', featureId: 'compound' }, weight: 3, text: [
-    'The compound peaks fast, far stronger than the label suggested.',
-    'Whatever Sophia mixed this time hits hard and immediate.',
-  ] },
-  { when: { causeType: 'feature', featureId: 'cultivator' }, weight: 3, text: [
-    'The harvest comes due, and weeks of careful feeding cash out at once.',
-    'Reneé\'s patient kitchen work pays off in one long, rich settling of weight.',
+    'The infusion runs warm into her — honeyed, dense, deliberate as temple wine.',
+    'Rich brew pumps through the ritual chalice, far heavier than anything she drank by choice.',
   ] },
   { when: { causeType: 'feature', featureId: 'contest' }, weight: 3, text: [
-    'The contest table is a wasteland, and {subject.first} ate her way through most of it.',
-    'The final plate goes down and the damage from the whole contest lands at once.',
+    'The feast-day table is a wasteland, and {subject.first} ate her way through most of it.',
+    'The final trencher goes down and the whole contest lands in her body at once.',
+  ] },
+  { when: { causeType: 'feature', featureId: 'compound' }, weight: 3, text: [
+    'Sylvie\'s experimental elixir peaks fast — far stronger than the label suggested.',
+    'Whatever the scholar mixed this time hits hard and immediate, alchemical and hungry.',
+  ] },
+  { when: { causeType: 'feature', featureId: 'cultivator' }, weight: 3, text: [
+    'The harvest ritual comes due, and weeks of careful feeding cash out at once.',
+    'Elara\'s patient kitchen work pays off in one long, rich settling of weight.',
   ] },
   { when: { causeType: 'digest_stageup' }, weight: 2, text: [
-    'The week\'s feeding catches up to her all at once at the scale.',
-    'Everything she packed away this week settles in, undeniable now.',
+    'The week\'s indulgence catches up to her all at once before the temple scales.',
+    'Everything she packed away this week settles in, undeniable now — a tithe of flesh.',
+  ] },
+  { when: { locale: 'sacred_grotto' }, weight: 2, text: [
+    'The grotto hums approval; standing stones warm as abundance rises through {subject.first}.',
+  ] },
+  { when: { locale: 'grand_cathedral' }, weight: 2, text: [
+    'Incense thickens; the nave seems to hold its breath as {subject.first} begins to change.',
   ] },
 ]);
 
 // ── ge.firstSensation ──────────────────────────────────────────
-// Shape: FULL SENTENCE. Her body's first response. Keyed sensation ×
-// intensity. Wildcard neutral.
 registerPool('ge.firstSensation', [
   { when: {}, text: [
     'She feels it before she sees it.',
@@ -131,7 +104,6 @@ registerPool('ge.firstSensation', [
     'She feels her body stretch to make room, and then keep stretching.',
     'Every inch of her seems to lengthen and soften at once.',
   ] },
-  // intensity overrides (urgent / unsettling)
   { when: { growthIntensity: 'violent' }, weight: 2, text: [
     'It slams into her with no warm-up at all.',
     'There is no easing into this one — her whole body lurches into the change.',
@@ -142,15 +114,16 @@ registerPool('ge.firstSensation', [
 ]);
 
 // ── ge.surgeDetail ─────────────────────────────────────────────
-// Shape: FULL SENTENCE. Extra detail layered onto {grow.sudden}.
-// Wildcard weighted-empty so small events stay lean.
 registerPool('ge.surgeDetail', [
   { when: {}, text: ['', '', ''] },
-  { when: { growthMethod: 'sculpt' }, text: [
-    'She can feel the fat travelling, settling where the rig decided it should go.',
+  { when: { growthMethod: 'blessing' }, text: [
+    'Golden warmth pools wherever Gorgara\'s favor touches — belly, hips, chest in generous order.',
+  ] },
+  { when: { growthMethod: 'spell' }, text: [
+    'Arcane light stipples her skin; each pulse leaves her softer, fuller, more luminous.',
   ] },
   { when: { growthMethod: 'gas' }, text: [
-    'She rounds outward smoothly, taut as a filled balloon.',
+    'She rounds outward smoothly, taut as a festival balloon blessed by the goddess.',
   ] },
   { when: { growthZone: 'belly' }, text: [
     'Most of it lands at her middle, pushing her belly out and forward.',
@@ -164,65 +137,57 @@ registerPool('ge.surgeDetail', [
   { when: { growthZone: 'bust' }, text: [
     'Her chest takes the lead, heavy and demanding new support.',
   ] },
-  // malfunction escalation
   { when: { malfunctionTier: 'moderate' }, weight: 2, text: [
-    'It overshoots the dose — more than anyone asked for, and faster.',
+    'The blessing overshoots the dose — more than anyone asked for, and faster.',
   ] },
   { when: { malfunctionTier: 'major' }, weight: 2, text: [
     'It blows well past the intended mark, and there\'s no obvious way to throttle it back.',
   ] },
   { when: { malfunctionTier: 'critical' }, weight: 3, text: [
     'It keeps going after it should have stopped — past alarming, into something her body simply accepts.',
-    'The growth refuses every limit, climbing on its own logic now.',
+    'The growth refuses every limit, climbing on its own sacred logic now.',
   ] },
   { when: { stagesJumpedMin: 2 }, weight: 2, text: [
-    'A whole size goes by, then most of another, before it finally eases.',
+    'A whole threshold goes by, then most of another, before it finally eases.',
   ] },
 ]);
 
 // ── ge.garment ─────────────────────────────────────────────────
-// Shape: NOUN PHRASE (possessive, lowercase). Archetype outfit lexicon;
-// outfitHint cells (weight 4) override for context. A future real outfit
-// system can drive this purely by setting outfitHint.
 registerPool('ge.garment', [
-  { when: {}, text: ['her clothes', 'the waistband she put on this morning', 'the fabric across her middle'] },
-  { when: { archetype: 'cheerleader' }, text: ['her cheer top', 'her practice shorts'] },
-  { when: { archetype: 'athlete' }, text: ['her compression gear', 'her track kit'] },
-  { when: { archetype: 'gamer' }, text: ['her oversized hoodie', 'her lounge shorts'] },
-  { when: { archetype: 'sorority' }, text: ['her going-out top', 'her chapter tee'] },
-  { when: { archetype: 'bookworm' }, text: ['her cardigan', 'her tucked-in blouse'] },
-  { when: { archetype: 'influencer' }, text: ['her fit-check outfit', 'her cropped top'] },
-  { when: { archetype: 'culinary' }, text: ['her chef\'s whites', 'her apron strings'] },
-  { when: { archetype: 'nursing' }, text: ['her scrubs', 'her scrub top'] },
-  { when: { archetype: 'farm_girl' }, text: ['her flannel', 'her denim'] },
-  { when: { archetype: 'eced' }, text: ['her sundress', 'her cozy cardigan'] },
-  { when: { archetype: 'predator' }, text: ['her dark blouse', 'her fitted dress'] },
-  { when: { archetype: 'explorer' }, text: ['her field shirt', 'her khakis'] },
-  { when: { archetype: 'psych' }, text: ['her blouse', 'her wrap top'] },
-  { when: { archetype: 'artsy' }, text: ['her paint-flecked smock', 'her loose tunic'] },
-  // outfitHint overrides
-  { when: { outfitHint: 'casual' }, weight: 4, text: ['her comfy stream fit', 'her soft default outfit'] },
-  { when: { outfitHint: 'revealing' }, weight: 4, text: ['her bold little outfit', 'the revealing fit she picked for chat'] },
-  { when: { outfitHint: 'branded' }, weight: 4, text: ['her brand-deal outfit', 'her sponsor merch'] },
-  { when: { outfitHint: 'contest' }, weight: 4, text: ['her contest stretch-pants', 'her competition tee'] },
+  { when: {}, text: ['her clothes', 'the waistband she laced this morning', 'the fabric across her middle'] },
+  { when: { archetype: 'nurturing' }, text: ['her apron strings', 'her matron\'s dress'] },
+  { when: { archetype: 'performer' }, text: ['her travel bodice', 'her bard\'s laced corset'] },
+  { when: { archetype: 'devout' }, text: ['her vestments', 'her prayer shawl'] },
+  { when: { archetype: 'scholar' }, text: ['her spell-worn robe', 'her scholar\'s sash'] },
+  { when: { archetype: 'dominant' }, text: ['her pact-gown', 'her dark velvet bodice'] },
+  { when: { archetype: 'competitive' }, text: ['her smith\'s leathers', 'her feast-day harness'] },
+  { when: { archetype: 'haughty' }, text: ['her noble stomacher', 'her embroidered bodice'] },
+  { when: { archetype: 'shy' }, text: ['her hooded cloak', 'her modest linen dress'] },
+  { when: { archetype: 'greedy' }, text: ['her merchant silks', 'her coin-laced belt'] },
+  { when: { archetype: 'ancient' }, text: ['her vine-wrapped linen', 'her living-bark shawl'] },
+  { when: { archetype: 'proud' }, text: ['her ceremonial armor', 'her guard\'s pauldrons'] },
+  { when: { archetype: 'chosen' }, text: ['her chosen\'s raiment', 'her blessing-wrap'] },
+  { when: { role: 'innkeeper' }, text: ['her innkeeper\'s apron', 'her hearth-side dress'] },
+  { when: { role: 'bard' }, text: ['her performance silks', 'her lute-slung bodice'] },
+  { when: { role: 'blacksmith' }, text: ['her soot-soft leathers', 'her forge apron'] },
+  { when: { role: 'priestess' }, text: ['her linen vestments', 'her dawnwell stole'] },
+  { when: { outfitHint: 'casual' }, weight: 4, text: ['her tavern-day dress', 'her soft everyday gown'] },
+  { when: { outfitHint: 'revealing' }, weight: 4, text: ['her festival gown', 'her daring feast-day silks'] },
+  { when: { outfitHint: 'branded' }, weight: 4, text: ['her house livery', 'her noble house colors'] },
+  { when: { outfitHint: 'contest' }, weight: 4, text: ['her feast-day garb', 'her competition sash and stretch-laced skirt'] },
 ]);
 
 // ── ge.clothingStrain ──────────────────────────────────────────
-// Shape: VERB PHRASE (lowercase predicate, no period). Follows {garment|cap}.
-// Uses number-agnostic modal/base verbs so singular ("her top") and
-// plural ("her scrubs") garments both read correctly.
 registerPool('ge.clothingStrain', [
   { when: {}, text: ['won\'t last the minute', 'can\'t keep up with the new softness', 'can\'t win this one'] },
   { when: { growthZone: 'belly' }, text: ['can\'t cover her middle anymore', 'won\'t stay down over her belly'] },
   { when: { growthZone: 'lower_body' }, text: ['won\'t make it over her hips', 'can\'t stretch any further across her thighs'] },
   { when: { growthZone: 'curves' }, text: ['can\'t keep up with her curves', 'can\'t cover her on every side at once'] },
-  { when: { growthZone: 'bust' }, text: ['won\'t stay buttoned over her chest', 'can\'t contain her bust any longer'] },
+  { when: { growthZone: 'bust' }, text: ['won\'t stay laced over her chest', 'can\'t contain her bust any longer'] },
   { when: { startStageMin: 6 }, weight: 2, text: ['never stood a chance', 'lost this fight long ago'] },
 ]);
 
 // ── ge.clothingFail ────────────────────────────────────────────
-// Shape: FULL SENTENCE. Outright failure. Weighted-empty wildcard so
-// small/early events usually skip it.
 registerPool('ge.clothingFail', [
   { when: {}, text: ['', '', '', ''] },
   { when: { endStageMin: 4, stagesJumpedMin: 1 }, text: [
@@ -233,7 +198,7 @@ registerPool('ge.clothingFail', [
     'The hem surrenders and her belly settles into the open air.',
   ] },
   { when: { growthZone: 'bust', endStageMin: 4 }, text: [
-    'A button gives up and pings off somewhere across the room.',
+    'A lace point gives up and pings off somewhere across the room.',
   ] },
   { when: { growthZone: 'lower_body', endStageMin: 4 }, text: [
     'A seam splits down one straining thigh.',
@@ -242,15 +207,14 @@ registerPool('ge.clothingFail', [
     'Whatever she was wearing simply isn\'t clothing anymore — just strained fabric and open seams.',
   ] },
   { when: { outfitHint: 'revealing', endStageMin: 3 }, weight: 2, text: [
-    'The bold little outfit gives out on camera, and chat absolutely loses it.',
+    'The festival gown gives out before the musicians finish their second song, and the hall erupts in delighted gasps.',
   ] },
   { when: { outfitHint: 'contest', endStageMin: 3 }, weight: 2, text: [
-    'The contest waistband finally lets go, and the crowd roars.',
+    'The feast-day sash finally snaps, and the crowd roars like Gorgara herself applauded.',
   ] },
 ]);
 
 // ── ge.reactionBody ────────────────────────────────────────────
-// Shape: FULL SENTENCE. Her physical reaction, before she speaks.
 registerPool('ge.reactionBody', [
   { when: {}, text: [
     '{subject.first} runs both hands down her new shape, taking stock.',
@@ -273,8 +237,6 @@ registerPool('ge.reactionBody', [
 ]);
 
 // ── ge.reactionDialogue ────────────────────────────────────────
-// Shape: DIALOGUE BEAT. Corruption-gated baseline; personas.js extends
-// per girl. priority hard-gate keeps tiers from leaking in pool mode.
 registerPool('ge.reactionDialogue', [
   { when: {}, priority: 1, text: [
     '"...okay," she manages. "That\'s — okay."',
@@ -289,19 +251,18 @@ registerPool('ge.reactionDialogue', [
     '"I keep saying I\'ll stop," she says. "I keep not meaning it."',
   ] },
   { when: { corruption: 2 }, priority: 1, text: [
-    '"More," she breathes, like it\'s the only word left. "God, more."',
+    '"More," she breathes, like it\'s the only word left. "Gorgara, more."',
     '"Look at me," she says, proud and unhurried. "Just look."',
   ] },
   { when: { corruption: 2, obsessionTierMin: 2 }, priority: 1, weight: 2, text: [
     '"I don\'t want it to stop," she says. "I don\'t think I could stand it if it did."',
   ] },
-  { when: { causeType: 'device_malfunction', corruption: 0 }, priority: 1, weight: 2, text: [
+  { when: { malfunctionTier: 'critical', corruption: 0 }, priority: 1, weight: 2, text: [
     '"It\'s not stopping," she says, voice climbing. "Why isn\'t it stopping?"',
   ] },
 ]);
 
 // ── ge.settleLine ──────────────────────────────────────────────
-// Shape: FULL SENTENCE. The aftermath settling.
 registerPool('ge.settleLine', [
   { when: {}, text: [
     'When it finally levels off, she\'s left to learn the shape of herself all over again.',
@@ -314,62 +275,52 @@ registerPool('ge.settleLine', [
   { when: { malfunctionTier: 'critical' }, weight: 2, text: [
     'It stops, finally — but no one is sure it stopped because it was finished.',
   ] },
-  { when: { isMalfunction: true }, weight: 2, text: [
-    'By the time the device cuts out, the damage is comfortably, permanently done.',
+  { when: { growthMethod: 'blessing' }, weight: 2, text: [
+    'The golden warmth fades to a low hum, and abundance remains like incense in the air.',
   ] },
 ]);
 
 // ── ge.permanentNote ───────────────────────────────────────────
-// Shape: FULL SENTENCE. The point-of-no-return register. Empty wildcard.
 registerPool('ge.permanentNote', [
   { when: {}, text: ['', '', ''] },
   { when: { isPermanent: true }, weight: 2, text: [
     'This one isn\'t going anywhere. Her body has already decided to keep it.',
-    'Whatever this added, it added for good.',
-  ] },
-  { when: { deviceId: 'growth_limit_remover' }, weight: 3, text: [
-    'And the ceiling is still gone. Whatever comes next has nothing to push back against.',
+    'Whatever this added, it added for good — a gift the goddess does not recall.',
   ] },
   { when: { limitRemoved: true }, weight: 3, text: [
     'Her body has stopped recognizing the idea of "enough" entirely.',
   ] },
 ]);
 
-// ── ge.taliaCameo ──────────────────────────────────────────────
-// Shape: DIALOGUE BEAT (Talia, the inventor). Mostly-empty wildcard;
-// appears mainly for device causes, heavier in the lab.
-registerPool('ge.taliaCameo', [
+// ── ge.scholarAside ─────────────────────────────────────────────
+// Sylvie or scholarly observers — mostly empty; fires in temple/lab contexts.
+registerPool('ge.scholarAside', [
   { when: {}, text: ['', '', '', ''] },
-  { when: { causeType: 'device_use', locale: 'lab' }, text: [
-    'Talia checks a readout and nods once. "Within tolerance," she says, not looking up.',
-    'Talia hums, tapping her tablet. "Good response curve. Logging it."',
+  { when: { growthMethod: 'spell', locale: 'marble_hall' }, text: [
+    'Sylvie murmurs a measurement under her breath and smiles like a woman vindicated.',
+    '"Fascinating curve," the scholar whispers, already scribbling notes by candlelight.',
   ] },
-  { when: { causeType: 'device_malfunction', locale: 'lab' }, weight: 2, text: [
-    'Talia frowns at a spiking graph. "Huh. That\'s new," she murmurs, already taking notes.',
-    'Talia smacks the side of the console. "Okay, that wasn\'t supposed to do that. Noted."',
+  { when: { causeType: 'feature', featureId: 'compound' }, weight: 2, text: [
+    'Sylvie watches the elixir\'s work with naked delight. "Hypothesis confirmed," she breathes.',
   ] },
-  { when: { deviceId: 'growth_accelerator_chamber' }, weight: 2, text: [
-    'Talia watches through the glass with frank engineer interest. "Beautiful field saturation," she says.',
-  ] },
-  { when: { malfunctionTier: 'critical', locale: 'lab' }, weight: 3, text: [
-    'Talia\'s hand hovers over the kill switch, then drops. "Let\'s just see where it lands," she decides.',
+  { when: { malfunctionTier: 'critical', growthMethod: 'spell' }, weight: 3, text: [
+    'Sylvie\'s hand hovers over the counterspell, then drops. "Let\'s see where Gorgara takes this," she decides.',
   ] },
 ]);
 
-// ── ge.deviceWindDown ──────────────────────────────────────────
-// Shape: FULL SENTENCE. The hardware powering down. Empty wildcard.
-registerPool('ge.deviceWindDown', [
+// ── ge.ritualFade ──────────────────────────────────────────────
+registerPool('ge.ritualFade', [
   { when: {}, text: ['', '', ''] },
-  { when: { deviceId: 'growth_accelerator_chamber' }, text: [
-    'The chamber hisses open and lets her out, unsteady on newly heavier legs.',
+  { when: { growthMethod: 'blessing' }, text: [
+    'The last gold motes drift away, leaving only warmth and new weight behind.',
   ] },
-  { when: { deviceId: 'growth_serum_sprayer' }, text: [
-    'The sprayer clicks empty, its work long since done.',
+  { when: { growthMethod: 'spell' }, text: [
+    'The working\'s light gutters out; the swell remains, sacred and satisfied.',
   ] },
-  { when: { deviceId: 'bloating_gas_canister' }, text: [
-    'The canister vents the last of itself and goes quiet.',
+  { when: { growthMethod: 'feast' }, text: [
+    'Empty trenchers steam in the silence; {subject.first} sighs, gloriously full.',
   ] },
-  { when: { deviceId: 'erogenous_growth_stimulator' }, text: [
-    'The collar dims back to a low, patient warmth, waiting for next time.',
+  { when: { locale: 'sacred_grotto' }, text: [
+    'The standing stones cool; the grotto returns to its hush, changed around her.',
   ] },
 ]);

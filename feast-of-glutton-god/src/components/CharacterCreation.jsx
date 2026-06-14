@@ -3,7 +3,8 @@ import { PLAYER_CLASSES } from "../gameData/classes.js";
 import { RACES } from "../gameData/races.js";
 import { getSubclassesForClass } from "../gameData/subclasses.js";
 import { applyRaceStatBonuses } from "../gameData/races.js";
-import { getSpellsForBuild } from "../gameData/spells.js";
+import { buildStartingSpells } from "../gameData/spellLearning.js";
+import { getCharacterSpells } from "../gameData/spellLearning.js";
 import { STAT_LABELS } from "../gameData/stats.js";
 
 const STEPS = ['race', 'class', 'subclass', 'details'];
@@ -28,7 +29,11 @@ export default function CharacterCreation({ onBack, onStart }) {
     });
   }, [selectedClass, raceId, humanPicks]);
 
-  const spellCount = getSpellsForBuild(classId, subclassId).length;
+  const spellCount = getCharacterSpells({
+    classId,
+    subclassId,
+    spellsKnown: buildStartingSpells(classId, subclassId).spellsKnown,
+  }).length;
 
   const goNext = () => {
     if (step === 1) {

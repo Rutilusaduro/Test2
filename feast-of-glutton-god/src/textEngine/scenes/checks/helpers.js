@@ -1,11 +1,12 @@
 /**
  * Shared helpers for check crit/fumble prose pools.
  *
- * Stage bands (0-indexed, 12 stages total):
+ * Stage bands (15-tier ladder):
  *   lean    0–2  — agile, intimate, precise
  *   mid     3–5  — rounded, confident abundance
  *   heavy   6–8  — grand, overwhelming presence
- *   extreme 9–11 — titanic, world-shaking power
+ *   vast    9–11 — colossal, hall-filling power
+ *   world   12+  — immobile legend, realm-shaking scale
  *
  * Relationship tiers (from relationships.js):
  *   distant  0–1  stranger / acquaintance
@@ -18,7 +19,8 @@ export const STAGE_BANDS = [
   { name: 'lean', when: { stageMax: 2 } },
   { name: 'mid', when: { stageMin: 3, stageMax: 5 } },
   { name: 'heavy', when: { stageMin: 6, stageMax: 8 } },
-  { name: 'extreme', when: { stageMin: 9 } },
+  { name: 'vast', when: { stageMin: 9, stageMax: 11 } },
+  { name: 'world', when: { stageMin: 12 } },
 ];
 
 export const REL_BANDS = [

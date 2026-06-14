@@ -4,11 +4,18 @@ import './npc/talk.js';
 import './npc/flirt.js';
 import './npc/bless.js';
 import './npc/feast.js';
+import './npc/intimate.js';
+import './npc/questOffer.js';
+import './overworld/spellCast.js';
+import './world/events.js';
+import './world/transformation.js';
+import './puzzles/index.js';
 import './combatText.js';
 import './checks/index.js';
 import './growthEvent/index.js';
 import './growth/index.js';
 import './quests/index.js';
+import './leveling/index.js';
 
 export { renderObserve, POSES } from './npc/observe.js';
 export { renderFeed, FEED_TEMPLATE } from './npc/feed.js';

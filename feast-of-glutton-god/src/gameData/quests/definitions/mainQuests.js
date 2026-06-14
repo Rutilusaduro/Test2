@@ -364,7 +364,7 @@ export const MAIN_QUESTS = [
           ap: 55,
           xp: 550,
           xpSource: 'major_story',
-          unlockRegions: ['ancient_temple'],
+          unlockRegions: ['ancient_temple', 'gorgara_cradle'],
           worldFlags: { temple_sanctuary_mercy: true, main_act2_complete: true },
           playerFlags: { cleric_plenty_unlocked: true, warlock_overflow_unlocked: true },
         },
@@ -393,6 +393,150 @@ export const MAIN_QUESTS = [
       worldFlags: { main_act2_complete: true },
       playerFlags: { cleric_plenty_unlocked: true, warlock_overflow_unlocked: true },
       textKey: 'quest.main.overflowing_temple.complete.default',
+    },
+  },
+
+  {
+    id: 'main_leviathan_coronation',
+    type: QUEST_TYPE.MAIN,
+    act: 3,
+    actLabel: 'Act III',
+    title: "Coronation of Abundance",
+    titleKey: 'quest.main.coronation.title',
+    descriptionKey: 'quest.main.coronation.desc',
+    tags: [QUEST_TAG.ABUNDANCE, QUEST_TAG.GROWTH, QUEST_TAG.CONVERSION],
+    region: 'gorgara_cradle',
+    giverNpcId: 'thalia_witch',
+
+    prerequisites: {
+      minPlayerLevel: 8,
+      questsCompleted: ['main_overflowing_temple'],
+      flags: ['main_act2_complete'],
+    },
+
+    stages: [
+      {
+        id: 'cradle_hunger',
+        title: 'Hunger at the Cradle',
+        descriptionKey: 'quest.main.coronation.stage.cradle.desc',
+        approaches: [QUEST_APPROACH.SOCIAL, QUEST_APPROACH.GROWTH],
+        objectives: [
+          {
+            id: 'meet_thalia',
+            label: 'Seek Thalia at Gorgara\'s Cradle',
+            type: OBJECTIVE_TYPE.VISIT_REGION,
+            regionId: 'gorgara_cradle',
+            count: 1,
+          },
+          {
+            id: 'thalia_close',
+            label: 'Earn Thalia\'s intimate trust',
+            type: OBJECTIVE_TYPE.NPC_RELATIONSHIP_MIN,
+            npcId: 'thalia',
+            tier: 3,
+            count: 1,
+          },
+        ],
+        onComplete: {
+          rewards: { ap: 20, xp: 80 },
+          textKey: 'quest.main.coronation.stage.cradle.complete',
+        },
+      },
+      {
+        id: 'spread_overflow',
+        title: 'Spread the Overflow',
+        descriptionKey: 'quest.main.coronation.stage.spread.desc',
+        approaches: [QUEST_APPROACH.FEEDING, QUEST_APPROACH.GROWTH],
+        objectives: [
+          {
+            id: 'growth_quota_cradle',
+            label: 'Guide three souls to significant growth in the cradle',
+            type: OBJECTIVE_TYPE.NPC_GROWTH_QUOTA,
+            regionId: 'gorgara_cradle',
+            minStagesGained: 2,
+            count: 3,
+            score: { [QUEST_SCORE.ABUNDANCE]: 3 },
+          },
+          {
+            id: 'feast_ritual',
+            label: 'Host a communal feast',
+            type: OBJECTIVE_TYPE.COMMUNAL_FEAST,
+            regionId: 'gorgara_cradle',
+            count: 1,
+          },
+        ],
+        onComplete: {
+          rewards: { ap: 30, xp: 120, playerSizeCapBonus: 1 },
+          textKey: 'quest.main.coronation.stage.spread.complete',
+        },
+      },
+      {
+        id: 'coronation',
+        title: 'Coronation of Abundance',
+        descriptionKey: 'quest.main.coronation.stage.coronation.desc',
+        approaches: [QUEST_APPROACH.GROWTH, QUEST_APPROACH.CONVERSION],
+        objectives: [
+          {
+            id: 'player_stage_8',
+            label: 'Ascend to Leviathan size (stage 8+)',
+            type: OBJECTIVE_TYPE.PLAYER_STAGE_MIN,
+            stage: 8,
+            count: 1,
+          },
+          {
+            id: 'convert_cradle',
+            label: 'Convert or defeat the cradle\'s famine spirits',
+            type: OBJECTIVE_TYPE.COMBAT_VICTORY,
+            regionId: 'gorgara_cradle',
+            enemyId: 'famine_hag',
+            count: 1,
+            score: { [QUEST_SCORE.CONVERSION]: 2 },
+          },
+        ],
+        onComplete: {
+          rewards: { ap: 40, xp: 200, xpSource: 'major_story' },
+          textKey: 'quest.main.coronation.stage.coronation.complete',
+        },
+      },
+    ],
+
+    endings: [
+      {
+        id: 'avatar_of_gorgara',
+        label: 'Avatar of Gorgara',
+        condition: { minScores: { [QUEST_SCORE.ABUNDANCE]: 5 } },
+        rewards: {
+          ap: 80,
+          xp: 800,
+          xpSource: 'major_story',
+          playerSizeCapBonus: 2,
+          worldFlags: { gorgara_avatar: true, main_act3_complete: true },
+          playerFlags: { leviathan_coronation: true },
+        },
+        textKey: 'quest.main.coronation.ending.avatar',
+      },
+      {
+        id: 'herald_of_feast',
+        label: 'Herald of the Eternal Feast',
+        condition: { minScores: { [QUEST_SCORE.CONVERSION]: 3 } },
+        rewards: {
+          ap: 70,
+          xp: 750,
+          xpSource: 'major_story',
+          playerSizeCapBonus: 1,
+          worldFlags: { feast_herald: true, main_act3_complete: true },
+        },
+        textKey: 'quest.main.coronation.ending.herald',
+      },
+    ],
+
+    rewards: {
+      ap: 50,
+      xp: 600,
+      xpSource: 'major_story',
+      worldFlags: { main_act3_complete: true },
+      unlockRegions: ['gorgara_cradle'],
+      textKey: 'quest.main.coronation.complete.default',
     },
   },
 ];

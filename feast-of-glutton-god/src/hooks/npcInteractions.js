@@ -5,17 +5,29 @@ import { renderTalk } from '../textEngine/scenes/npc/talk.js';
 import { renderFlirt } from '../textEngine/scenes/npc/flirt.js';
 import { renderBless } from '../textEngine/scenes/npc/bless.js';
 import { renderFeast } from '../textEngine/scenes/npc/feast.js';
-import { renderGrowthScene } from '../textEngine/scenes/growthEvent/index.js';
+import { renderIntimate } from '../textEngine/scenes/npc/intimate.js';
 import { renderCombatBeat } from '../textEngine/scenes/combatText.js';
-import { advanceStage } from '../gameData/stages.js';
+import { applyGrowthWithPresentation } from '../gameData/growthPresentation.js';
 import { addCorruption } from '../gameData/corruption.js';
-import { addRelationship } from '../gameData/relationships.js';
-import { getTier } from '../gameData/relationships.js';
+import {
+  awardRelationship,
+  getTier,
+  getFlirtBonus,
+  getGrowthStageBonus,
+  getInteractionLockReason,
+  INTERACTION_UNLOCKS,
+  getTierUpMessage,
+  canUnlockInteraction,
+} from '../gameData/relationships.js';
 import { getCorruptionTier } from '../gameData/corruption.js';
 import { getStage } from '../gameData/stages.js';
 import { spendAP } from '../gameData/player.js';
 import { checkSeduce, formatCheckSummary, toTextContext, DC } from '../gameData/skillChecks.js';
 import { recordNpcInteractionForQuests, recordNpcGrowthForQuests } from './questHooks.js';
+import { awardAbundanceSpreadWithEvents } from '../gameData/worldEvents.js';
+import { awardInfluence, getRelationshipInfluenceBonus } from '../gameData/influence.js';
+import { awardRegionTransformation } from '../gameData/worldTransformation.js';
+import { appendPuzzleHintToTalk } from '../gameData/puzzleHints.js';
 
 function withQuestProgress(game, npc, interaction, meta, result) {
   const quest = recordNpcInteractionForQuests(game, {
@@ -37,6 +49,14 @@ function withQuestProgress(game, npc, interaction, meta, result) {
         ? `${questMessages}\n\n${growthQuest.questMessages}`
         : growthQuest.questMessages;
     }
+    if (result.growth.stagesJumped > 0) {
+      const relResult = awardRelationship(result.npc ?? npc, 'growth_witnessed');
+      if (relResult.tierUp) {
+        const tierMsg = getTierUpMessage(result.npc ?? npc, relResult);
+        questMessages = questMessages ? `${questMessages}\n\n${tierMsg}` : tierMsg;
+        result.relationship = relResult;
+      }
+    }
   }
   if (questMessages) {
     result.text = (result.text || '') + `\n\n---\n${questMessages}`;
@@ -44,8 +64,58 @@ function withQuestProgress(game, npc, interaction, meta, result) {
       result.narrative += `\n\n---\n${questMessages}`;
     }
   }
+  if (['feed', 'bless', 'feast', 'intimate', 'talk'].includes(interaction)
+    || interaction?.startsWith('feed_') || interaction?.startsWith('bless_')) {
+    const key = interaction.startsWith('feed') ? 'npc_feed'
+      : interaction.startsWith('bless') ? 'npc_bless'
+        : `npc_${interaction}`;
+    const spread = awardAbundanceSpreadWithEvents(game, key);
+    if (spread?.worldEvent?.triggered && spread.worldEvent.message) {
+      result.text = (result.text || '') + `\n\n---\n${spread.worldEvent.message}`;
+      if (result.narrative) result.narrative += `\n\n---\n${spread.worldEvent.message}`;
+    }
+    const transform = awardRegionTransformation(game, game.region, key);
+    if (transform.levelUp && transform.message) {
+      result.text = (result.text || '') + `\n\n---\n${transform.message}`;
+      if (result.narrative) result.narrative += `\n\n---\n${transform.message}`;
+    }
+    const relBonus = getRelationshipInfluenceBonus(result.npc ?? npc);
+    if (interaction === 'feast' || interaction === 'bless' || interaction?.startsWith('bless')) {
+      awardInfluence(game, 'religious', 2 + relBonus, key);
+    } else if (interaction === 'feed' || interaction?.startsWith('feed')) {
+      awardInfluence(game, 'cultural', 1 + relBonus, key);
+    } else if (interaction === 'flirt' || interaction === 'intimate') {
+      awardInfluence(game, 'cultural', 1 + relBonus, key);
+    }
+  }
   result.questNotes = quest;
   return result;
+}
+
+function applyRelationshipGain(npc, source, amountOverride) {
+  const relResult = awardRelationship(npc, source, amountOverride);
+  return relResult;
+}
+
+function appendTierUp(result, npc, relResult) {
+  if (!relResult?.tierUp) return result;
+  const msg = getTierUpMessage(npc, relResult);
+  result.text = (result.text || '') + `\n\n${msg}`;
+  if (result.narrative) result.narrative += `\n\n${msg}`;
+  result.relationship = relResult;
+  return result;
+}
+
+function growNpc(npc, game, baseStages, method = 'feed') {
+  const bonus = getGrowthStageBonus(npc, method);
+  const stages = baseStages + bonus;
+  const startStage = getStage(npc.lbs).id;
+  const presentation = applyGrowthWithPresentation(npc, game, stages, { growthMethod: method });
+  return {
+    ...presentation,
+    startStage: presentation.startStage ?? startStage,
+    bonusStages: bonus,
+  };
 }
 
 let sessionHistory = null;
@@ -68,20 +138,35 @@ export function doObserve(npc, player, game) {
   const pose = poses[Math.floor(Math.random() * poses.length)];
   const text = renderObserve(npc, player, { pose, location: game.region, history: getTextHistory(game) });
   addCorruption(npc, 1);
-  return withQuestProgress(game, npc, 'observe', null, { text, npc });
+  const relResult = applyRelationshipGain(npc, 'observe');
+  return withQuestProgress(game, npc, 'observe', null, appendTierUp({ text, npc }, npc, relResult));
 }
 
 export function doTalk(npc, player, game) {
   const text = renderTalk(npc, player, { location: game.region, history: getTextHistory(game) });
-  addRelationship(npc, 3);
-  return withQuestProgress(game, npc, 'talk', null, { text, npc });
+  const relResult = applyRelationshipGain(npc, 'talk');
+  const offers = getQuestOffersForNpc(game, npc);
+  let questOfferText = '';
+  if (offers.length) {
+    questOfferText = '\n\n' + buildQuestOfferNarrative(npc, player, offers);
+  }
+  const result = appendTierUp({
+    text: text + questOfferText,
+    npc,
+    questOffers: offers.map((o) => ({ id: o.id, title: o.title, type: o.type })),
+  }, npc, relResult);
+  return withQuestProgress(game, npc, 'talk', null, appendPuzzleHintToTalk(result, game, npc));
 }
 
 export function doFlirt(npc, player, game) {
-  const relBonus = (npc.relationship || 0) >= 40 ? 2 : 0;
+  if (!canUnlockInteraction(npc, 'flirt')) {
+    return { text: getInteractionLockReason(npc, 'flirt'), npc, ok: false };
+  }
+
+  const flirtBonus = getFlirtBonus(npc);
   const check = checkSeduce(player, DC.medium, {
-    bonuses: relBonus
-      ? [{ type: 'circumstantial', label: 'Warm rapport', value: relBonus, source: 'relationship' }]
+    bonuses: flirtBonus
+      ? [{ type: 'circumstantial', label: 'Warm bond', value: flirtBonus, source: 'relationship' }]
       : [],
     applyCriticalEffects: true,
     target: npc,
@@ -100,11 +185,15 @@ export function doFlirt(npc, player, game) {
     checkCritical: check.critical,
   });
 
+  let relResult;
   if (check.success) {
-    addRelationship(updatedNpc, check.critical === 'success' ? 8 : 5);
+    relResult = applyRelationshipGain(
+      updatedNpc,
+      check.critical === 'success' ? 'flirt_crit' : 'flirt_success',
+    );
     addCorruption(updatedNpc, check.critical === 'success' ? 5 : 3);
   } else if (check.critical === 'failure') {
-    addRelationship(updatedNpc, 1);
+    relResult = applyRelationshipGain(updatedNpc, 'flirt_fumble');
   }
 
   const summary = formatCheckSummary(check);
@@ -117,98 +206,94 @@ export function doFlirt(npc, player, game) {
     : check.critical === 'failure'
       ? '\n\n✦ A charming fumble — you blush, and she finds it endearing.'
       : '';
-  const narrative = `${text}${failNote}${critNote}`;
+  let narrative = `${text}${failNote}${critNote}`;
+  let result = { text: `${summary}\n\n${narrative}`, narrative, check, npc: updatedNpc, success: check.success };
+  if (relResult) result = appendTierUp(result, updatedNpc, relResult);
 
-  return withQuestProgress(game, updatedNpc, 'flirt', null, {
-    text: `${summary}\n\n${narrative}`,
-    narrative,
-    check,
-    npc: updatedNpc,
-    success: check.success,
-  });
+  return withQuestProgress(game, updatedNpc, 'flirt', null, result);
 }
 
 export function doFeed(npc, player, game, feedType = 'hand') {
-  const startStage = getStage(npc.lbs).id;
-  const growth = advanceStage(npc, feedType === 'magical' ? 2 : 1);
+  const baseStages = feedType === 'magical' ? 2 : 1;
+  const growth = growNpc(npc, game, baseStages, 'feed');
   const text = renderFeed(npc, player, { feedType, location: game.region, history: getTextHistory(game) });
   addCorruption(npc, feedType === 'magical' ? 6 : 4);
-  addRelationship(npc, 4);
-  const growthText = renderGrowthScene(npc, {
-    growthMethod: 'feed',
-    startStage,
-    endStage: growth.endStage,
-    gainLbs: 10,
-    week: game.day,
-  });
-  return withQuestProgress(game, npc, 'feed', { feedType }, {
-    text: text + '\n\n' + growthText, npc, growth,
-  });
+  const relResult = applyRelationshipGain(npc, feedType === 'magical' ? 'feed_magical' : 'feed');
+  let result = appendTierUp({
+    text: text + '\n\n' + (growth.text || ''), npc, growth,
+  }, npc, relResult);
+  return withQuestProgress(game, npc, 'feed', { feedType }, result);
 }
 
 export function doBless(npc, player, game, blessType = 'minor') {
+  if (!canUnlockInteraction(npc, 'bless')) {
+    return { text: getInteractionLockReason(npc, 'bless'), npc, ok: false };
+  }
   const costs = { minor: 5, major: 15, targeted: 10 };
   const cost = costs[blessType] || 5;
   if (!spendAP(game, cost)) return { text: 'Not enough Abundance Points.', npc, ok: false };
-  const startStage = getStage(npc.lbs).id;
-  const stages = blessType === 'major' ? 2 : 1;
-  const growth = advanceStage(npc, stages);
+  const baseStages = blessType === 'major' ? 2 : 1;
+  const growth = growNpc(npc, game, baseStages, 'blessing');
   const text = renderBless(npc, player, {
     blessType,
     zone: blessType === 'targeted' ? 'belly' : undefined,
     history: getTextHistory(game),
   });
   addCorruption(npc, blessType === 'major' ? 10 : 5);
-  addRelationship(npc, 6);
-  const growthText = renderGrowthScene(npc, {
-    growthMethod: 'blessing',
-    startStage,
-    endStage: growth.endStage,
-    week: game.day,
-  });
-  return withQuestProgress(game, npc, 'bless', { blessType }, {
-    text: text + '\n\n' + growthText, npc, growth, ok: true,
-  });
+  const awardKey = blessType === 'major' ? 'bless_major' : blessType === 'targeted' ? 'bless_targeted' : 'bless_minor';
+  const relResult = applyRelationshipGain(npc, awardKey);
+  let result = appendTierUp({
+    text: text + '\n\n' + (growth.text || ''), npc, growth, ok: true,
+  }, npc, relResult);
+  return withQuestProgress(game, npc, 'bless', { blessType }, result);
 }
 
 export function doFeast(npc, player, game) {
+  if (!canUnlockInteraction(npc, 'feast')) {
+    return { text: getInteractionLockReason(npc, 'feast'), npc, ok: false };
+  }
   if (!spendAP(game, 20)) return { text: 'Not enough Abundance Points for a feast.', npc, ok: false };
-  const startStage = getStage(npc.lbs).id;
-  const growth = advanceStage(npc, 3);
+  const growth = growNpc(npc, game, 3, 'feast');
   const text = renderFeast(npc, player, { history: getTextHistory(game) });
   addCorruption(npc, 15);
-  addRelationship(npc, 10);
-  const growthText = renderGrowthScene(npc, {
-    growthMethod: 'feast',
-    startStage,
-    endStage: growth.endStage,
-    week: game.day,
-  });
+  const relResult = applyRelationshipGain(npc, 'feast');
+  let result = appendTierUp({
+    text: text + '\n\n' + (growth.text || ''), npc, growth, ok: true,
+  }, npc, relResult);
   game.day += 1;
-  return withQuestProgress(game, npc, 'feast', null, {
-    text: text + '\n\n' + growthText, npc, growth, ok: true,
-  });
+  return withQuestProgress(game, npc, 'feast', null, result);
 }
 
 export function getInteractionMenu(npc, player) {
   const rel = getTier(npc.relationship || 0);
   const cor = getCorruptionTier(npc.corruption || 0);
-  const menu = [
-    { id: 'talk', label: 'Talk', enabled: true },
-    { id: 'flirt', label: 'Flirt / Compliment', enabled: true },
-    { id: 'observe', label: 'Observe / Admire', enabled: true },
-    { id: 'feed', label: 'Feed', enabled: true },
-    { id: 'bless', label: 'Bless (spend AP)', enabled: true },
-    { id: 'feast', label: 'Invite to Feast', enabled: (player.ap || 0) >= 20 },
-    { id: 'special', label: `Special (${player.subclass})`, enabled: true },
-    { id: 'intimate', label: 'Intimate', enabled: rel.id >= 4 },
-    { id: 'corrupt', label: 'Corrupt', enabled: rel.id >= 2 && cor.id < 2 },
-    { id: 'recruit', label: 'Recruit', enabled: rel.id >= 3 && cor.id >= 1 && npc.companionId },
+
+  const item = (id, label, extraEnabled = true, hint) => ({
+    id,
+    label,
+    enabled: canUnlockInteraction(npc, id) && extraEnabled,
+    hint: !canUnlockInteraction(npc, id) ? getInteractionLockReason(npc, id) : hint,
+    tierRequired: INTERACTION_UNLOCKS[id] ?? 0,
+  });
+
+  return [
+    item('talk', 'Talk'),
+    item('flirt', 'Flirt / Compliment'),
+    item('observe', 'Observe / Admire'),
+    item('feed', 'Feed'),
+    item('bless', 'Bless (spend AP)'),
+    item('feast', 'Invite to Feast', (player.ap || 0) >= 20, (player.ap || 0) < 20 ? 'Requires 20 AP' : null),
+    item('special', `Special (${player.subclass})`),
+    item('intimate', 'Intimate'),
+    item('corrupt', 'Corrupt', cor.id < 2),
+    item('recruit', 'Recruit', cor.id >= 1 && Boolean(npc.companionId)),
   ];
-  return menu;
 }
 
 export function doSpecial(npc, player, game) {
+  if (!canUnlockInteraction(npc, 'special')) {
+    return { text: getInteractionLockReason(npc, 'special'), npc, ok: false };
+  }
   const bySubclass = {
     feast_singer: 'You perform a private growth ballad. Her body sways in time, swelling with each verse.',
     indulgence: 'You stage an intimate feeding performance — every crumb and moan draws her deeper into appetite.',
@@ -231,29 +316,33 @@ export function doSpecial(npc, player, game) {
     warlock: "You invoke Gorgara's Claim — hunger floods her until she moans your name.",
   };
   const line = bySubclass[player.subclassId] || byClass[player.classId] || byClass.cleric;
-  const startStage = getStage(npc.lbs).id;
-  const growth = advanceStage(npc, 2);
+  const growth = growNpc(npc, game, 2, 'blessing');
   addCorruption(npc, 8);
-  addRelationship(npc, 5);
-  const growthText = renderGrowthScene(npc, { growthMethod: 'blessing', startStage, endStage: growth.endStage, week: game.day });
-  return withQuestProgress(game, npc, 'special', null, {
-    text: line + '\n\n' + growthText, npc, growth,
-  });
+  const relResult = applyRelationshipGain(npc, 'special');
+  let result = appendTierUp({
+    text: line + '\n\n' + (growth.text || ''), npc, growth,
+  }, npc, relResult);
+  return withQuestProgress(game, npc, 'special', null, result);
 }
 
 export function doIntimate(npc, player, game) {
-  const startStage = getStage(npc.lbs).id;
-  const growth = advanceStage(npc, 2);
+  if (!canUnlockInteraction(npc, 'intimate')) {
+    return { text: getInteractionLockReason(npc, 'intimate'), npc, ok: false };
+  }
+  const growth = growNpc(npc, game, 2, 'intimate');
   addCorruption(npc, 5);
-  addRelationship(npc, 3);
-  const growthText = renderGrowthScene(npc, { growthMethod: 'blessing', startStage, endStage: growth.endStage, week: game.day });
-  return withQuestProgress(game, npc, 'intimate', null, {
-    text: `Intimacy with ${npc.name} — warmth, feeding, worship, growth during lovemaking.\n\n${growthText}`,
-    npc, growth,
-  });
+  const relResult = applyRelationshipGain(npc, 'intimate');
+  const sceneText = renderIntimate(npc, player, { location: game.region, history: getTextHistory(game) });
+  let result = appendTierUp({
+    text: sceneText + '\n\n' + (growth.text || ''), npc, growth,
+  }, npc, relResult);
+  return withQuestProgress(game, npc, 'intimate', null, result);
 }
 
 export function doCorrupt(npc, player, game) {
+  if (!canUnlockInteraction(npc, 'corrupt')) {
+    return { text: getInteractionLockReason(npc, 'corrupt'), npc, ok: false };
+  }
   if (!spendAP(game, 10)) return { text: 'Not enough AP.', npc, ok: false };
   addCorruption(npc, 15);
   return withQuestProgress(game, npc, 'corrupt', null, {
@@ -262,6 +351,9 @@ export function doCorrupt(npc, player, game) {
 }
 
 export function doRecruit(npc, player, game) {
+  if (!canUnlockInteraction(npc, 'recruit')) {
+    return { text: getInteractionLockReason(npc, 'recruit'), npc, ok: false };
+  }
   if (!npc.companionId) return { text: 'She cannot join your party.', npc, ok: false };
   const exists = game.party.find((c) => c.id === npc.companionId);
   if (exists) return { text: `${npc.name} is already in your party.`, npc, ok: false };
@@ -270,6 +362,33 @@ export function doRecruit(npc, player, game) {
   return withQuestProgress(game, npc, 'recruit', null, {
     text: `${npc.name} joins your feast-bound pilgrimage!`, npc: companion, ok: true,
   });
+}
+
+/** Award relationship from quest completion or overworld spell cast. */
+export function awardNpcRelationship(game, npcId, source, amount) {
+  const npc = game.party?.find((c) => c.id === npcId)
+    || game.npcStates?.[npcId]
+    || null;
+  if (!npc) return null;
+  const relResult = awardRelationship(npc, source, amount);
+  if (game.npcStates?.[npcId]) {
+    game.npcStates[npcId] = { ...game.npcStates[npcId], relationship: npc.relationship, bondFlags: npc.bondFlags };
+  }
+  const partyIdx = game.party?.findIndex((c) => c.id === npcId);
+  if (partyIdx >= 0) game.party[partyIdx] = { ...game.party[partyIdx], ...npc };
+  return relResult;
+}
+
+/** Accept a quest offered by an NPC during dialogue. */
+export function acceptNpcQuestOffer(game, npc, questId) {
+  const result = acceptQuestFromNpc(game, questId);
+  if (!result.ok) return { text: result.message || 'Could not accept quest.', ok: false };
+  return {
+    ok: true,
+    text: `${npc.name} smiles warmly.\n\n${result.message}`,
+    questId,
+    game,
+  };
 }
 
 export function renderCombatNarration(unit, interaction) {

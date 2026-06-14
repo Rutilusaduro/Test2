@@ -3,9 +3,11 @@
  */
 import { getQuestDefinition, getAllQuests } from './quests/registry.js';
 import { QUEST_TYPE, OBJECTIVE_TYPE, QUEST_SCORE, QUEST_NPC_ALIASES } from './quests/constants.js';
-import { getTier } from './relationships.js';
+import { getTier, awardRelationship, getTierUpMessage } from './relationships.js';
+import { awardAbundanceSpreadWithEvents } from './worldEvents.js';
 import { getCorruptionTier } from './corruption.js';
 import { getStage, advanceStage } from './stages.js';
+import { applyGrowthWithPresentation } from './growthPresentation.js';
 import { addAbundancePoints } from './player.js';
 import { addExperience, XP_SOURCES } from './leveling.js';
 import { getNpcState, applyNpcState } from './player.js';
@@ -333,7 +335,17 @@ function applyRewardBundle(game, bundle = {}) {
     const { levelUps } = addExperience(game.player, amount, source);
     messages.push(`+${amount} XP`);
     if (levelUps.length) {
-      game.lastLevelUpMessage = levelUps.map((lu) => `Level ${lu.level}! ${lu.flavor}`).join('\n');
+      game.lastLevelUpMessage = levelUps.map((lu) => lu.narrative || `Level ${lu.level}! ${lu.flavor}`).join('\n\n---\n\n');
+      game.lastLevelUpResult = levelUps[levelUps.length - 1];
+    }
+    if (bundle.xpSource === 'major_story') {
+      const spread = awardAbundanceSpreadWithEvents(game, 'quest_complete_main');
+      if (spread.gained) messages.push(`+${spread.gained} abundance influence`);
+      if (spread.worldEvent?.triggered) messages.push(spread.worldEvent.message);
+    } else if (bundle.xp && bundle.xp >= 50) {
+      const spread = awardAbundanceSpreadWithEvents(game, 'quest_complete_side');
+      if (spread.gained) messages.push(`+${spread.gained} abundance influence`);
+      if (spread.worldEvent?.triggered) messages.push(spread.worldEvent.message);
     }
   }
   for (const flag of Object.keys(bundle.flags ?? {})) {
@@ -388,6 +400,23 @@ function applyRewardBundle(game, bundle = {}) {
     game.player.storyFlags[`companion_unlock_${cid}`] = true;
     messages.push(`Companion available: ${cid.replace(/_/g, ' ')}`);
   }
+  const relRewards = bundle.npcRelationships
+    ? bundle.npcRelationships
+    : bundle.npcRelationship
+      ? [bundle.npcRelationship]
+      : [];
+  for (const rel of relRewards) {
+    if (!rel?.npcId) continue;
+    const template = findNpc(rel.npcId, game);
+    const npc = template ? getNpcState(game, template) : getNpcState(game, { id: rel.npcId });
+    const result = awardRelationship(npc, rel.source || 'quest_personal', rel.amount);
+    applyNpcState(game, npc.id, npc);
+    if (npc.isCompanion) {
+      game.party = (game.party ?? []).map((c) => (c.id === npc.id ? { ...npc } : c));
+    }
+    messages.push(`+${result.gained} bond with ${npc.name}`);
+    if (result.tierUp) messages.push(getTierUpMessage(npc, result));
+  }
   return messages;
 }
 
@@ -414,15 +443,18 @@ function runGrowthTrigger(game, player, growthSpec, npc) {
     ? getNpcForObjective(game, growthSpec.npcId)
     : npc;
   if (!targetNpc) return '';
-  const startStage = getStage(targetNpc.lbs).id;
   const stages = growthSpec.stages ?? 1;
-  advanceStage(targetNpc, stages);
+  const presentation = applyGrowthWithPresentation(targetNpc, game, stages, {
+    growthMethod: 'quest',
+    regionId: game?.region,
+  });
   applyNpcState(game, targetNpc.id, targetNpc);
+  if (presentation.text) return presentation.text;
   const proseKey = growthSpec.proseKey ?? 'growth.target.minor';
   return renderGrowthProse(proseKey, targetNpc, player, {
-    startStage,
-    endStage: getStage(targetNpc.lbs).id,
-    stagesJumped: stages,
+    startStage: presentation.startStage,
+    endStage: presentation.endStage,
+    stagesJumped: presentation.stagesJumped,
     growthPerspective: growthSpec.target === 'player' ? 'self' : 'target',
   });
 }
@@ -484,6 +516,14 @@ export function notifyQuestEvent(game, event = {}) {
         matched = event.type === 'npc_interaction'
           && event.interaction === 'feast'
           && (!obj.regionId || event.regionId === obj.regionId || game.region === obj.regionId);
+      } else if (obj.type === OBJECTIVE_TYPE.PUZZLE_SOLVED) {
+        matched = event.type === 'puzzle_solved'
+          && (!obj.puzzleId || event.puzzleId === obj.puzzleId)
+          && (!obj.regionId || event.regionId === obj.regionId);
+      } else if (obj.type === OBJECTIVE_TYPE.FEATURE_EXAMINED) {
+        matched = event.type === 'feature_examined'
+          && (!obj.featureId || event.featureId === obj.featureId)
+          && (!obj.regionId || event.regionId === obj.regionId);
       } else if (obj.type === OBJECTIVE_TYPE.NPC_GROWTH_QUOTA) {
         if (event.type === 'npc_growth') {
           recordGrowthQuotaProgress(game, instance, obj, event);
@@ -501,6 +541,8 @@ export function notifyQuestEvent(game, event = {}) {
         OBJECTIVE_TYPE.NPC_INTERACTION,
         OBJECTIVE_TYPE.COMBAT_VICTORY,
         OBJECTIVE_TYPE.COMMUNAL_FEAST,
+        OBJECTIVE_TYPE.PUZZLE_SOLVED,
+        OBJECTIVE_TYPE.FEATURE_EXAMINED,
       ].includes(obj.type)) {
         const rec = instance.objectives[obj.id];
         rec.progress += 1;

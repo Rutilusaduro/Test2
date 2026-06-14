@@ -1,10 +1,12 @@
-import { getStage, getTileSize, getMovement, advanceStage } from "./stages.js";
+import { getStage, getTileSize, getMovement, getHpBonus } from "./stages.js";
+import { advanceStageUniversal } from "./growthPresentation.js";
 import { addCorruption } from "./corruption.js";
+import { getCombatModifiers } from "./stagePerks.js";
 import { createEnemy } from "./enemies.js";
 import {
   initCombatTurnState, beginTurn, endTurn, getActiveEntry, getEconomy,
   canSpendMovement, spendMovement, canUseAction, spendAction, onUnitGrew,
-  ACTION_TYPES, getCombatUnitId,
+  ACTION_TYPES, getCombatUnitId, getAvailableBonusActions,
 } from "./combatTurn.js";
 import {
   resolveAttackRoll,
@@ -219,12 +221,50 @@ export function attackUnit(combat, attacker, target) {
 }
 
 export function applyGrowth(unit, stages = 1) {
-  const result = advanceStage(unit, stages);
-  const hpBonus = Math.floor(unit.maxHp * 0.15 * stages);
+  const result = advanceStageUniversal(unit, stages);
+  const endStage = getStage(unit.lbs).id;
+  const hpMult = getHpBonus(endStage) + 0.15;
+  const hpBonus = Math.floor(unit.maxHp * hpMult * stages);
   unit.maxHp += hpBonus;
   unit.hp = Math.min(unit.maxHp, unit.hp + hpBonus);
   return result;
 }
+
+export function useBonusAction(combat, unit, actionId, target = null) {
+  const entry = getActiveEntry(combat.turnState);
+  if (entry && !canUseAction(combat.turnState, entry.id, ACTION_TYPES.BONUS)) {
+    combat.log.push("Bonus action already used!");
+    return combat;
+  }
+
+  if (actionId === "self_feed") {
+    const growth = applyGrowth(unit, 1);
+    addCorruption(unit, 4);
+    combat.lastGrowth = { unit, ...growth };
+    onUnitGrew(combat.turnState, unit, growth);
+    combat.log.push(`${unit.name} self-feeds mid-battle — swelling with glorious hunger!`);
+  } else if (actionId === "body_slam" && target) {
+    const mods = getCombatModifiers(unit);
+    const damage = 4 + (mods.damageBonus || 0);
+    target.hp = Math.max(0, target.hp - damage);
+    const growth = applyGrowth(target, 1);
+    addCorruption(target, 5);
+    combat.lastGrowth = { unit: target, ...growth };
+    onUnitGrew(combat.turnState, target, growth);
+    combat.log.push(`${unit.name} body-slams ${target.name} with ${getStage(unit.lbs).label} mass!`);
+  } else if (actionId === "crushing_aura") {
+    for (const e of combat.enemies.filter((en) => en.hp > 0 && !en.converted)) {
+      addCorruption(e, 6);
+      e.hunger = Math.min(100, (e.hunger || 0) + 15);
+    }
+    combat.log.push(`${unit.name}'s crushing aura radiates — enemies feel the weight of abundance!`);
+  }
+
+  if (entry) spendAction(combat.turnState, entry.id, ACTION_TYPES.BONUS);
+  return combat;
+}
+
+export { getAvailableBonusActions };
 
 export function feedTarget(combat, feeder, target, amount = 1) {
   const entry = getActiveEntry(combat.turnState);
@@ -273,14 +313,22 @@ export function castSpell(combat, caster, spell, target, opts = {}) {
     combat.log.push(`${castSpellData.name} bathes ${target.name} in warm healing.`);
   }
   if (eff.growth) {
-    const targets = eff.aoe ? [...combat.enemies, ...combat.allies] : [target];
+    let targets;
+    if (eff.party && eff.aoe) {
+      targets = combat.allies.filter((a) => a.hp > 0);
+    } else if (eff.aoe) {
+      targets = [...combat.enemies, ...combat.allies].filter((t) => t?.hp > 0);
+    } else {
+      targets = [target];
+    }
     for (const t of targets.filter(Boolean)) {
       const g = applyGrowth(t, scale(eff.growth));
       addCorruption(t, 3 * scale(eff.growth));
       combat.lastGrowth = { unit: t, ...g };
       onUnitGrew(combat.turnState, t, g);
     }
-    combat.log.push(`${castSpellData.name} swells ${eff.aoe ? "the battlefield" : target?.name} with golden abundance!`);
+    const label = eff.party ? 'your allies' : eff.aoe ? 'the battlefield' : target?.name;
+    combat.log.push(`${castSpellData.name} swells ${label} with golden abundance!`);
   }
   if (eff.corruption && target) addCorruption(target, scale(eff.corruption));
   if (eff.feed && target) {
@@ -296,6 +344,18 @@ export function castSpell(combat, caster, spell, target, opts = {}) {
     const g = applyGrowth(caster, scale(eff.selfGrowth));
     combat.lastGrowth = { unit: caster, ...g };
     onUnitGrew(combat.turnState, caster, g);
+  }
+  if (eff.drain && target) {
+    const g = applyGrowth(caster, scale(eff.drain));
+    addCorruption(target, 4);
+    combat.lastGrowth = { unit: caster, ...g };
+    onUnitGrew(combat.turnState, caster, g);
+    combat.log.push(`${caster.name} drains essence from ${target.name} into new curves!`);
+  }
+  if (eff.buff) {
+    caster.tempFlags = caster.tempFlags || {};
+    caster.tempFlags[eff.buff] = (caster.tempFlags[eff.buff] || 0) + 1;
+    combat.log.push(`${castSpellData.name} blesses ${caster.name} with ${eff.buff} power.`);
   }
 
   const costNote = cost.method === "ap" ? ` (${cost.apSpent} AP)` : cost.upcast ? " (upcast)" : "";

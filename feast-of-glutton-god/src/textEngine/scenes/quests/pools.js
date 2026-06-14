@@ -101,6 +101,41 @@ registerQuestCopy('quest.main.overflowing_temple.complete.default', [
   'The Overflowing Temple stands transformed. Denial is memory; abundance is eternal.',
 ]);
 
+// ─── Main: Coronation of Abundance (Act III) ─────────────────────────────────
+
+registerQuestCopy('quest.main.coronation.title', ["Coronation of Abundance"]);
+registerQuestCopy('quest.main.coronation.desc', [
+  'At Gorgara\'s Cradle, Thalia whispers of a final rite — crown your abundance and awaken the goddess fully.',
+  'The world has been softened. Now it must be transformed. Your body, your gospel, your feast become legend.',
+]);
+registerQuestCopy('quest.main.coronation.stage.cradle.desc', [
+  'Seek Thalia Blackfeast where the cradle breathes hunger. Earn her intimate trust before the rite begins.',
+]);
+registerQuestCopy('quest.main.coronation.stage.cradle.complete', [
+  'Thalia\'s eyes burn with pact-fire and want. "You are ready," she purrs. "Let us make a god of your softness."',
+]);
+registerQuestCopy('quest.main.coronation.stage.spread.desc', [
+  'Spread overflow through the cradle — grow three souls, host a communal feast, let abundance become climate.',
+]);
+registerQuestCopy('quest.main.coronation.stage.spread.complete', [
+  'The cradle swells with shared appetite. Steam, moans, and jiggling flesh sanctify the land.',
+]);
+registerQuestCopy('quest.main.coronation.stage.coronation.desc', [
+  'Ascend to enormous size and break the famine spirits that cling to old hunger. Crown yourself in flesh and faith.',
+]);
+registerQuestCopy('quest.main.coronation.stage.coronation.complete', [
+  'You stand vast and radiant — a living throne of abundance. Gorgara\'s voice thunders: "More."',
+]);
+registerQuestCopy('quest.main.coronation.ending.avatar', [
+  '★ Avatar of Gorgara — you are the goddess made walkable, kissable, infinitely feastable.',
+]);
+registerQuestCopy('quest.main.coronation.ending.herald', [
+  '★ Herald of the Eternal Feast — your gospel converts nations; your body is the scripture.',
+]);
+registerQuestCopy('quest.main.coronation.complete.default', [
+  'Act III complete. The world will never be thin again — and every soul is grateful.',
+]);
+
 // ─── Side: The Baker's Indulgence ────────────────────────────────────────────
 
 registerQuestCopy('quest.side.baker.title', ["The Baker's Indulgence"]);
@@ -264,4 +299,24 @@ registerPool('quest.complete', [
     'Quest complete! Celebration ripples through flesh and friendship alike.',
     'The feast closes with sighs of satisfaction — and hunger for more.',
   ]},
+]);
+
+registerQuestCopy('quest.side.paths.title', ['Paths of Abundance']);
+registerQuestCopy('quest.side.paths.desc', [
+  'Elara whispers of strange obstacles across the land — doors that demand cleverness, ravines that hunger for growth. She believes you can solve them all with abundance, not violence.',
+]);
+registerQuestCopy('quest.side.paths.stage.discover.desc', [
+  'Find a regional mystery and examine it. Then solve it — by spell, skill, size, bond, or any delicious combination.',
+]);
+registerQuestCopy('quest.side.paths.stage.discover.complete', [
+  'Elara claps her flour-dusted hands. "See? The world bends to those who think with their bellies *and* their brilliance."',
+]);
+registerQuestCopy('quest.side.paths.stage.master.desc', [
+  'Solve three mysteries across the regions. Each one teaches the land that abundance is clever, sensual, and unstoppable.',
+]);
+registerQuestCopy('quest.side.paths.stage.master.complete', [
+  'Word spreads: the Chosen solves problems the way Gorgara intended — with pleasure, growth, and glorious ingenuity.',
+]);
+registerQuestCopy('quest.side.paths.complete', [
+  'Paths of Abundance complete. You are a problem-solver of divine appetite — and the world is softer for it.',
 ]);

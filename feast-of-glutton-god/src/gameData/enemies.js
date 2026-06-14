@@ -1,3 +1,5 @@
+import { MAX_STAGE_ID } from "./stages.js";
+
 export const ENEMY_TYPES = {
   harvest_harpy: {
     id: "harvest_harpy",
@@ -100,6 +102,7 @@ export function createEnemy(typeId) {
     gender: "she",
     pronouns: "she",
     isEnemy: true,
+    sizeCap: MAX_STAGE_ID,
   };
 }
 
