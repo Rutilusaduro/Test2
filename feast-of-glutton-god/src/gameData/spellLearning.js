@@ -2,7 +2,7 @@
  * Spell learning on level up — class-specific, subclass-aware, growth-prioritized.
  */
 import { getSpell } from './spells.js';
-import { getCasterType } from './spellSlots.js';
+import { getCasterType, getMaxSpellLevelForCharacter } from './spellSlots.js';
 import { getEffectiveStatMod } from './stats.js';
 import { getStage } from './stages.js';
 import {
@@ -25,15 +25,13 @@ export function isGrowthThemedSpell(spell) {
 }
 
 export function getMaxCastableSpellLevel(character) {
-  const slots = character.spellSlots?.max ?? [0, 0, 0, 0, 0];
-  for (let i = slots.length - 1; i >= 0; i--) {
-    if (slots[i] > 0) return i + 1;
-  }
+  const fromTables = getMaxSpellLevelForCharacter(character);
+  if (fromTables > 0) return fromTables;
   const level = character.level || 1;
   if (getCasterType(character.classId) === 'pact') {
-    return Math.min(5, Math.ceil(level / 2));
+    return level >= 17 ? 9 : level >= 15 ? 8 : level >= 13 ? 7 : level >= 11 ? 6 : Math.min(5, Math.ceil(level / 2));
   }
-  return Math.min(5, Math.max(1, Math.ceil(level / 2)));
+  return Math.min(9, Math.max(1, Math.ceil(level / 2)));
 }
 
 function sortGrowthFirst(spellIds) {
@@ -151,7 +149,7 @@ export function getMagicalSecretsPool(character, maxSpellLevel) {
   const otherClasses = ['wizard', 'cleric', 'warlock', 'bard'].filter((c) => c !== character.classId);
   const ids = new Set();
   for (const classId of otherClasses) {
-    for (let lvl = 1; lvl <= 12; lvl++) {
+    for (let lvl = 1; lvl <= 20; lvl++) {
       for (const id of getCurriculumForLevel(classId, lvl)) ids.add(id);
     }
   }

@@ -5,7 +5,7 @@ import { STAT_KEYS, STAT_LABELS } from './stats.js';
 import { getClass } from './classes.js';
 import { applySpellChoices } from './spellLearning.js';
 
-export const ASI_LEVELS = [4, 8, 12];
+export const ASI_LEVELS = [4, 8, 12, 16, 19];
 
 export function buildAsiOptions(character) {
   const cls = getClass(character.classId);

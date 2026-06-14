@@ -3,11 +3,19 @@ import './pools.js';
 import { createContext, render } from '../../engine.js';
 import '../../modules.js';
 
+function getLevelTier(level = 1) {
+  if (level >= 17) return 'apotheosis';
+  if (level >= 11) return 'mythic';
+  if (level >= 5) return 'heroic';
+  return 'aspirant';
+}
+
 export function renderLevelUpText(key, player, options = {}) {
   const ctx = createContext({
     subject: player,
     globals: {
       level: options.level ?? player?.level,
+      levelTier: options.levelTier ?? getLevelTier(options.level ?? player?.level),
       classId: player?.classId,
       subclassId: player?.subclassId,
       growthLevelUp: options.growthLevelUp ?? false,
@@ -25,6 +33,11 @@ export function buildLevelUpMessage(player, levelUpResult) {
     growthLevelUp: levelUpResult.growthLevelUp,
   });
   if (celebration) parts.push(celebration);
+
+  const tierFlavor = renderLevelUpText('levelup.tier', player, {
+    level: levelUpResult.level,
+  });
+  if (tierFlavor) parts.push(tierFlavor);
 
   const classFlavor = renderLevelUpText(`levelup.${player.classId}`, player, {
     level: levelUpResult.level,

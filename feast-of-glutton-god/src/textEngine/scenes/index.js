@@ -23,6 +23,7 @@ import './growthEvent/index.js';
 import './growth/index.js';
 import './quests/index.js';
 import './leveling/index.js';
+import './leveling/tiers.js';
 import './dm/index.js';
 import './dm/combat.js';
 import './dm/cast.js';

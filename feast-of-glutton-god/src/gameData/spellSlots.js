@@ -10,44 +10,68 @@
  */
 import { getSpellcastingStat, getEffectiveStatMod, proficiencyBonus } from "./stats.js";
 
-export const MAX_SPELL_LEVEL = 5;
+export const MAX_SPELL_LEVEL = 9;
 
-/** Slots by character level — [1st, 2nd, 3rd, 4th, 5th] */
+/** Slots by character level — [1st..9th] */
 export const FULL_CASTER_SLOTS = {
-  1:  [2, 0, 0, 0, 0],
-  2:  [3, 0, 0, 0, 0],
-  3:  [4, 2, 0, 0, 0],
-  4:  [4, 3, 0, 0, 0],
-  5:  [4, 3, 2, 0, 0],
-  6:  [4, 3, 3, 0, 0],
-  7:  [4, 3, 3, 1, 0],
-  8:  [4, 3, 3, 2, 0],
-  9:  [4, 3, 3, 3, 1],
-  10: [4, 3, 3, 3, 2],
-  11: [4, 3, 3, 3, 2],
-  12: [4, 3, 3, 3, 2],
+  1:  [2, 0, 0, 0, 0, 0, 0, 0, 0],
+  2:  [3, 0, 0, 0, 0, 0, 0, 0, 0],
+  3:  [4, 2, 0, 0, 0, 0, 0, 0, 0],
+  4:  [4, 3, 0, 0, 0, 0, 0, 0, 0],
+  5:  [4, 3, 2, 0, 0, 0, 0, 0, 0],
+  6:  [4, 3, 3, 0, 0, 0, 0, 0, 0],
+  7:  [4, 3, 3, 1, 0, 0, 0, 0, 0],
+  8:  [4, 3, 3, 2, 0, 0, 0, 0, 0],
+  9:  [4, 3, 3, 3, 1, 0, 0, 0, 0],
+  10: [4, 3, 3, 3, 2, 0, 0, 0, 0],
+  11: [4, 3, 3, 3, 2, 1, 0, 0, 0],
+  12: [4, 3, 3, 3, 2, 1, 0, 0, 0],
+  13: [4, 3, 3, 3, 2, 1, 1, 0, 0],
+  14: [4, 3, 3, 3, 2, 1, 1, 0, 0],
+  15: [4, 3, 3, 3, 2, 1, 1, 1, 0],
+  16: [4, 3, 3, 3, 2, 1, 1, 1, 0],
+  17: [4, 3, 3, 3, 2, 1, 1, 1, 1],
+  18: [4, 3, 3, 3, 3, 1, 1, 1, 1],
+  19: [4, 3, 3, 3, 3, 2, 1, 1, 1],
+  20: [4, 3, 3, 3, 3, 2, 2, 1, 1],
 };
 
 export const HALF_CASTER_SLOTS = {
-  1:  [0, 0, 0, 0, 0],
-  2:  [2, 0, 0, 0, 0],
-  3:  [3, 0, 0, 0, 0],
-  4:  [3, 2, 0, 0, 0],
-  5:  [4, 2, 0, 0, 0],
-  6:  [4, 3, 0, 0, 0],
-  7:  [4, 3, 2, 0, 0],
-  8:  [4, 3, 2, 0, 0],
-  9:  [4, 3, 3, 1, 0],
-  10: [4, 3, 3, 2, 0],
-  11: [4, 3, 3, 2, 0],
-  12: [4, 3, 3, 2, 1],
+  1:  [0, 0, 0, 0, 0, 0, 0, 0, 0],
+  2:  [2, 0, 0, 0, 0, 0, 0, 0, 0],
+  3:  [3, 0, 0, 0, 0, 0, 0, 0, 0],
+  4:  [3, 0, 0, 0, 0, 0, 0, 0, 0],
+  5:  [4, 2, 0, 0, 0, 0, 0, 0, 0],
+  6:  [4, 2, 0, 0, 0, 0, 0, 0, 0],
+  7:  [4, 3, 0, 0, 0, 0, 0, 0, 0],
+  8:  [4, 3, 0, 0, 0, 0, 0, 0, 0],
+  9:  [4, 3, 2, 0, 0, 0, 0, 0, 0],
+  10: [4, 3, 2, 0, 0, 0, 0, 0, 0],
+  11: [4, 3, 3, 0, 0, 0, 0, 0, 0],
+  12: [4, 3, 3, 0, 0, 0, 0, 0, 0],
+  13: [4, 3, 3, 1, 0, 0, 0, 0, 0],
+  14: [4, 3, 3, 1, 0, 0, 0, 0, 0],
+  15: [4, 3, 3, 2, 0, 0, 0, 0, 0],
+  16: [4, 3, 3, 2, 0, 0, 0, 0, 0],
+  17: [4, 3, 3, 3, 1, 0, 0, 0, 0],
+  18: [4, 3, 3, 3, 1, 0, 0, 0, 0],
+  19: [4, 3, 3, 3, 2, 0, 0, 0, 0],
+  20: [4, 3, 3, 3, 2, 0, 0, 0, 0],
 };
 
 /** Warlock: [slotCount, slotLevel] */
 export const PACT_SLOTS = {
   1:  [1, 1], 2:  [2, 1], 3:  [2, 2], 4:  [2, 2], 5:  [2, 3],
   6:  [2, 3], 7:  [2, 4], 8:  [2, 4], 9:  [2, 5], 10: [2, 5],
-  11: [3, 5], 12: [3, 5],
+  11: [3, 5], 12: [3, 5], 13: [3, 5], 14: [3, 5], 15: [3, 5],
+  16: [3, 5], 17: [4, 5], 18: [4, 5], 19: [4, 5], 20: [4, 5],
+};
+
+export const WARLOCK_ARCANUM_BY_LEVEL = {
+  11: 6,
+  13: 7,
+  15: 8,
+  17: 9,
 };
 
 export const CASTER_TYPES = {
@@ -62,12 +86,20 @@ export function getCasterType(classId) {
 }
 
 function emptySlots() {
-  return [0, 0, 0, 0, 0];
+  return Array.from({ length: MAX_SPELL_LEVEL }, () => 0);
+}
+
+function normalizeSlotArray(slots = []) {
+  const next = emptySlots();
+  for (let i = 0; i < Math.min(next.length, slots.length); i++) {
+    next[i] = slots[i] ?? 0;
+  }
+  return next;
 }
 
 /** Build max slot pool for a character at rest */
 export function getMaxSpellSlots(character) {
-  const level = Math.min(character.level || 1, 12);
+  const level = Math.min(character.level || 1, 20);
   const type = getCasterType(character.classId);
 
   if (type === "pact") {
@@ -81,11 +113,47 @@ export function getMaxSpellSlots(character) {
   return { slots: [...(table[level] || emptySlots())], pact: false };
 }
 
+export function getMaxSpellLevelForCharacter(character) {
+  const level = Math.min(character.level || 1, 20);
+  const type = getCasterType(character.classId);
+
+  if (type === "pact") {
+    let arcanum = 0;
+    for (const [unlockLevel, spellLevel] of Object.entries(WARLOCK_ARCANUM_BY_LEVEL)) {
+      if (level >= Number(unlockLevel)) arcanum = Math.max(arcanum, spellLevel);
+    }
+    return Math.max(arcanum, PACT_SLOTS[level]?.[1] ?? 1);
+  }
+
+  const slots = getMaxSpellSlots(character).slots;
+  for (let i = slots.length - 1; i >= 0; i--) {
+    if (slots[i] > 0) return i + 1;
+  }
+  return 0;
+}
+
 /** Initialize or refresh spell slot state on character */
 export function initSpellSlots(character) {
   const max = getMaxSpellSlots(character);
   character.spellSlots = {
     current: [...max.slots],
+    max: [...max.slots],
+    pact: max.pact,
+    pactLevel: max.pactLevel ?? null,
+  };
+  return character;
+}
+
+/** Preserve current spent slots while updating max slot topology for migrations/leveling. */
+export function syncSpellSlots(character) {
+  const max = getMaxSpellSlots(character);
+  const prevCurrent = character.spellSlots?.current ?? [];
+  const current = normalizeSlotArray(prevCurrent);
+  character.spellSlots = {
+    current: current.map((count, idx) => {
+      if (prevCurrent[idx] == null) return max.slots[idx] ?? 0;
+      return Math.min(count, max.slots[idx] ?? 0);
+    }),
     max: [...max.slots],
     pact: max.pact,
     pactLevel: max.pactLevel ?? null,

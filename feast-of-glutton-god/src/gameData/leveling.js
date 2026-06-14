@@ -23,11 +23,12 @@ import { autoPrepareSpells } from "./spellPreparation.js";
 import { restoreFavorFromRest } from "./favor.js";
 import { tickRegionHostility } from "./regionHostility.js";
 
-export const MAX_LEVEL = 12;
+export const MAX_LEVEL = 20;
 
 /** XP required to reach each level (cumulative) */
 export const XP_THRESHOLDS = [
-  0, 0, 300, 900, 1800, 3000, 4500, 6500, 9000, 12000, 15500, 19500, 24000,
+  0, 0, 300, 900, 2700, 6500, 14000, 23000, 34000, 48000, 64000,
+  85000, 100000, 120000, 140000, 165000, 195000, 225000, 265000, 305000, 355000,
 ];
 
 export const XP_SOURCES = {
@@ -45,7 +46,14 @@ export const XP_SOURCES = {
 
 /** Size stage caps unlocked by level milestones (tier ids on new ladder) */
 export const SIZE_CAP_BY_LEVEL = {
-  1: 3, 3: 5, 5: 7, 7: 9, 9: 11, 12: 13,
+  1: 3,
+  3: 5,
+  5: 7,
+  7: 9,
+  9: 11,
+  12: 12,
+  16: 13,
+  20: 14,
 };
 
 const LEVEL_UP_FLAVOR = [
@@ -60,8 +68,15 @@ const LEVEL_UP_FLAVOR = [
   "A divine heaviness blesses every step.",
   "Legends will speak of the softness you wield.",
   "You are abundance incarnate — beautiful, vast, unstoppable.",
+  "Titanic presence gathers beneath your skin; the feast now bends kingdoms around you.",
   "Near apotheosis of the eternal feast.",
+  "World-shaping hunger answers when you whisper. Reality grows softer at your command.",
+  "Pilgrims would call this impossible. You call it another exquisite becoming.",
+  "The Fat Goddess no longer feels distant — her pulse and yours beat in the same golden rhythm.",
+  "You cross into legend with every breath, every step, every glorious pound.",
+  "At the edge of divinity, your abundance remakes allies, foes, and lands alike.",
   "A living avatar of the Fat Goddess's endless, pleasurable fullness.",
+  "Level twenty: the feast crowns you. Even gods must reckon with your inexhaustible plenty.",
 ];
 
 export function getXpForNextLevel(character) {

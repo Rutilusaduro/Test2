@@ -2,6 +2,7 @@
  * Extended spell catalog — growth-focused, modular by class and subclass.
  */
 import { getSubclass } from './subclasses.js';
+import { getMaxSpellLevelForCharacter } from './spellSlots.js';
 export const CANTRIPS = [
   { id: 'gentle_plump', name: 'Gentle Plump', slotLevel: 0, school: 'abundance', desc: 'Softly swell a willing target by one stage with a pleasurable surge.', effect: { growth: 1 } },
   { id: 'indulgent_touch', name: 'Indulgent Touch', slotLevel: 0, school: 'abundance', desc: 'Touch a willing creature and cause a small, pleasurable growth surge.', effect: { growth: 1, corruption: 1 } },
@@ -115,10 +116,33 @@ export const BONUS_SPELLS = {
     effect: { growth: 2, corruption: 6 },
     environment: { crush: true, swell: true },
   },
+  sated_storm: {
+    id: 'sated_storm', name: 'Sated Storm', slotLevel: 3, school: 'evocation', apCost: 14,
+    desc: 'A thunderhead of honeyed force bursts overhead, battering foes with caloric lightning.',
+    effect: {
+      damage: {
+        dice: { count: 6, sides: 6 },
+        damageType: 'overindulgence',
+        save: 'dex',
+        halfOnSuccess: true,
+        aoe: true,
+        radius: 2,
+        range: 6,
+        growthConversion: 0.2,
+      },
+    },
+    environment: { slick: true },
+  },
   overflow_cascade: {
     id: 'overflow_cascade', name: 'Overflow Cascade', slotLevel: 4, school: 'abundance',
     desc: 'Chain growth effect rippling across multiple targets.',
     effect: { growth: 1, aoe: true, corruption: 3 },
+  },
+  velvet_gravity: {
+    id: 'velvet_gravity', name: 'Velvet Gravity', slotLevel: 4, school: 'abundance', apCost: 18,
+    desc: 'You thicken the air with lush gravity that drags bodies downward into plush, helpless abundance.',
+    effect: { growth: 1, aoe: true, corruption: 4 },
+    environment: { crush: true, soften: true },
   },
   eternal_indulgence: {
     id: 'eternal_indulgence', name: 'Eternal Indulgence', slotLevel: 4, school: 'abundance',
@@ -131,19 +155,59 @@ export const BONUS_SPELLS = {
     effect: { growth: 2, corruption: 5, charm: 1 },
   },
   true_overflow: {
-    id: 'true_overflow', name: 'True Overflow', slotLevel: 7, school: 'abundance', minSizeStage: 6,
+    id: 'true_overflow', name: 'True Overflow', slotLevel: 7, school: 'abundance', apCost: 32, minSizeStage: 6,
     desc: 'Permanent or very long-term size stage increases through divine excess.',
     effect: { growth: 3, corruption: 8 },
   },
+  velvet_cataclysm: {
+    id: 'velvet_cataclysm', name: 'Velvet Cataclysm', slotLevel: 7, school: 'evocation', apCost: 32, minSizeStage: 6,
+    desc: 'A ruinous blossom of caloric pressure detonates across the battlefield, breaking resistance beneath sumptuous force.',
+    effect: {
+      damage: {
+        dice: { count: 8, sides: 8 },
+        damageType: 'abundance_overload',
+        save: 'dex',
+        halfOnSuccess: true,
+        aoe: true,
+        radius: 3,
+        range: 6,
+        growthConversion: 0.25,
+      },
+    },
+    environment: { crush: true },
+  },
+  queenly_metamorphosis: {
+    id: 'queenly_metamorphosis', name: 'Queenly Metamorphosis', slotLevel: 7, school: 'transmutation', apCost: 32, minSizeStage: 6,
+    desc: 'An ally is recast in regal softness, rising into a fuller, more radiant shape wreathed in spellcraft.',
+    effect: { growth: 3, heal: 24, buff: 'spellpower' },
+  },
   mass_indulgence: {
-    id: 'mass_indulgence', name: 'Mass Indulgence', slotLevel: 8, school: 'abundance', minSizeStage: 7,
+    id: 'mass_indulgence', name: 'Mass Indulgence', slotLevel: 8, school: 'abundance', apCost: 36, minSizeStage: 7,
     desc: 'A huge growth ritual affecting many — the town itself seems to swell.',
     effect: { growth: 2, aoe: true, party: true, corruption: 6 },
   },
+  palace_of_plenty: {
+    id: 'palace_of_plenty', name: 'Palace of Plenty', slotLevel: 8, school: 'abundance', apCost: 36, minSizeStage: 7,
+    desc: 'You unfold a royal banquet-hall of living abundance, restoring allies while every breath invites more divine softness.',
+    effect: { growth: 2, aoe: true, party: true, heal: 30 },
+    environment: { ritual: true, fertile: true, swell: true },
+  },
   gorgaras_awakening: {
-    id: 'gorgaras_awakening', name: 'Awakening of the Fat Goddess', slotLevel: 9, school: 'abundance', minSizeStage: 8,
+    id: 'gorgaras_awakening', name: 'Awakening of the Fat Goddess', slotLevel: 9, school: 'abundance', apCost: 42, minSizeStage: 8,
     desc: 'Your patron surges through you — massive area growth as the Hunger Beyond stirs awake.',
     effect: { growth: 4, aoe: true, corruption: 10 },
+  },
+  worldwell_communion: {
+    id: 'worldwell_communion', name: 'Worldwell Communion', slotLevel: 9, school: 'conjuration', apCost: 44, minSizeStage: 8,
+    desc: 'You crack the earth open to a hidden worldwell of cream and nectar, flooding the land with holy excess.',
+    effect: { growth: 3, aoe: true, corruption: 8 },
+    environment: { ritual: true, fertile: true, slick: true },
+  },
+  apotheosis_feast: {
+    id: 'apotheosis_feast', name: 'Apotheosis Feast', slotLevel: 9, school: 'abundance', apCost: 42, minSizeStage: 8,
+    desc: 'The final course of the goddess lays itself before your allies, mending them, empowering them, and lifting them toward living legend.',
+    effect: { growth: 4, aoe: true, party: true, heal: 40, buff: 'spellpower' },
+    environment: { ritual: true, fertile: true, swell: true },
   },
   honeyed_overflow: {
     id: 'honeyed_overflow', name: 'Honeyed Overflow', slotLevel: 1, school: 'enchantment',
@@ -162,14 +226,25 @@ export const BONUS_SPELLS = {
     environment: { fertile: true, soften: true, ritual: true, slick: true },
   },
   divine_plump: {
-    id: 'divine_plump', name: 'Divine Plump', slotLevel: 6, school: 'abundance',
+    id: 'divine_plump', name: 'Divine Plump', slotLevel: 6, school: 'abundance', apCost: 28,
     desc: 'Holy light concentrates flesh into sacred, jiggling abundance.',
     effect: { growth: 2, heal: 15, corruption: 6 },
+  },
+  cathedral_of_cream: {
+    id: 'cathedral_of_cream', name: 'Cathedral of Cream', slotLevel: 6, school: 'conjuration', apCost: 28,
+    desc: 'A sanctuary of whipped radiance rises around your allies, mending them and blessing them with sumptuous growth.',
+    effect: { growth: 2, heal: 20, aoe: true, party: true },
+    environment: { fertile: true, ritual: true, soften: true, slick: true },
   },
   cascade_of_curves: {
     id: 'cascade_of_curves', name: 'Cascade of Curves', slotLevel: 5, school: 'transmutation',
     desc: 'Rippling transmutation rolls through the body — hip to thigh to belly in waves.',
     effect: { growth: 2, corruption: 5 },
+  },
+  throne_of_flesh: {
+    id: 'throne_of_flesh', name: 'Throne of Flesh', slotLevel: 5, school: 'transmutation', apCost: 24,
+    desc: 'You enthrone an ally in living softness, hardening their presence and swelling them into sacred resilience.',
+    effect: { growth: 2, heal: 18, buff: 'altar' },
   },
   lovers_feast: {
     id: 'lovers_feast', name: "Lover's Feast", slotLevel: 3, school: 'abundance',
@@ -331,8 +406,9 @@ export function spellHasEnvironmentUse(spell) {
 }
 
 export function getCastableSpells(character) {
+  const maxSpellLevel = getMaxSpellLevelForCharacter(character);
   return getSpellsForBuild(character.classId, character.subclassId).filter((s) => {
     if (s.slotLevel === 0) return true;
-    return character.level >= s.slotLevel + 1 || s.slotLevel <= 1;
+    return s.slotLevel <= maxSpellLevel;
   });
 }

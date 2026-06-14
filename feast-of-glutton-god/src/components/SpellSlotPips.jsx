@@ -2,7 +2,7 @@ export default function SpellSlotPips({ player, compact = false }) {
   const slots = player?.spellSlots;
   if (!slots?.max) return null;
 
-  const rows = [1, 2, 3, 4, 5]
+  const rows = Array.from({ length: slots.max.length }, (_, idx) => idx + 1)
     .map((lvl) => {
       const max = slots.max[lvl - 1] ?? 0;
       if (max <= 0) return null;

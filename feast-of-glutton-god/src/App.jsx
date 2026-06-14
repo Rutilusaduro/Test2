@@ -12,8 +12,8 @@ import { saveGame, loadGame } from "./gameData/save.js";
 import { createCombatState, getCombatRewards } from "./gameData/combat.js";
 import { buildCombatIntro, buildCombatWrapup } from "./textEngine/scenes/dm/combat.js";
 import { pickEncounter } from "./gameData/enemies.js";
-import { awardCombatXp, initializeStartingSpells } from "./gameData/leveling.js";
-import { initSpellSlots } from "./gameData/spellSlots.js";
+import { awardCombatXp, getSizeCapForLevel, initializeStartingSpells } from "./gameData/leveling.js";
+import { initSpellSlots, syncSpellSlots } from "./gameData/spellSlots.js";
 import { ensureQuestState } from "./gameData/questEngine.js";
 import { ensureInfluenceState } from "./gameData/influence.js";
 import { ensureTransformationState } from "./gameData/worldTransformation.js";
@@ -156,7 +156,8 @@ export default function App() {
     const g = loadGame();
     if (g) {
       if (!g.player.spellSlots) initSpellSlots(g.player);
-      if (!g.player.sizeCap) g.player.sizeCap = 3;
+        else syncSpellSlots(g.player);
+        if (!g.player.sizeCap) g.player.sizeCap = getSizeCapForLevel(g.player.level || 1);
       ensureInfluenceState(g);
       ensureTransformationState(g);
       ensureReactivityState(g);

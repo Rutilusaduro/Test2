@@ -10,8 +10,16 @@ registerSelectors(
   'enemyType', 'enemySizeBand', 'victoryType', 'regionTransformation', 'sceneVariant',
   'outcomeKind', 'partySize', 'regionName', 'role', 'archetype',
   'spellSchool', 'castType', 'paidBy', 'failCause', 'spellName',
-  'consentState', 'playerClass', 'severity',
+  'consentState', 'playerClass', 'severity', 'levelTier',
   'hostilityTier', 'favorState', 'crackdown', 'action', 'escalationTier',
   'divineAttentionTier', 'portentId', 'threatTier', 'act', 'heraldId',
   'escalationTierMin', 'escalationTierMax', 'consentState', 'gainDesireMin',
+  // player level — passed as globals.level in createContext; range variants auto-resolve
+  'level', 'levelMin', 'levelMax',
+  // spell-level selectors — for named high-level spell pools
+  'spellId', 'spellSlotLevel', 'spellSlotLevelMin', 'spellSlotLevelMax',
+  // companion tier band — mirrors level bands for companion-arc keying
+  'companionTier',
+  // growth quantity for level-up context
+  'isMilestone',
 );
