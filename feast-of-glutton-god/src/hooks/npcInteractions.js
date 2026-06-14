@@ -25,7 +25,12 @@ import { getStage } from '../gameData/stages.js';
 import { spendAP } from '../gameData/player.js';
 import { checkSeduce, formatCheckSummary, toTextContext, DC } from '../gameData/skillChecks.js';
 import { recordNpcInteractionForQuests, recordNpcGrowthForQuests } from './questHooks.js';
-import { awardAbundanceSpread } from '../gameData/abundanceSpread.js';
+import { awardAbundanceSpreadWithEvents } from '../gameData/worldEvents.js';
+import {
+  getQuestOffersForNpc,
+  buildQuestOfferNarrative,
+  acceptQuestFromNpc,
+} from '../gameData/questOffers.js';
 
 function withQuestProgress(game, npc, interaction, meta, result) {
   const quest = recordNpcInteractionForQuests(game, {
@@ -67,7 +72,11 @@ function withQuestProgress(game, npc, interaction, meta, result) {
     const key = interaction.startsWith('feed') ? 'npc_feed'
       : interaction.startsWith('bless') ? 'npc_bless'
         : `npc_${interaction}`;
-    awardAbundanceSpread(game, key);
+    const spread = awardAbundanceSpreadWithEvents(game, key);
+    if (spread?.worldEvent?.triggered && spread.worldEvent.message) {
+      result.text = (result.text || '') + `\n\n---\n${spread.worldEvent.message}`;
+      if (result.narrative) result.narrative += `\n\n---\n${spread.worldEvent.message}`;
+    }
   }
   result.questNotes = quest;
   return result;
@@ -122,7 +131,17 @@ export function doObserve(npc, player, game) {
 export function doTalk(npc, player, game) {
   const text = renderTalk(npc, player, { location: game.region, history: getTextHistory(game) });
   const relResult = applyRelationshipGain(npc, 'talk');
-  return withQuestProgress(game, npc, 'talk', null, appendTierUp({ text, npc }, npc, relResult));
+  const offers = getQuestOffersForNpc(game, npc);
+  let questOfferText = '';
+  if (offers.length) {
+    questOfferText = '\n\n' + buildQuestOfferNarrative(npc, player, offers);
+  }
+  const result = appendTierUp({
+    text: text + questOfferText,
+    npc,
+    questOffers: offers.map((o) => ({ id: o.id, title: o.title, type: o.type })),
+  }, npc, relResult);
+  return withQuestProgress(game, npc, 'talk', null, result);
 }
 
 export function doFlirt(npc, player, game) {
@@ -375,6 +394,18 @@ export function awardNpcRelationship(game, npcId, source, amount) {
   const partyIdx = game.party?.findIndex((c) => c.id === npcId);
   if (partyIdx >= 0) game.party[partyIdx] = { ...game.party[partyIdx], ...npc };
   return relResult;
+}
+
+/** Accept a quest offered by an NPC during dialogue. */
+export function acceptNpcQuestOffer(game, npc, questId) {
+  const result = acceptQuestFromNpc(game, questId);
+  if (!result.ok) return { text: result.message || 'Could not accept quest.', ok: false };
+  return {
+    ok: true,
+    text: `${npc.name} smiles warmly.\n\n${result.message}`,
+    questId,
+    game,
+  };
 }
 
 export function renderCombatNarration(unit, interaction) {

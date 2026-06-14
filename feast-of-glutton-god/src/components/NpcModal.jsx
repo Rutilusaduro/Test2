@@ -1,7 +1,7 @@
 import { useState } from "react";
 import {
   getInteractionMenu, doObserve, doTalk, doFlirt, doFeed, doBless,
-  doFeast, doSpecial, doIntimate, doCorrupt, doRecruit,
+  doFeast, doSpecial, doIntimate, doCorrupt, doRecruit, acceptNpcQuestOffer,
 } from "../hooks/npcInteractions.js";
 import { getStage } from "../gameData/stages.js";
 import { getTier, getRelationshipProgress } from "../gameData/relationships.js";
@@ -15,6 +15,7 @@ export default function NpcModal({ npc, player, game, onClose, onUpdate, onGameR
   const [submenu, setSubmenu] = useState(null);
   const [activeCheck, setActiveCheck] = useState(null);
   const [pendingResult, setPendingResult] = useState(null);
+  const [questOffers, setQuestOffers] = useState([]);
 
   const stage = getStage(npc.lbs);
   const rel = getTier(npc.relationship || 0);
@@ -26,6 +27,7 @@ export default function NpcModal({ npc, player, game, onClose, onUpdate, onGameR
     if (result.npc) onUpdate(result.npc);
     if (result.questNotes) onGameRefresh?.();
     setText(result.text || "");
+    setQuestOffers(result.questOffers || []);
     setSubmenu(null);
     onDebugContext?.({
       npc: result.npc || npc,
@@ -79,6 +81,17 @@ export default function NpcModal({ npc, player, game, onClose, onUpdate, onGameR
       case "bless": return setSubmenu("bless");
       case "feast": return apply(doFeast(n, player, game), "feast");
       default: break;
+    }
+  };
+
+  const handleAcceptQuest = (questId) => {
+    const res = acceptNpcQuestOffer(game, npc, questId);
+    if (res.ok) {
+      setText((t) => `${t}\n\n---\n${res.text}`);
+      setQuestOffers((offers) => offers.filter((o) => o.id !== questId));
+      onGameRefresh?.();
+    } else {
+      setText((t) => `${t}\n\n${res.text}`);
     }
   };
 
@@ -168,6 +181,20 @@ export default function NpcModal({ npc, player, game, onClose, onUpdate, onGameR
               </button>
             ))}
             <button onClick={() => setSubmenu(null)}>Back</button>
+          </div>
+        )}
+
+        {questOffers.length > 0 && !activeCheck && (
+          <div className="modal-actions" style={{ marginTop: "0.75rem" }}>
+            {questOffers.map((q) => (
+              <button
+                key={q.id}
+                className="primary"
+                onClick={() => handleAcceptQuest(q.id)}
+              >
+                Accept: {q.title}
+              </button>
+            ))}
           </div>
         )}
 

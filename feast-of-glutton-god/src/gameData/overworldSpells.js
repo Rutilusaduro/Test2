@@ -2,19 +2,20 @@
  * Overworld spell casting — cast known spells on nearby NPCs outside combat.
  */
 import { getSpell, getSpellForCast } from './spells.js';
-import { getCharacterSpells } from './spellLearning.js';
-import { hasSpellSlot, spendSpellSlot, recoverAllSpellSlots } from './spellSlots.js';
+import { hasSpellSlot, spendSpellSlot } from './spellSlots.js';
 import { spendAP } from './player.js';
 import { advanceStage, getStage } from './stages.js';
 import { addCorruption } from './corruption.js';
 import { awardRelationship, getGrowthStageBonus } from './relationships.js';
-import { awardAbundanceSpread } from './abundanceSpread.js';
+import { getPreparedSpells, isSpellPrepared } from './spellPreparation.js';
+import { awardAbundanceSpreadWithEvents } from './worldEvents.js';
 import { renderOverworldSpellCast } from '../textEngine/scenes/overworld/spellCast.js';
 import { renderGrowthScene } from '../textEngine/scenes/growthEvent/index.js';
 import { getStagePerk } from './stagePerks.js';
 
 export function getOverworldCastableSpells(player) {
-  return getCharacterSpells(player).filter((spell) => {
+  return getPreparedSpells(player).filter((spell) => {
+    if (!isSpellPrepared(player, spell.id)) return false;
     if (spell.minSizeStage != null) {
       const stageId = getStage(player.lbs).id;
       if (stageId < spell.minSizeStage) return false;
@@ -49,7 +50,7 @@ function applyOverworldSpellEffects(game, npc, player, spell) {
     results.growth.startStage = startStage;
     addCorruption(npc, 3 * stages);
     results.relationship = awardRelationship(npc, 'spell_bless', 4 + stages);
-    awardAbundanceSpread(game, 'overworld_spell_growth');
+    awardAbundanceSpreadWithEvents(game, 'overworld_spell_growth');
   }
   if (eff.feed && !eff.growth) {
     const startStage = getStage(npc.lbs).id;
@@ -57,7 +58,7 @@ function applyOverworldSpellEffects(game, npc, player, spell) {
     results.growth.startStage = startStage;
     addCorruption(npc, 4);
     results.relationship = awardRelationship(npc, 'feed');
-    awardAbundanceSpread(game, 'overworld_spell_growth');
+    awardAbundanceSpreadWithEvents(game, 'overworld_spell_growth');
   }
   if (eff.corruption) addCorruption(npc, eff.corruption);
   if (eff.charm) {
@@ -88,6 +89,10 @@ export function castSpellOnNpc(game, npc, spellId, opts = {}) {
   const cost = resolveOverworldCost(player, spell, opts.overflow);
   if (!cost.ok) return { ok: false, text: cost.reason };
 
+  if (player.classId === 'wizard' && !isSpellPrepared(player, spellId)) {
+    return { ok: false, text: `${spell.name} is not prepared. Prepare it after your next rest.` };
+  }
+
   const target = { ...npc };
   const effects = applyOverworldSpellEffects(game, target, player, cost.spell);
 
@@ -98,6 +103,7 @@ export function castSpellOnNpc(game, npc, spellId, opts = {}) {
     spell: cost.spell,
     overflow: opts.overflow,
     relationship: effects.relationship,
+    growth: effects.growth,
   });
 
   let growthText = '';
@@ -110,18 +116,17 @@ export function castSpellOnNpc(game, npc, spellId, opts = {}) {
     });
   }
 
-  const spread = awardAbundanceSpread(game, 'overworld_spell_growth');
+  const spread = awardAbundanceSpreadWithEvents(game, 'overworld_spell_growth');
   const spreadNote = spread.gained ? `\n\n✦ Abundance spreads (+${spread.gained} world influence)` : '';
+  const eventNote = spread.worldEvent?.triggered ? `\n\n${spread.worldEvent.message}` : '';
   const perk = getStagePerk(player);
 
   return {
     ok: true,
     npc: target,
-    text: `${prose}\n\n${growthText}${spreadNote}`.trim(),
+    text: `${prose}\n\n${growthText}${spreadNote}${eventNote}`.trim(),
     effects,
     spread,
     casterPerk: perk.label,
   };
 }
-
-export { recoverAllSpellSlots };

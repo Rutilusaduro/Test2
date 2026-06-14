@@ -41,7 +41,7 @@ export function getAbundanceMilestone(points) {
 export function awardAbundanceSpread(game, source, amountOverride) {
   game.worldFlags = game.worldFlags || {};
   const base = amountOverride ?? ABUNDANCE_AWARDS[source] ?? 0;
-  if (base <= 0) return { gained: 0, total: getAbundanceSpread(game) };
+  if (base <= 0) return { gained: 0, total: getAbundanceSpread(game), milestoneUp: false };
   const old = getAbundanceSpread(game);
   const oldMilestone = getAbundanceMilestone(old).current;
   game.worldFlags.abundanceSpread = old + base;
@@ -52,6 +52,7 @@ export function awardAbundanceSpread(game, source, amountOverride) {
     total,
     milestoneUp: newMilestone.points > oldMilestone.points,
     milestone: newMilestone,
+    oldMilestone,
   };
 }
 

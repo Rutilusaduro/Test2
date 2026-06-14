@@ -19,6 +19,7 @@ import {
   buildAsiOptions,
   getRoleplayOptions,
 } from "./levelUpChoices.js";
+import { autoPrepareSpells } from "./spellPreparation.js";
 
 export const MAX_LEVEL = 12;
 
@@ -220,6 +221,7 @@ export function awardCombatXp(player, combat) {
 export function longRest(character) {
   character.hp = character.maxHp;
   recoverAllSpellSlots(character);
+  autoPrepareSpells(character);
   const maxAp = getMaxAbundancePoints(character);
   character.ap = Math.min(maxAp, (character.ap || 0) + 15);
   if (character.restFlags) character.restFlags.hungerForMoreUsed = false;
@@ -231,6 +233,7 @@ export function initializeStartingSpells(character) {
   const start = buildStartingSpells(character.classId, character.subclassId);
   character.spellsKnown = start.spellsKnown;
   if (character.classId === 'wizard') character.spellbook = [...start.spellsKnown];
+  autoPrepareSpells(character);
   character.spells = getCharacterSpells(character);
   return start;
 }

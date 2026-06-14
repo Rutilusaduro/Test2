@@ -5,7 +5,7 @@ import {
   advanceTurn, checkVictory, checkConversion, convertEnemy, getTurnSummary,
   getActiveUnit, isPlayerTurn, useBonusAction, getAvailableBonusActions,
 } from "../gameData/combat.js";
-import { getCharacterSpells } from "../gameData/spellLearning.js";
+import { getPreparedSpells } from "../gameData/spellPreparation.js";
 import { hasSpellSlot } from "../gameData/spellSlots.js";
 import { renderCombatNarration } from "../hooks/npcInteractions.js";
 import { renderGrowthScene } from "../textEngine/scenes/growthEvent/index.js";
@@ -23,7 +23,7 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onDebu
   const reachable = mode === "move" && playerTurn && selectedUnit
     ? getReachableTiles(combat, selectedUnit)
     : [];
-  const spells = getCharacterSpells(player);
+  const spells = getPreparedSpells(player);
   const slots = player.spellSlots?.current || [];
   const activeUnit = getActiveUnit(combat) || combat.allies.find((a) => a.isPlayer);
   const bonusActions = activeUnit ? getAvailableBonusActions(activeUnit) : [];

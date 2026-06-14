@@ -14,6 +14,7 @@ import { initSpellSlots } from "./gameData/spellSlots.js";
 import { ensureQuestState } from "./gameData/questEngine.js";
 import { recordCombatEndForQuests } from "./hooks/questHooks.js";
 import { ensureSpellState, getCharacterSpells } from "./gameData/spellLearning.js";
+import { autoPrepareSpells } from "./gameData/spellPreparation.js";
 import { completePendingLevelUp as completeLevelUpChoice } from "./gameData/levelUpChoices.js";
 import "./textEngine/scenes/index.js";
 
@@ -27,6 +28,9 @@ function migratePlayerSpells(player) {
   }
   if (!player.spellsKnown?.length) {
     initializeStartingSpells(player);
+  }
+  if (player.classId === 'wizard' && !player.spellsPrepared?.length) {
+    autoPrepareSpells(player);
   }
 }
 

@@ -60,6 +60,7 @@ export function createPlayer(name, classId, options = {}) {
     subclassFeatures: subclass?.features || [],
     spellsKnown: [],
     spellbook: classId === 'wizard' ? [] : undefined,
+    spellsPrepared: classId === 'wizard' ? [] : undefined,
     features: [],
     spells: [],
     levelUpsPending: [],

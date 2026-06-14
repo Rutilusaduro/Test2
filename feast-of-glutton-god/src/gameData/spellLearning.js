@@ -79,6 +79,13 @@ export function learnSpell(character, spellId) {
   if (character.classId === 'wizard') {
     character.spellbook = character.spellbook || [];
     if (!character.spellbook.includes(spellId)) character.spellbook.push(spellId);
+    const cap = getPreparedCap(character);
+    character.spellsPrepared = character.spellsPrepared || [];
+    if ((spell.slotLevel ?? 0) > 0 && character.spellsPrepared.length < cap) {
+      if (!character.spellsPrepared.includes(spellId)) {
+        character.spellsPrepared.push(spellId);
+      }
+    }
   }
   character.spells = getCharacterSpells(character);
   return true;

@@ -4,7 +4,7 @@
 import { getQuestDefinition, getAllQuests } from './quests/registry.js';
 import { QUEST_TYPE, OBJECTIVE_TYPE, QUEST_SCORE, QUEST_NPC_ALIASES } from './quests/constants.js';
 import { getTier, awardRelationship, getTierUpMessage } from './relationships.js';
-import { awardAbundanceSpread } from './abundanceSpread.js';
+import { awardAbundanceSpreadWithEvents } from './worldEvents.js';
 import { getCorruptionTier } from './corruption.js';
 import { getStage, advanceStage } from './stages.js';
 import { addAbundancePoints } from './player.js';
@@ -338,11 +338,13 @@ function applyRewardBundle(game, bundle = {}) {
       game.lastLevelUpResult = levelUps[levelUps.length - 1];
     }
     if (bundle.xpSource === 'major_story') {
-      const spread = awardAbundanceSpread(game, 'quest_complete_main');
+      const spread = awardAbundanceSpreadWithEvents(game, 'quest_complete_main');
       if (spread.gained) messages.push(`+${spread.gained} abundance influence`);
+      if (spread.worldEvent?.triggered) messages.push(spread.worldEvent.message);
     } else if (bundle.xp && bundle.xp >= 50) {
-      const spread = awardAbundanceSpread(game, 'quest_complete_side');
+      const spread = awardAbundanceSpreadWithEvents(game, 'quest_complete_side');
       if (spread.gained) messages.push(`+${spread.gained} abundance influence`);
+      if (spread.worldEvent?.triggered) messages.push(spread.worldEvent.message);
     }
   }
   for (const flag of Object.keys(bundle.flags ?? {})) {
