@@ -52,8 +52,12 @@ export function recordRegionVisitForQuests(game, regionId) {
 
 export function recordCombatEndForQuests(game, combat) {
   ensureQuestState(game);
+  if (!combat?.victory || combat.victory === 'lose') {
+    return { questMessages: '' };
+  }
   const victoryType = combat.victory === 'converted' ? 'converted' : 'win';
   const defeatedEnemyIds = (combat.enemies ?? [])
+    .filter((e) => e.hp <= 0 || e.converted)
     .map((e) => e.typeId || e.type || e.id)
     .filter(Boolean);
   const { lines, growthSnippets } = notifyQuestEvent(game, {

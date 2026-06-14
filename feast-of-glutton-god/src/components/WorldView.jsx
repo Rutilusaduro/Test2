@@ -198,7 +198,10 @@ export default function WorldView({ game, onUpdate, onEncounter, onHostilityEnco
 
       <div className="stats-bar">
         <span className="stat"><strong>{player.name}</strong> — {player.raceName || 'Human'} {player.subclass}</span>
-        <span className="stat">Lv <strong>{player.level}</strong> ({Math.round(xp.pct)}% to next)</span>
+        <span className="stat">
+          Lv <strong>{player.level}</strong>
+          {xp.maxLevel ? ' (max)' : ` (${Math.round(xp.pct)}% to next)`}
+        </span>
         <span className="stat" title={stageMech.desc}>
           Stage: <strong>{stage.label}</strong> ({Math.round(player.lbs)} lbs)
           {isAtSizeCap(player) ? ' ★' : ''}

@@ -73,8 +73,17 @@ export function getXpForNextLevel(character) {
 export function getXpProgress(character) {
   const level = character.level || 1;
   const current = XP_THRESHOLDS[level] ?? 0;
+  if (level >= MAX_LEVEL) {
+    return { current, next: null, xp: character.xp ?? 0, pct: 100, maxLevel: true };
+  }
   const next = XP_THRESHOLDS[level + 1] ?? current;
-  return { current, next, xp: character.xp ?? 0, pct: next > current ? ((character.xp - current) / (next - current)) * 100 : 100 };
+  return {
+    current,
+    next,
+    xp: character.xp ?? 0,
+    pct: next > current ? ((character.xp - current) / (next - current)) * 100 : 100,
+    maxLevel: false,
+  };
 }
 
 export function getLevelUpFlavor(level) {
