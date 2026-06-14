@@ -7,20 +7,23 @@ import { renderBless } from '../textEngine/scenes/npc/bless.js';
 import { renderFeast } from '../textEngine/scenes/npc/feast.js';
 import { renderIntimate } from '../textEngine/scenes/npc/intimate.js';
 import { renderCombatBeat } from '../textEngine/scenes/combatText.js';
-import { applyGrowthWithPresentation } from '../gameData/growthPresentation.js';
+import { applyNpcGrowth } from '../gameData/npcGrowth.js';
+import { addGainDesire, getGainDesire } from '../gameData/gainDesire.js';
+import {
+  isInteractionSatiationLocked,
+  getSatiationLockReason,
+  isSatiationRefusing,
+} from '../gameData/satiation.js';
 import { addCorruption } from '../gameData/corruption.js';
 import {
   awardRelationship,
   getTier,
   getFlirtBonus,
-  getGrowthStageBonus,
   getInteractionLockReason,
   INTERACTION_UNLOCKS,
   getTierUpMessage,
   canUnlockInteraction,
 } from '../gameData/relationships.js';
-import { getCorruptionTier } from '../gameData/corruption.js';
-import { getStage } from '../gameData/stages.js';
 import { spendAP } from '../gameData/player.js';
 import { checkSeduce, formatCheckSummary, toTextContext, DC } from '../gameData/skillChecks.js';
 import { recordNpcInteractionForQuests, recordNpcGrowthForQuests } from './questHooks.js';
@@ -31,7 +34,7 @@ import { appendPuzzleHintToTalk } from '../gameData/puzzleHints.js';
 import { getReactivityGlobals } from '../gameData/worldReactivity.js';
 import { syncGateUnlocks } from '../gameData/regionObstacles.js';
 import { getQuestOffersForNpc, buildQuestOfferNarrative, acceptQuestFromNpc } from '../gameData/questOffers.js';
-import { awardFatteningXp } from '../gameData/leveling.js';
+import { renderSpecial } from '../textEngine/scenes/npc/special.js';
 
 function withQuestProgress(game, npc, interaction, meta, result) {
   const quest = recordNpcInteractionForQuests(game, {
@@ -53,7 +56,7 @@ function withQuestProgress(game, npc, interaction, meta, result) {
         ? `${questMessages}\n\n${growthQuest.questMessages}`
         : growthQuest.questMessages;
     }
-    if (result.growth.stagesJumped > 0) {
+    if (result.growth?.stagesJumped > 0 && result.growth?.consentState !== 'forced') {
       const relResult = awardRelationship(result.npc ?? npc, 'growth_witnessed');
       if (relResult.tierUp) {
         const tierMsg = getTierUpMessage(result.npc ?? npc, relResult);
@@ -111,21 +114,14 @@ function appendTierUp(result, npc, relResult) {
 }
 
 function growNpc(npc, game, baseStages, method = 'feed') {
-  const bonus = getGrowthStageBonus(npc, method);
-  const stages = baseStages + bonus;
-  const startStage = getStage(npc.lbs).id;
-  const presentation = applyGrowthWithPresentation(npc, game, stages, { growthMethod: method, raisedBy: 'player' });
-  const gateMsgs = syncGateUnlocks(game, { regionId: game.region });
-  let fattenXp = null;
-  if (game?.player && presentation.stagesJumped > 0) {
-    fattenXp = awardFatteningXp(game.player, presentation.stagesJumped, method);
-  }
+  return applyNpcGrowth(npc, game, baseStages, method, { history: getTextHistory(game) });
+}
+
+function growthRenderOpts(npc, growth) {
   return {
-    ...presentation,
-    startStage: presentation.startStage ?? startStage,
-    bonusStages: bonus,
-    gateMsgs,
-    fattenXp,
+    consentState: growth.consentState ?? 'willing',
+    severity: growth.severity ?? 0,
+    gainDesire: getGainDesire(npc),
   };
 }
 
@@ -205,6 +201,7 @@ export function doFlirt(npc, player, game) {
       updatedNpc,
       check.critical === 'success' ? 'flirt_crit' : 'flirt_success',
     );
+    addGainDesire(updatedNpc, check.critical === 'success' ? 4 : 2);
     addCorruption(updatedNpc, check.critical === 'success' ? 5 : 3);
   } else if (check.critical === 'failure') {
     relResult = applyRelationshipGain(updatedNpc, 'flirt_fumble');
@@ -228,11 +225,24 @@ export function doFlirt(npc, player, game) {
 }
 
 export function doFeed(npc, player, game, feedType = 'hand') {
+  if (isInteractionSatiationLocked(npc, game, 'feed')) {
+    return { text: getSatiationLockReason(npc), npc, ok: false, refused: true };
+  }
   const baseStages = feedType === 'magical' ? 2 : 1;
   const growth = growNpc(npc, game, baseStages, 'feed');
-  const text = renderFeed(npc, player, { feedType, location: game.region, history: getTextHistory(game) });
-  addCorruption(npc, feedType === 'magical' ? 6 : 4);
-  const relResult = applyRelationshipGain(npc, feedType === 'magical' ? 'feed_magical' : 'feed');
+  if (growth.refused) {
+    return { text: growth.text, npc, ok: false, refused: true, growth };
+  }
+  const renderOpts = growthRenderOpts(npc, growth);
+  const text = renderFeed(npc, player, {
+    feedType, location: game.region, history: getTextHistory(game), ...renderOpts,
+  });
+  if (growth.consentState !== 'forced') {
+    addCorruption(npc, feedType === 'magical' ? 6 : 4);
+  }
+  const relResult = growth.consentState !== 'forced' && growth.stagesJumped > 0
+    ? applyRelationshipGain(npc, feedType === 'magical' ? 'feed_magical' : 'feed')
+    : null;
   let result = appendTierUp({
     text: text + '\n\n' + (growth.text || ''), npc, growth,
   }, npc, relResult);
@@ -243,19 +253,31 @@ export function doBless(npc, player, game, blessType = 'minor') {
   if (!canUnlockInteraction(npc, 'bless')) {
     return { text: getInteractionLockReason(npc, 'bless'), npc, ok: false };
   }
+  if (isInteractionSatiationLocked(npc, game, 'bless')) {
+    return { text: getSatiationLockReason(npc), npc, ok: false, refused: true };
+  }
   const costs = { minor: 5, major: 15, targeted: 10 };
   const cost = costs[blessType] || 5;
   if (!spendAP(game, cost)) return { text: 'Not enough Abundance Points.', npc, ok: false };
   const baseStages = blessType === 'major' ? 2 : 1;
   const growth = growNpc(npc, game, baseStages, 'blessing');
+  if (growth.refused) {
+    return { text: growth.text, npc, ok: false, refused: true, growth };
+  }
+  const renderOpts = growthRenderOpts(npc, growth);
   const text = renderBless(npc, player, {
     blessType,
     zone: blessType === 'targeted' ? 'belly' : undefined,
     history: getTextHistory(game),
+    ...renderOpts,
   });
-  addCorruption(npc, blessType === 'major' ? 10 : 5);
+  if (growth.consentState !== 'forced') {
+    addCorruption(npc, blessType === 'major' ? 10 : 5);
+  }
   const awardKey = blessType === 'major' ? 'bless_major' : blessType === 'targeted' ? 'bless_targeted' : 'bless_minor';
-  const relResult = applyRelationshipGain(npc, awardKey);
+  const relResult = growth.consentState !== 'forced' && growth.stagesJumped > 0
+    ? applyRelationshipGain(npc, awardKey)
+    : null;
   let result = appendTierUp({
     text: text + '\n\n' + (growth.text || ''), npc, growth, ok: true,
   }, npc, relResult);
@@ -266,11 +288,19 @@ export function doFeast(npc, player, game) {
   if (!canUnlockInteraction(npc, 'feast')) {
     return { text: getInteractionLockReason(npc, 'feast'), npc, ok: false };
   }
+  if (isSatiationRefusing(npc, game)) {
+    return { text: getSatiationLockReason(npc), npc, ok: false, refused: true };
+  }
   if (!spendAP(game, 20)) return { text: 'Not enough Abundance Points for a feast.', npc, ok: false };
   const growth = growNpc(npc, game, 3, 'feast');
+  if (growth.refused) {
+    return { text: growth.text, npc, ok: false, refused: true, growth };
+  }
   const text = renderFeast(npc, player, { history: getTextHistory(game) });
-  addCorruption(npc, 15);
-  const relResult = applyRelationshipGain(npc, 'feast');
+  if (growth.consentState !== 'forced') addCorruption(npc, 15);
+  const relResult = growth.consentState !== 'forced' && growth.stagesJumped > 0
+    ? applyRelationshipGain(npc, 'feast')
+    : null;
   game.day += 1;
   game.worldFlags = game.worldFlags ?? {};
   game.worldFlags[`feast_held_${game.region}`] = true;
@@ -285,17 +315,23 @@ export function doFeast(npc, player, game) {
   return withQuestProgress(game, npc, 'feast', null, result);
 }
 
-export function getInteractionMenu(npc, player) {
+export function getInteractionMenu(npc, player, game) {
   const rel = getTier(npc.relationship || 0);
   const cor = getCorruptionTier(npc.corruption || 0);
 
-  const item = (id, label, extraEnabled = true, hint) => ({
-    id,
-    label,
-    enabled: canUnlockInteraction(npc, id) && extraEnabled,
-    hint: !canUnlockInteraction(npc, id) ? getInteractionLockReason(npc, id) : hint,
-    tierRequired: INTERACTION_UNLOCKS[id] ?? 0,
-  });
+  const item = (id, label, extraEnabled = true, hint) => {
+    const satiationLocked = game && isInteractionSatiationLocked(npc, game, id);
+    const enabled = canUnlockInteraction(npc, id) && extraEnabled && !satiationLocked;
+    let lockHint = !canUnlockInteraction(npc, id) ? getInteractionLockReason(npc, id) : hint;
+    if (satiationLocked) lockHint = getSatiationLockReason(npc);
+    return {
+      id,
+      label,
+      enabled,
+      hint: lockHint,
+      tierRequired: INTERACTION_UNLOCKS[id] ?? 0,
+    };
+  };
 
   return [
     item('talk', 'Talk'),
@@ -315,31 +351,23 @@ export function doSpecial(npc, player, game) {
   if (!canUnlockInteraction(npc, 'special')) {
     return { text: getInteractionLockReason(npc, 'special'), npc, ok: false };
   }
-  const bySubclass = {
-    feast_singer: 'You perform a private growth ballad. Her body sways in time, swelling with each verse.',
-    indulgence: 'You stage an intimate feeding performance — every crumb and moan draws her deeper into appetite.',
-    sirens_call: 'Your voice coils around her like honey. She leans in, hungry, before she realizes she is melting.',
-    overflowing_heart: 'You share vulnerability and warmth until growth feels like trust made flesh.',
-    school_overflow: 'You conjure a cauldron of experimental feast-magic. She watches, fascinated, as the brew swells her.',
-    expanding_form: 'You inscribe lasting runes of expansion. Her body accepts the change as sacred and permanent.',
-    arcane_gluttony: 'You devour ambient magic and channel it into her — greedy, gleeful, glorious.',
-    domain_plenty: 'You lead a prayer of abundance. Golden light pours into her, belly rounding with divine pleasure.',
-    eternal_feast: 'You consecrate the room as a ritual banquet. Steam and sighs sanctify every swelling inch.',
-    mother_abundance: 'You cradle her in matronly warmth. Growth spreads slow and safe, like being held by the goddess.',
-    pact_everfull: "You invoke Gorgara's Claim — hunger floods her until she moans your name.",
-    devouring_shadow: 'Shadow-hunger steals resistance and leaves plush, stolen curves in its wake.',
-    honeyed_tongue: 'You whisper a sweet pact. She agrees to grow before she notices she already has.',
-  };
-  const byClass = {
-    bard: 'You perform a private growth ballad. Her body sways in time, swelling with each verse.',
-    wizard: 'You conjure a cauldron of experimental feast-magic. She watches, fascinated, as the brew swells her.',
-    cleric: 'You lead a prayer of abundance. Golden light pours into her, belly rounding with divine pleasure.',
-    warlock: "You invoke Gorgara's Claim — hunger floods her until she moans your name.",
-  };
-  const line = bySubclass[player.subclassId] || byClass[player.classId] || byClass.cleric;
+  if (isInteractionSatiationLocked(npc, game, 'special')) {
+    return { text: getSatiationLockReason(npc), npc, ok: false, refused: true };
+  }
   const growth = growNpc(npc, game, 2, 'blessing');
-  addCorruption(npc, 8);
-  const relResult = applyRelationshipGain(npc, 'special');
+  if (growth.refused) {
+    return { text: growth.text, npc, ok: false, refused: true, growth };
+  }
+  const renderOpts = growthRenderOpts(npc, growth);
+  const line = renderSpecial(npc, player, {
+    playerClass: player.classId,
+    history: getTextHistory(game),
+    ...renderOpts,
+  });
+  if (growth.consentState !== 'forced') addCorruption(npc, 8);
+  const relResult = growth.consentState !== 'forced' && growth.stagesJumped > 0
+    ? applyRelationshipGain(npc, 'special')
+    : null;
   let result = appendTierUp({
     text: line + '\n\n' + (growth.text || ''), npc, growth,
   }, npc, relResult);
@@ -350,9 +378,17 @@ export function doIntimate(npc, player, game) {
   if (!canUnlockInteraction(npc, 'intimate')) {
     return { text: getInteractionLockReason(npc, 'intimate'), npc, ok: false };
   }
+  if (isInteractionSatiationLocked(npc, game, 'intimate')) {
+    return { text: getSatiationLockReason(npc), npc, ok: false, refused: true };
+  }
   const growth = growNpc(npc, game, 2, 'intimate');
-  addCorruption(npc, 5);
-  const relResult = applyRelationshipGain(npc, 'intimate');
+  if (growth.refused) {
+    return { text: growth.text, npc, ok: false, refused: true, growth };
+  }
+  if (growth.consentState !== 'forced') addCorruption(npc, 5);
+  const relResult = growth.consentState !== 'forced' && growth.stagesJumped > 0
+    ? applyRelationshipGain(npc, 'intimate')
+    : null;
   const sceneText = renderIntimate(npc, player, { location: game.region, history: getTextHistory(game) });
   let result = appendTierUp({
     text: sceneText + '\n\n' + (growth.text || ''), npc, growth,

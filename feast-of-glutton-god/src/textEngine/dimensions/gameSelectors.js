@@ -10,4 +10,5 @@ registerSelectors(
   'enemyType', 'enemySizeBand', 'victoryType', 'regionTransformation', 'sceneVariant',
   'outcomeKind', 'partySize', 'regionName', 'role', 'archetype',
   'spellSchool', 'castType', 'paidBy', 'failCause', 'spellName',
+  'consentState', 'playerClass', 'severity',
 );

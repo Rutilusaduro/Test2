@@ -5,7 +5,8 @@ import {
 } from "../hooks/npcInteractions.js";
 import { getStage } from "../gameData/stages.js";
 import { getTier, getRelationshipProgress } from "../gameData/relationships.js";
-import { getCorruptionTier } from "../gameData/corruption.js";
+import { getGainDesireTier } from "../gameData/gainDesire.js";
+import { getSatiationTier } from "../gameData/satiation.js";
 import SkillCheckRoll from "./SkillCheckRoll.jsx";
 
 import { addBugNote, captureGameContext } from "../hooks/bugLog.js";
@@ -21,7 +22,9 @@ export default function NpcModal({ npc, player, game, onClose, onUpdate, onGameR
   const rel = getTier(npc.relationship || 0);
   const relProgress = getRelationshipProgress(npc.relationship || 0);
   const cor = getCorruptionTier(npc.corruption || 0);
-  const menu = getInteractionMenu(npc, player);
+  const desire = getGainDesireTier(npc.gainDesire ?? 0);
+  const satiation = getSatiationTier(npc.satiation ?? 0);
+  const menu = getInteractionMenu(npc, player, game);
   const tierZero = new Set(['talk', 'observe', 'feed']);
   const visibleMenu = menu.filter((item) => item.enabled || tierZero.has(item.id));
   const isFirstMeeting = (npc.relationship || 0) === 0;
@@ -137,6 +140,8 @@ export default function NpcModal({ npc, player, game, onClose, onUpdate, onGameR
             <span className="stat" title={rel.desc}>{rel.label}</span>
           )}
           <span className="stat">{cor.label}</span>
+          <span className="stat" title={desire.desc}>Desire: {desire.label}</span>
+          <span className="stat" title={satiation.desc}>Satiation: {satiation.label}</span>
           {npc.bondFlags?.devoted && <span className="stat" style={{ color: "var(--gold-bright)" }}>★ Devoted</span>}
           {npc.role && <span className="stat">{npc.role}</span>}
         </div>

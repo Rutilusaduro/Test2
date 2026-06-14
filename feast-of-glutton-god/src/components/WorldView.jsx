@@ -13,6 +13,7 @@ import { getStage, isAtSizeCap } from "../gameData/stages.js";
 import { getTier } from "../gameData/relationships.js";
 import { getCorruptionTier } from "../gameData/corruption.js";
 import { getXpProgress, longRest } from "../gameData/leveling.js";
+import { decaySatiationForGame } from "../gameData/satiation.js";
 import { getPlayerDerivedStats } from "../gameData/player.js";
 import { getTravelOptions } from "../gameData/regionObstacles.js";
 import { getVisibleFeatures } from "../gameData/puzzleEngine.js";
@@ -361,6 +362,7 @@ export default function WorldView({ game, onUpdate, onEncounter, onPuzzleCombat,
           <button onClick={onEncounter}>Seek Encounter</button>
           <button onClick={() => onUpdate((g) => {
             longRest(g.player);
+            decaySatiationForGame(g, { longRest: true });
             const next = applySettling({ ...g, day: g.day + 1, lastLevelUpMessage: null });
             return next;
           })}>

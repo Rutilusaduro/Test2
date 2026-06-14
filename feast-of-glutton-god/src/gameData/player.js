@@ -9,6 +9,8 @@ import { CLASS_SKILL_PROFICIENCIES } from "./skills.js";
 import { applyRaceStatBonuses, getRace } from "./races.js";
 import { getSubclass, getDefaultSubclassId } from "./subclasses.js";
 import { getStartLbsWithRace } from "./raceFeatures.js";
+import { ensureGainDesire } from "./gainDesire.js";
+import { ensureSatiation } from "./satiation.js";
 
 /**
  * @param {string} name
@@ -178,7 +180,10 @@ export function applyNpcState(game, npcId, updates) {
 
 export function getNpcState(game, npc) {
   const saved = game.npcStates?.[npc.id] || {};
-  return { ...npc, ...saved };
+  const merged = { ...npc, ...saved };
+  ensureGainDesire(merged);
+  ensureSatiation(merged, game);
+  return merged;
 }
 
 export function getPlayerDerivedStats(player) {

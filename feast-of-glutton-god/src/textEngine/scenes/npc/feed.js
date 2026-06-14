@@ -21,6 +21,27 @@ registerPool('npc.feed.opening', [
 ]);
 
 registerPool('npc.feed.reaction', [
+  { when: { consentState: 'forced', severityMin: 2 }, text: [
+    '{subject.first} tries to twist away — food and magic follow anyway.',
+    '"Don\'t," she chokes out, mouth still wet with your offering.',
+    'Her eyes flash anger and fear; she swallows because her body insists.',
+    'She hates that she can taste how good it is while hating that it happens.',
+  ]},
+  { when: { consentState: 'forced' }, text: [
+    'She eats because the spell leaves her no graceful exit — shame hot on her cheeks.',
+    '{subject.first} trembles; pleasure and protest war in the same breath.',
+    '"Why," she whispers, not asking for food — asking for mercy.',
+    'Resistance thins; fullness arrives like a verdict.',
+  ]},
+  { when: { gainDesireMin: 75 }, text: [
+    '"More," {subject.first} moans before you offer the next bite — insatiable, adored.',
+    'She feeds from your hand like worship, hips rolling with each swallow.',
+    'Her hunger is holy; every crumb is communion.',
+  ]},
+  { when: { gainDesireMin: 50 }, text: [
+    'She eats with eager grace — appetite an open door you are welcome to walk through.',
+    '{subject.first} purrs around your fingers, already asking with her eyes.',
+  ]},
   { when: { relationship: [0, 1], corruption: 0 }, text: [
     '"I… shouldn\'t," she murmurs, but her mouth is already full.',
     'She eats with guilty pleasure, unable to stop.',
@@ -74,9 +95,21 @@ export function renderFeed(npc, player, opts = {}) {
       feedType: opts.feedType || 'hand',
       growthMethod: 'feed',
       location: opts.location,
+      consentState: opts.consentState || 'willing',
+      severity: opts.severity ?? 0,
+      gainDesire: opts.gainDesire ?? npc.gainDesire,
     },
     seed: opts.seed,
     history: opts.history,
   });
-  return render(FEED_TEMPLATE, ctx, { trace: opts.trace });
+  const main = render(FEED_TEMPLATE, ctx, { trace: opts.trace });
+  if (opts.consentState === 'forced') {
+    const forced = render('{npc.growth.forced}', ctx, { trace: opts.trace });
+    return [main, forced].filter(Boolean).join(' ');
+  }
+  if ((opts.gainDesire ?? npc.gainDesire ?? 0) >= 50 && opts.consentState !== 'forced') {
+    const rapture = render('{npc.growth.rapture}', ctx, { trace: opts.trace });
+    return [main, rapture].filter(Boolean).join(' ');
+  }
+  return main;
 }

@@ -17,6 +17,9 @@ import { renderGrowthScene } from "../textEngine/scenes/growthEvent/index.js";
 import { renderCombatBeat } from "../textEngine/scenes/combatText.js";
 import { renderCombatIntro, renderCombatOutro } from "../textEngine/scenes/dm/combat.js";
 import { renderCastFeedback } from "../textEngine/scenes/dm/cast.js";
+import { renderSatiationRefusal } from "../textEngine/scenes/npc/satiation.js";
+import { renderForcedGrowth, renderWillingRapture } from "../textEngine/scenes/npc/consentGrowth.js";
+import { renderSpecial } from "../textEngine/scenes/npc/special.js";
 import { ENEMY_TYPES } from "../gameData/enemies.js";
 import { REGIONS } from "../gameData/regions.js";
 import { resolveGrowthZone } from "../textEngine/growthLexicon.js";
@@ -34,7 +37,8 @@ const SPELL_SCHOOLS = ["abundance", "enchantment", "transmutation", "evocation",
 const CAST_TYPES = ["action", "bonus"];
 const PAID_BY = ["slot", "ap", "cantrip"];
 const FAIL_CAUSES = ["no_resource", "no_action", "no_bonus"];
-const CAST_KINDS = ["invoke", "fizzle", "noaction", "nobonus"];
+const CONSENT_STATES = ["willing", "forced"];
+const SATIATION_TIER_IDS = ["0", "1", "2", "3"];
 const ENEMY_TYPE_IDS = Object.keys(ENEMY_TYPES);
 const REGION_IDS = REGIONS.map((r) => r.id);
 
@@ -184,6 +188,39 @@ const SECTIONS = {
       });
     },
   },
+  "npc.satiation.refusal": {
+    params: ["satiationTier", "girl"],
+    fn: (s, opts) => renderSatiationRefusal(s, MOCK_PLAYER, {
+      tier: { id: Number(opts.satiationTier === RANDOM ? pick(SATIATION_TIER_IDS) : opts.satiationTier) },
+      trace: opts.trace,
+    }),
+  },
+  "npc.growth.forced": {
+    params: [...STATE_PARAMS, "consentState"],
+    fn: (s, opts) => renderForcedGrowth(s, MOCK_PLAYER, {
+      severity: opts.consentState === "forced" ? 2 : 1,
+      method: "feed",
+      trace: opts.trace,
+    }),
+  },
+  "npc.growth.rapture": {
+    params: STATE_PARAMS,
+    fn: (s, opts) => renderWillingRapture(s, MOCK_PLAYER, {
+      gainDesire: s.gainDesire ?? 80,
+      method: "feed",
+      trace: opts.trace,
+    }),
+  },
+  "npc.special": {
+    params: [...STATE_PARAMS, "consentState"],
+    fn: (s, opts) => renderSpecial(s, MOCK_PLAYER, {
+      playerClass: "cleric",
+      consentState: opts.consentState === RANDOM ? pick(CONSENT_STATES) : opts.consentState,
+      severity: 1,
+      gainDesire: s.gainDesire ?? 40,
+      trace: opts.trace,
+    }),
+  },
   "char.desc": {
     params: STATE_PARAMS,
     fn: (s, opts) => render("{char.desc}", createContext({ subject: s, ref: MOCK_PLAYER, week: 3 }), { trace: opts.trace }),
@@ -213,6 +250,8 @@ const PARAM_DEFS = [
   { key: "castType", label: "Cast type", options: CAST_TYPES },
   { key: "paidBy", label: "Paid by", options: PAID_BY },
   { key: "failCause", label: "Fail cause", options: FAIL_CAUSES },
+  { key: "consentState", label: "Consent", options: CONSENT_STATES },
+  { key: "satiationTier", label: "Satiation tier", options: SATIATION_TIER_IDS },
 ];
 
 function rollSample(params) {
@@ -262,6 +301,8 @@ function rollSample(params) {
     castType: v.castType,
     paidBy: v.paidBy,
     failCause: v.failCause,
+    consentState: v.consentState,
+    satiationTier: v.satiationTier,
   };
   const text = SECTIONS[v.section].fn(student, opts);
   const nodes = trace.filter((t) => t.leaf && t.text.trim() && !t.key.startsWith("subject."));

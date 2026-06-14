@@ -67,7 +67,7 @@ function collectTexts(variant) {
   return [];
 }
 
-const DM_POOL_PREFIXES = ['dm.combat.', 'dm.cast.'];
+const DM_POOL_PREFIXES = ['dm.combat.', 'dm.cast.', 'npc.satiation.', 'npc.growth.', 'npc.bless.forced', 'npc.refusal', 'npc.special.'];
 const STRICT_POOL = (key) => DM_POOL_PREFIXES.some((p) => key.startsWith(p));
 
 // ── static: pool variant length + when keys (combat DM pools) ──
