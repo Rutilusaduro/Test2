@@ -13,7 +13,8 @@ import { awardCombatXp, initializeStartingSpells } from "./gameData/leveling.js"
 import { initSpellSlots } from "./gameData/spellSlots.js";
 import { ensureQuestState } from "./gameData/questEngine.js";
 import { recordCombatEndForQuests } from "./hooks/questHooks.js";
-import { completePendingLevelUp, ensureSpellState, getCharacterSpells } from "./gameData/spellLearning.js";
+import { ensureSpellState, getCharacterSpells } from "./gameData/spellLearning.js";
+import { completePendingLevelUp as completeLevelUpChoice } from "./gameData/levelUpChoices.js";
 import "./textEngine/scenes/index.js";
 
 function migratePlayerSpells(player) {
@@ -70,17 +71,22 @@ export default function App() {
     });
   }, []);
 
-  const handleLevelUpComplete = useCallback((selectedSpellIds) => {
+  const handleLevelUpComplete = useCallback((payload = {}) => {
     setGame((prev) => {
       const next = { ...prev };
-      const learned = completePendingLevelUp(next.player, selectedSpellIds);
-      if (learned?.learned?.length) {
-        const names = learned.learned.map((s) => s.name).join(', ');
-        next.lastLevelUpMessage = (next.lastLevelUpMessage || '') + `\n\nLearned: ${names}`;
+      const result = completeLevelUpChoice(next.player, payload);
+      if (result?.learned?.length) {
+        const names = result.learned.map((s) => s.name).join(', ');
+        next.lastQuestMessage = (next.lastQuestMessage || '') + `\n\nLearned: ${names}`;
       }
-      next.lastLevelUpResult = null;
-      if (next.player.levelUpsPending?.length) {
-        next.lastLevelUpResult = { level: next.player.levelUpsPending[0].level, narrative: next.player.levelUpsPending[0].narrative };
+      if (result?.asi) {
+        next.lastLevelUpMessage = (next.lastLevelUpMessage || '') + `\n\n${result.asi.label} +2`;
+      }
+      const pending = next.player.levelUpsPending?.[0];
+      if (pending) {
+        next.lastLevelUpResult = { level: pending.level, narrative: pending.narrative };
+      } else {
+        next.lastLevelUpResult = null;
       }
       saveGame(next);
       return next;

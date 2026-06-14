@@ -14,6 +14,11 @@ import {
   getCharacterSpells,
 } from "./spellLearning.js";
 import { buildLevelUpMessage } from "../textEngine/scenes/leveling/index.js";
+import {
+  ASI_LEVELS,
+  buildAsiOptions,
+  getRoleplayOptions,
+} from "./levelUpChoices.js";
 
 export const MAX_LEVEL = 12;
 
@@ -38,8 +43,6 @@ export const XP_SOURCES = {
 export const SIZE_CAP_BY_LEVEL = {
   1: 5, 3: 7, 6: 9, 9: 11, 12: 11,
 };
-
-const ASI_LEVELS = [4, 8, 12];
 
 const LEVEL_UP_FLAVOR = [
   null,
@@ -103,9 +106,6 @@ export function applyLevelUp(character, context = {}) {
 
   let asi = false;
   if (ASI_LEVELS.includes(character.level)) {
-    const primary = cls.primaryStat || "cha";
-    character.stats = character.stats || {};
-    character.stats[primary] = (character.stats[primary] || 10) + 1;
     asi = true;
   }
 
@@ -152,17 +152,48 @@ export function applyLevelUp(character, context = {}) {
     narrative: null,
   };
 
+  result.narrative = buildLevelUpMessage(character, result);
+
+  const pending = [];
   if (spellResult.choices) {
-    character.levelUpsPending = character.levelUpsPending || [];
-    character.levelUpsPending.push({
+    pending.push({
       level: character.level,
       type: 'spell_choice',
       narrative: result.narrative,
       ...spellResult.choices,
     });
+  } else {
+    pending.push({
+      level: character.level,
+      type: 'celebration',
+      narrative: result.narrative,
+    });
   }
 
-  result.narrative = buildLevelUpMessage(character, result);
+  if (asi) {
+    pending.push({
+      level: character.level,
+      type: 'asi_choice',
+      pickCount: 1,
+      options: buildAsiOptions(character),
+      description: 'Ability Score Improvement — channel +2 into one stat that reflects your abundance.',
+    });
+  }
+
+  if (growthLevelUp || sizeCapIncreased) {
+    pending.push({
+      level: character.level,
+      type: 'roleplay',
+      options: getRoleplayOptions(growthLevelUp),
+      description: 'How do you mark this milestone of growth and power? (Optional flavor)',
+      optional: true,
+    });
+  }
+
+  if (pending.length) {
+    character.levelUpsPending = [...(character.levelUpsPending || []), ...pending];
+  }
+
   return result;
 }
 

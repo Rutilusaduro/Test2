@@ -71,17 +71,17 @@ export const BONUS_SPELLS = {
     effect: { growth: 2, corruption: 5, charm: 1 },
   },
   true_overflow: {
-    id: 'true_overflow', name: 'True Overflow', slotLevel: 7, school: 'abundance',
+    id: 'true_overflow', name: 'True Overflow', slotLevel: 7, school: 'abundance', minSizeStage: 6,
     desc: 'Permanent or very long-term size stage increases through divine excess.',
     effect: { growth: 3, corruption: 8 },
   },
   mass_indulgence: {
-    id: 'mass_indulgence', name: 'Mass Indulgence', slotLevel: 8, school: 'abundance',
+    id: 'mass_indulgence', name: 'Mass Indulgence', slotLevel: 8, school: 'abundance', minSizeStage: 7,
     desc: 'A huge growth ritual affecting many — the town itself seems to swell.',
     effect: { growth: 2, aoe: true, party: true, corruption: 6 },
   },
   gorgaras_awakening: {
-    id: 'gorgaras_awakening', name: "Gorgara's Awakening", slotLevel: 9, school: 'abundance',
+    id: 'gorgaras_awakening', name: "Gorgara's Awakening", slotLevel: 9, school: 'abundance', minSizeStage: 8,
     desc: 'Massive area growth event. Multiple characters may leap several size stages.',
     effect: { growth: 4, aoe: true, corruption: 10 },
   },

@@ -4,6 +4,7 @@
 import { getSpell } from './spells.js';
 import { getCasterType } from './spellSlots.js';
 import { getEffectiveStatMod } from './stats.js';
+import { getStage } from './stages.js';
 import {
   getLearningModel,
   getCurriculumForLevel,
@@ -111,12 +112,27 @@ export function buildStartingSpells(classId, subclassId) {
 }
 
 function filterLearnable(spellIds, character, maxLevel) {
+  const stageId = getStage(character.lbs).id;
   return sortGrowthFirst(spellIds.filter((id) => {
     if (knowsSpell(character, id)) return false;
     const spell = getSpell(id);
     if (!spell || spell.slotLevel === 0) return false;
-    return spell.slotLevel <= maxLevel;
+    if (spell.slotLevel > maxLevel) return false;
+    if (spell.minSizeStage != null && stageId < spell.minSizeStage) return false;
+    return true;
   }));
+}
+
+/** Cross-class growth spells for Bard Magical Secrets. */
+export function getMagicalSecretsPool(character, maxSpellLevel) {
+  const otherClasses = ['wizard', 'cleric', 'warlock', 'bard'].filter((c) => c !== character.classId);
+  const ids = new Set();
+  for (const classId of otherClasses) {
+    for (let lvl = 1; lvl <= 12; lvl++) {
+      for (const id of getCurriculumForLevel(classId, lvl)) ids.add(id);
+    }
+  }
+  return filterLearnable([...ids], character, maxSpellLevel);
 }
 
 /**
@@ -177,7 +193,13 @@ export function resolveSpellLearning(character, newLevel) {
   const extraPick = magicalSecrets ? (model.magicalSecretsCount ?? 2) : 0;
   const totalPick = (typeof pickCount === 'number' ? pickCount : 0) + extraPick;
 
-  if (totalPick <= 0 || curriculum.length === 0) {
+  let optionPool = [...curriculum];
+  if (magicalSecrets) {
+    optionPool = [...new Set([...optionPool, ...getMagicalSecretsPool(character, maxSpellLevel)])];
+  }
+  optionPool = sortGrowthFirst(optionPool);
+
+  if (totalPick <= 0 || optionPool.length === 0) {
     return {
       autoGranted: autoGranted.map((id) => spellSummary(id)),
       choices: null,
@@ -186,7 +208,7 @@ export function resolveSpellLearning(character, newLevel) {
     };
   }
 
-  const options = curriculum.slice(0, Math.max(totalPick + 3, 5));
+  const options = optionPool.slice(0, Math.max(totalPick + 3, 6));
   if (options.length <= totalPick) {
     for (const id of options) {
       if (learnSpell(character, id)) autoGranted.push(id);
@@ -205,7 +227,9 @@ export function resolveSpellLearning(character, newLevel) {
       pickCount: totalPick,
       options: options.map((id) => spellSummary(id, true)),
       label: model.label,
-      description: model.description,
+      description: magicalSecrets
+        ? 'Magical Secrets — choose growth spells from any class list.'
+        : model.description,
     },
     growthHighlights: growthHighlights.map((id) => spellSummary(id)),
     model: model.type,
@@ -222,6 +246,7 @@ export function spellSummary(spellId, highlightGrowth = false) {
     desc: spell.desc,
     slotLevel: spell.slotLevel,
     school: spell.school,
+    minSizeStage: spell.minSizeStage,
     growth,
     highlight: highlightGrowth && growth,
   };
@@ -238,13 +263,4 @@ export function applySpellChoices(character, spellIds = []) {
 
 export function getPendingLevelUp(character) {
   return character.levelUpsPending?.[0] ?? null;
-}
-
-export function completePendingLevelUp(character, selectedSpellIds = []) {
-  const pending = character.levelUpsPending?.[0];
-  if (!pending) return null;
-
-  const learned = applySpellChoices(character, selectedSpellIds);
-  character.levelUpsPending = character.levelUpsPending.slice(1);
-  return { ...pending, learned };
 }
