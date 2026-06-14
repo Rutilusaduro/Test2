@@ -19,8 +19,8 @@ export default function App() {
   const [game, setGame] = useState(null);
   const [debugContext, setDebugContext] = useState({});
 
-  const startNewGame = useCallback((name, classId) => {
-    const g = createNewGame(name, classId);
+  const startNewGame = useCallback((name, classId, options = {}) => {
+    const g = createNewGame(name, classId, options);
     setGame(g);
     setScreen("world");
   }, []);
@@ -30,6 +30,8 @@ export default function App() {
     if (g) {
       if (!g.player.spellSlots) initSpellSlots(g.player);
       if (!g.player.sizeCap) g.player.sizeCap = 5;
+      if (!g.player.raceId) g.player.raceId = 'human';
+      if (!g.player.raceName) g.player.raceName = 'Human';
       ensureQuestState(g);
       setGame(g);
       setScreen("world");

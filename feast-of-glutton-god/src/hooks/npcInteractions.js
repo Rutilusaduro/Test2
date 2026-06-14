@@ -209,19 +209,35 @@ export function getInteractionMenu(npc, player) {
 }
 
 export function doSpecial(npc, player, game) {
-  const lines = {
+  const bySubclass = {
+    feast_singer: 'You perform a private growth ballad. Her body sways in time, swelling with each verse.',
+    indulgence: 'You stage an intimate feeding performance — every crumb and moan draws her deeper into appetite.',
+    sirens_call: 'Your voice coils around her like honey. She leans in, hungry, before she realizes she is melting.',
+    overflowing_heart: 'You share vulnerability and warmth until growth feels like trust made flesh.',
+    school_overflow: 'You conjure a cauldron of experimental feast-magic. She watches, fascinated, as the brew swells her.',
+    expanding_form: 'You inscribe lasting runes of expansion. Her body accepts the change as sacred and permanent.',
+    arcane_gluttony: 'You devour ambient magic and channel it into her — greedy, gleeful, glorious.',
+    domain_plenty: 'You lead a prayer of abundance. Golden light pours into her, belly rounding with divine pleasure.',
+    eternal_feast: 'You consecrate the room as a ritual banquet. Steam and sighs sanctify every swelling inch.',
+    mother_abundance: 'You cradle her in matronly warmth. Growth spreads slow and safe, like being held by the goddess.',
+    pact_everfull: "You invoke Gorgara's Claim — hunger floods her until she moans your name.",
+    devouring_shadow: 'Shadow-hunger steals resistance and leaves plush, stolen curves in its wake.',
+    honeyed_tongue: 'You whisper a sweet pact. She agrees to grow before she notices she already has.',
+  };
+  const byClass = {
     bard: 'You perform a private growth ballad. Her body sways in time, swelling with each verse.',
     wizard: 'You conjure a cauldron of experimental feast-magic. She watches, fascinated, as the brew swells her.',
     cleric: 'You lead a prayer of abundance. Golden light pours into her, belly rounding with divine pleasure.',
-    warlock: 'You invoke Gorgara\'s Claim — hunger floods her until she moans your name.',
+    warlock: "You invoke Gorgara's Claim — hunger floods her until she moans your name.",
   };
+  const line = bySubclass[player.subclassId] || byClass[player.classId] || byClass.cleric;
   const startStage = getStage(npc.lbs).id;
   const growth = advanceStage(npc, 2);
   addCorruption(npc, 8);
   addRelationship(npc, 5);
   const growthText = renderGrowthScene(npc, { growthMethod: 'blessing', startStage, endStage: growth.endStage, week: game.day });
   return withQuestProgress(game, npc, 'special', null, {
-    text: (lines[player.classId] || lines.cleric) + '\n\n' + growthText, npc, growth,
+    text: line + '\n\n' + growthText, npc, growth,
   });
 }
 

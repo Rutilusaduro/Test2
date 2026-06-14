@@ -11,6 +11,10 @@ import { getStage } from './stages.js';
 import { getEffectiveStatMod, proficiencyBonus } from './stats.js';
 import { SKILLS, SKILL_SIZE_ROLL, DC, isSkillProficient } from './skills.js';
 import {
+  applyRacialRollAdjustments,
+  getRacialSaveRollMode,
+} from './raceFeatures.js';
+import {
   CRIT_SUCCESS_EFFECTS,
   CRIT_FAILURE_EFFECTS,
   applyCheckEffects,
@@ -239,11 +243,25 @@ export function resolveSkillCheck(entity, options = {}) {
     bonuses,
   });
 
-  const rollMode = mergeRollMode({ advantage, disadvantage }, modifiers);
-  const { rolls, chosen: naturalRoll, mode: rollModeLabel } = rollD20WithAdvantage({
+  const racialSave = getRacialSaveRollMode(entity, modifiers.stat);
+  const rollMode = mergeRollMode(
+    {
+      advantage: advantage || racialSave.advantage,
+      disadvantage: disadvantage || racialSave.disadvantage,
+    },
+    modifiers,
+  );
+  const { rolls, chosen, mode: rollModeLabel } = rollD20WithAdvantage({
     ...rollMode,
     rng,
   });
+
+  const racialRoll = applyRacialRollAdjustments(entity, chosen, {
+    skillId,
+    stat: modifiers.stat,
+  }, rng);
+  const naturalRoll = racialRoll.roll;
+  const displayRolls = racialRoll.rerolled ? [...rolls, naturalRoll] : rolls;
 
   const total = naturalRoll + modifiers.numericTotal;
   const critical = detectCritical(naturalRoll);
@@ -283,8 +301,9 @@ export function resolveSkillCheck(entity, options = {}) {
     entity: updatedEntity,
     target: updatedTarget,
 
-    rolls,
+    rolls: displayRolls,
     naturalRoll,
+    racialReroll: racialRoll.rerolled || false,
     rollMode: rollModeLabel,
     modifierTotal: modifiers.numericTotal,
     total,

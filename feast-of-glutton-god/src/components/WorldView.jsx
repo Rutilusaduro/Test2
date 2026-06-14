@@ -72,7 +72,7 @@ export default function WorldView({ game, onUpdate, onEncounter, onSave, onDebug
       </div>
 
       <div className="stats-bar">
-        <span className="stat"><strong>{player.name}</strong> — {player.subclass}</span>
+        <span className="stat"><strong>{player.name}</strong> — {player.raceName || 'Human'} {player.subclass}</span>
         <span className="stat">Lv <strong>{player.level}</strong> ({Math.round(xp.pct)}% to next)</span>
         <span className="stat">Stage: <strong>{stage.label}</strong> ({Math.round(player.lbs)} lbs)</span>
         <span className="stat">AC <strong>{derived.ac}</strong></span>
