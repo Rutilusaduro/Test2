@@ -4,7 +4,7 @@ import '../../modules.js';
 registerPool('npc.quest.offer', [
   { when: { questType: 'main', relationship: [0, 1] }, text: [
     '"There is something you must do," {subject.first} says, voice low with urgency and warmth. "Will you help me spread the feast?"',
-    '{subject.name} leans close. "Gorgara\'s gospel needs a champion. I have a task — sacred, sensual, necessary."',
+    '{subject.name} leans close. "the Fat Goddess\'s gospel needs a champion. I have a task — sacred, sensual, necessary."',
   ]},
   { when: { questType: 'main', relationship: [2, 3, 4, 5] }, text: [
     '"My dear," {subject.first} breathes, "I\'ve been saving this for you." Her eyes shine. "A quest worthy of our bond — and bodies that will grow glorious together."',

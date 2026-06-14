@@ -60,7 +60,7 @@ export default function CharacterCreation({ onBack, onStart }) {
   };
 
   const finish = () => {
-    onStart(name || "Chosen of Gorgara", classId, {
+    onStart(name || "Chosen of the Fat Goddess", classId, {
       raceId,
       subclassId,
       humanStatPicks: raceId === "human" ? humanPicks : undefined,
@@ -155,7 +155,7 @@ export default function CharacterCreation({ onBack, onStart }) {
             <input
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="Chosen of Gorgara"
+              placeholder="Chosen of the Fat Goddess"
               style={{
                 width: "100%", padding: "0.6rem", background: "var(--bg-card)",
                 border: "1px solid var(--border)", color: "var(--text)", borderRadius: 4,
@@ -187,7 +187,7 @@ export default function CharacterCreation({ onBack, onStart }) {
           <div className="panel">
             <h2>Summary</h2>
             <div className="prose" style={{ fontSize: "0.95rem" }}>
-              <p><strong>{name || "Chosen of Gorgara"}</strong></p>
+              <p><strong>{name || "Chosen of the Fat Goddess"}</strong></p>
               <p>{selectedRace?.name} {selectedClass?.name} — {selectedSubclass?.name}</p>
               <p style={{ color: "var(--text-dim)", marginTop: "0.5rem" }}>
                 {spellCount} spells known · Stage {selectedRace?.startStageBonus ? "bonus" : "standard"} start

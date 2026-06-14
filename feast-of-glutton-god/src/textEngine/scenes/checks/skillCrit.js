@@ -336,7 +336,7 @@ registerCheckPool('check.crit.persuade', {
     ],
     intimate: [
       'You preach devotion into flesh — {ref.first} swells accepting your critical blessing.',
-      'Lover and convert merge; {ref.name} grows praising Gorgara through you.',
+      'Lover and convert merge; {ref.name} grows praising the Fat Goddess through you.',
     ],
   },
   vast: {

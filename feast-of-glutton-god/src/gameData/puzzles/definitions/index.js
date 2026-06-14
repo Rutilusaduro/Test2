@@ -156,7 +156,7 @@ export const REGION_PUZZLES = [
     type: PUZZLE_TYPE.TRAVERSAL,
     stateFlag: 'puzzle_choked_ravine_solved',
     examinedFlag: 'puzzle_choked_ravine_examined',
-    desc: 'A gorge choked with overgrown vines and swollen fruit blocks the path toward Gorgara\'s Cradle.',
+    desc: 'A gorge choked with overgrown vines and swollen fruit blocks the path toward Shrine of the Thin Veil.',
     gateId: 'gate_heartlands_cradle',
     solutions: [
       {
@@ -558,7 +558,7 @@ export const REGION_PUZZLES = [
     onSolve: { worldFlags: { dryad_grove_open: true } },
   },
 
-  // ─── Gorgara's Cradle (intimate sacred — 2 mysteries) ───────────────────────
+  // ─── Shrine of the Thin Veil (intimate sacred — 2 mysteries) ───────────────────────
 
   {
     id: 'cradle_hunger_altar',

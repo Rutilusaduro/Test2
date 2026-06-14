@@ -76,7 +76,7 @@ export const STAGE_PERKS = [
     growth: { growthDamageBonus: 6 },
     command: { rivalGoddess: true },
     influence: { growthDecreeBonus: 10, replacementGoddess: true },
-    desc: 'Apotheosis — Gorgara\'s rival. The continent fattens in your shadow.',
+    desc: 'Apotheosis — the Fat Goddess\'s rival. The continent fattens in your shadow.',
   },
 ];
 

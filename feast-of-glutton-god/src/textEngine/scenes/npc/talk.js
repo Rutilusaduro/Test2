@@ -31,7 +31,7 @@ registerPool('npc.talk.greeting', [
 
 registerPool('npc.talk.topic', [
   { when: { relationship: 0, corruption: 0 }, text: [
-    'She speaks cautiously about Gorgara, as if testing the word on her tongue.',
+    'She speaks cautiously about the Fat Goddess, as if testing the word on her tongue.',
     'She admits she\'s noticed changes in the village — people growing, smiling, eating more.',
   ]},
   { when: { relationship: 1 }, text: [
@@ -40,7 +40,7 @@ registerPool('npc.talk.topic', [
   ]},
   { when: { relationship: 2 }, text: [
     '"I dream about food now," she confesses, blushing. "Rich, impossible food."',
-    'She asks what it feels like to carry Gorgara\'s spark inside you.',
+    'She asks what it feels like to carry the Fat Goddess\'s spark inside you.',
   ]},
   { when: { relationship: 3, corruption: 2 }, text: [
     '"I want to be part of the feast," she says simply. "All of it. Forever."',
@@ -51,7 +51,7 @@ registerPool('npc.talk.topic', [
     'Every topic turns to appetite, touch, and the pleasure of swelling together.',
   ]},
   { when: { relationship: 5 }, text: [
-    'She speaks of devotion like scripture — your bond, her body, Gorgara\'s gospel intertwined.',
+    'She speaks of devotion like scripture — your bond, her body, the Fat Goddess\'s gospel intertwined.',
     'Plans for eternity: feasts, growth, lovemaking, and spreading abundance as one.',
   ]},
   { when: { corruption: 2 }, text: [
@@ -75,7 +75,7 @@ registerPool('npc.talk.topic', [
     'She speaks of blocked roads and cracked foundations — abundance has become civic engineering.',
   ]},
   { when: {}, text: [
-    'You talk of abundance, of Gorgara\'s awakening, of the pleasure in growing.',
+    'You talk of abundance, of the Fat Goddess\'s awakening, of the pleasure in growing.',
   ]},
 ]);
 

@@ -52,7 +52,7 @@ registerCheckPoolAliases(['check.crit.strength', 'check.crit.str'], {
   vast: {
     distant: [
       'Mountains shift when you exert yourself; {ref.first} is reshaped by your presence alone — softer, grander, unable to resist.',
-      'Your impossible strength rewrites the moment: {ref.name} swells as though Gorgara herself applauded your roll.',
+      'Your impossible strength rewrites the moment: {ref.name} swells as though the Fat Goddess herself applauded your roll.',
     ],
     warm: [
       'You are a continent of power; {ref.first} is a tide pool caught in your shadow, growing vast and grateful.',
@@ -66,7 +66,7 @@ registerCheckPoolAliases(['check.crit.strength', 'check.crit.str'], {
   world: {
     distant: [
       'Mountains shift when you exert yourself; {ref.first} is reshaped by your presence alone — softer, grander, unable to resist',
-      'Your impossible strength rewrites the moment: {ref.name} swells as though Gorgara herself applauded your roll',
+      'Your impossible strength rewrites the moment: {ref.name} swells as though the Fat Goddess herself applauded your roll',
     ],
     warm: [
       'You are a the realm of power; {ref.first} is a tide pool caught in your shadow, growing vast and grateful.',
@@ -309,7 +309,7 @@ registerCheckPoolAliases(['check.crit.intelligence', 'check.crit.int'], {
 registerCheckPoolAliases(['check.crit.wisdom', 'check.crit.wis'], {
   lean: {
     distant: [
-      'You sense the right moment before it arrives — Gorgara\'s warmth threads through you, softening your lean frame with divine approval.',
+      'You sense the right moment before it arrives — the Fat Goddess\'s warmth threads through you, softening your lean frame with divine approval.',
       'Instinct blooms into certainty; {ref.first} stills as if feeling the goddess too, curves rounding in quiet answer.',
     ],
     warm: [
@@ -331,7 +331,7 @@ registerCheckPoolAliases(['check.crit.wisdom', 'check.crit.wis'], {
       '{ref.name} trusts your roll completely; faith becomes flesh along {their} waist.',
     ],
     intimate: [
-      'You channel Gorgara\'s abundance into {ref.first} with perfect poise — lover and priestess, both larger for the rite.',
+      'You channel the Fat Goddess\'s abundance into {ref.first} with perfect poise — lover and priestess, both larger for the rite.',
       'Your wisdom is worship: {ref.name} swells in your arms, blessed and breathless.',
     ],
   },
@@ -345,14 +345,14 @@ registerCheckPoolAliases(['check.crit.wisdom', 'check.crit.wis'], {
       'Your wisdom steadies a swelling world; {ref.name} emerges from your shadow rounder and grateful.',
     ],
     intimate: [
-      'Devotion and divinity peak together — you and {ref.first} swell through a critical blessing, moaning praise to Gorgara.',
+      'Devotion and divinity peak together — you and {ref.first} swell through a critical blessing, moaning praise to the Fat Goddess.',
       'You read every sacred sign on {ref.name}\'s body and answer with growth, perfect and loving.',
     ],
   },
   vast: {
     distant: [
       'Oracle and immensity — you see the feast entire, and reality softens to match your vision, including {ref.first}.',
-      'Gorgara laughs through you; {ref.name} balloons, anointed by your flawless sense.',
+      'the Fat Goddess laughs through you; {ref.name} balloons, anointed by your flawless sense.',
     ],
     warm: [
       'Your wisdom moves continents of flesh; {ref.first} is carried along, larger and laughing in the current.',
@@ -366,7 +366,7 @@ registerCheckPoolAliases(['check.crit.wisdom', 'check.crit.wis'], {
   world: {
     distant: [
       'Oracle and immensity — you see the feast entire, and reality softens to match your vision, including {ref.first}',
-      'Gorgara laughs through you; {ref.name} balloons, anointed by your flawless sense',
+      'the Fat Goddess laughs through you; {ref.name} balloons, anointed by your flawless sense',
     ],
     warm: [
       'Your wisdom moves the realms of flesh; {ref.first} is carried along, larger and laughing in the current.',
@@ -436,7 +436,7 @@ registerCheckPoolAliases(['check.crit.charisma', 'check.crit.cha'], {
     ],
     intimate: [
       'Devotion and divinity pour from you — {ref.first} swells to match your love, a critical apotheosis of charm and flesh.',
-      'You speak your lover larger; Gorgara herself seems to applaud through {ref.name}\'s moans.',
+      'You speak your lover larger; the Fat Goddess herself seems to applaud through {ref.name}\'s moans.',
     ],
   },
   world: {
@@ -450,7 +450,7 @@ registerCheckPoolAliases(['check.crit.charisma', 'check.crit.cha'], {
     ],
     intimate: [
       'Devotion and divinity pour from you — {ref.first} swells to match your love, a critical apotheosis of charm and flesh',
-      'You speak your lover larger; Gorgara herself seems to applaud through {ref.name}\'s moans.',
+      'You speak your lover larger; the Fat Goddess herself seems to applaud through {ref.name}\'s moans.',
     ],
   },
 });

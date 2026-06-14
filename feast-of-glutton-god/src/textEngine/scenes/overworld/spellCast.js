@@ -5,7 +5,7 @@ import '../../lexicon.js';
 registerPool('overworld.spell.opening', [
   { when: { spellSchool: 'abundance' }, text: [
     'Golden caloric light pours from your palms onto {subject.name} — warm, thick, obscene with promise.',
-    'You channel Gorgara\'s overflow; the air grows heavy with the scent of cream, sugar, and inevitable swelling.',
+    'You channel the Fat Goddess\'s overflow; the air grows heavy with the scent of cream, sugar, and inevitable swelling.',
     'Sacred calories spiral around {subject.first}, seeking every curve to lavish and enlarge.',
   ]},
   { when: { spellSchool: 'enchantment' }, text: [

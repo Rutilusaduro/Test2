@@ -85,7 +85,7 @@ export const WEIGHT_STAGES = [
   {
     id: 14, tier: 'tarrasque_matriarch', band: STAGE_BAND.WORLD, label: 'Tarrasque Matriarch',
     min: 3500, color: '#100000',
-    desc: 'Tarrasque Matriarch — apotheosis of gluttony. Gorgara\'s rival, the world\'s new hunger.',
+    desc: 'Tarrasque Matriarch — apotheosis of gluttony. the Fat Goddess\'s rival, the world\'s new hunger.',
   },
 ];
 

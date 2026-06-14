@@ -72,7 +72,7 @@ registerPool('grow.crossing', [
   { when: { endStage: 14 }, text: [
     'There is no larger thing left to become — only more of her, spreading like a feast that never ends.',
     'Apotheosis feels less like lightning and more like settling: vast, warm, and final.',
-    'Gorgara\'s rival does not arrive with trumpets. She arrives with groaning stone and grateful screaming.',
+    'the Fat Goddess\'s rival does not arrive with trumpets. She arrives with groaning stone and grateful screaming.',
     'The scale has no ceiling left. She is the ceiling — soft, sacred, and still growing in legend.',
   ] },
 ]);

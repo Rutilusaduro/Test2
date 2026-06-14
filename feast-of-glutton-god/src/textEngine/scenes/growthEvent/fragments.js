@@ -4,7 +4,7 @@
 // per-stage crossing lexicon in stageCrossings.js, companion dialogue
 // in personas.js. Every pool carries a tone-neutral wildcard.
 //
-// Tone: sensual abundance, Gorgara's blessing, high fantasy — no
+// Tone: sensual abundance, the Fat Goddess's blessing, high fantasy — no
 // modern/college register. Ritual overflow uses malfunctionTier when
 // a spell or relic exceeds its intended strength.
 // ═══════════════════════════════════════════════════════════════
@@ -23,7 +23,7 @@ registerPool('ge.causeAction', [
   ] },
   { when: { growthMethod: 'blessing' }, text: [
     'Golden light pours into {subject.first}, and abundance answers like a prayer finally heard.',
-    'Gorgara\'s warmth settles over her skin; the blessing does not ask permission before it swells.',
+    'the Fat Goddess\'s warmth settles over her skin; the blessing does not ask permission before it swells.',
   ] },
   { when: { growthMethod: 'spell' }, text: [
     'Arcane sweetness coils through {subject.first} — a spell cast in hunger, not malice.',
@@ -117,7 +117,7 @@ registerPool('ge.firstSensation', [
 registerPool('ge.surgeDetail', [
   { when: {}, text: ['', '', ''] },
   { when: { growthMethod: 'blessing' }, text: [
-    'Golden warmth pools wherever Gorgara\'s favor touches — belly, hips, chest in generous order.',
+    'Golden warmth pools wherever the Fat Goddess\'s favor touches — belly, hips, chest in generous order.',
   ] },
   { when: { growthMethod: 'spell' }, text: [
     'Arcane light stipples her skin; each pulse leaves her softer, fuller, more luminous.',
@@ -210,7 +210,7 @@ registerPool('ge.clothingFail', [
     'The festival gown gives out before the musicians finish their second song, and the hall erupts in delighted gasps.',
   ] },
   { when: { outfitHint: 'contest', endStageMin: 3 }, weight: 2, text: [
-    'The feast-day sash finally snaps, and the crowd roars like Gorgara herself applauded.',
+    'The feast-day sash finally snaps, and the crowd roars like the Fat Goddess herself applauded.',
   ] },
 ]);
 
@@ -251,7 +251,7 @@ registerPool('ge.reactionDialogue', [
     '"I keep saying I\'ll stop," she says. "I keep not meaning it."',
   ] },
   { when: { corruption: 2 }, priority: 1, text: [
-    '"More," she breathes, like it\'s the only word left. "Gorgara, more."',
+    '"More," she breathes, like it\'s the only word left. "the Fat Goddess, more."',
     '"Look at me," she says, proud and unhurried. "Just look."',
   ] },
   { when: { corruption: 2, obsessionTierMin: 2 }, priority: 1, weight: 2, text: [
@@ -304,7 +304,7 @@ registerPool('ge.scholarAside', [
     'Sylvie watches the elixir\'s work with naked delight. "Hypothesis confirmed," she breathes.',
   ] },
   { when: { malfunctionTier: 'critical', growthMethod: 'spell' }, weight: 3, text: [
-    'Sylvie\'s hand hovers over the counterspell, then drops. "Let\'s see where Gorgara takes this," she decides.',
+    'Sylvie\'s hand hovers over the counterspell, then drops. "Let\'s see where the Fat Goddess takes this," she decides.',
   ] },
 ]);
 

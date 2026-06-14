@@ -14,7 +14,7 @@ export const CLASS_FEATURES = {
     5: [{ id: 'growth_formula', name: 'Growth Formula', desc: 'Copy growth spells from scrolls and feast-rituals at reduced cost.' }],
   },
   cleric: {
-    2: [{ id: 'channel_divinity', name: 'Channel Divinity', desc: 'Invoke Gorgara to create a feast that triggers growth in the faithful.' }],
+    2: [{ id: 'channel_divinity', name: 'Channel Divinity', desc: 'Invoke the Fat Goddess to create a feast that triggers growth in the faithful.' }],
     5: [{ id: 'destroy_repression', name: 'Destroy Repression', desc: 'Turn undead or puritanical foes with waves of divine indulgence.' }],
     6: [{ id: 'domain_feature', name: 'Domain Feature', desc: 'Your domain\'s abundance intensifies — communal growth rituals strengthen.' }],
   },

@@ -50,18 +50,18 @@ export const SIZE_CAP_BY_LEVEL = {
 
 const LEVEL_UP_FLAVOR = [
   null,
-  "Gorgara's spark kindles within you — the feast has only begun.",
+  "the Fat Goddess's spark kindles within you — the feast has only begun.",
   "Your body carries abundance more easily now; every curve feels intentional.",
   "Power settles into your softness like warm honey.",
   "You have become a vessel worthy of greater indulgence.",
-  "The Everfull smiles — your growth is her gospel.",
+  "The Fat Goddess smiles — your growth is her gospel.",
   "Milestones of flesh and faith align in glorious harmony.",
   "You radiate plenty; the world leans closer to be fed.",
   "A divine heaviness blesses every step.",
   "Legends will speak of the softness you wield.",
   "You are abundance incarnate — beautiful, vast, unstoppable.",
   "Near apotheosis of the eternal feast.",
-  "A living avatar of Gorgara's endless, pleasurable fullness.",
+  "A living avatar of the Fat Goddess's endless, pleasurable fullness.",
 ];
 
 export function getXpForNextLevel(character) {

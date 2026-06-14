@@ -11,7 +11,7 @@ export const SKILLS = {
   endure_growth:   { id: "endure_growth",   stat: "con", label: "Endure Growth",   desc: "Withstand intense swelling pleasurably" },
   indulge:         { id: "indulge",         stat: "con", label: "Indulge",         desc: "Eat, feast, embrace fullness" },
   arcana:          { id: "arcana",          stat: "int", label: "Arcana",          desc: "Magical growth theory, overflow rituals" },
-  insight:         { id: "insight",         stat: "wis", label: "Insight",         desc: "Read desires, sense Gorgara's influence" },
+  insight:         { id: "insight",         stat: "wis", label: "Insight",         desc: "Read desires, sense the Fat Goddess's influence" },
   devotion:        { id: "devotion",        stat: "wis", label: "Devotion",        desc: "Channel divine abundance" },
   sneak:           { id: "sneak",           stat: "dex", label: "Sneak",           desc: "Move quietly despite one's size" },
   grace:           { id: "grace",           stat: "dex", label: "Grace",           desc: "Delicate movement, precise feeding" },

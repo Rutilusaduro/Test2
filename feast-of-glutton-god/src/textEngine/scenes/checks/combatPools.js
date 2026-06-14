@@ -758,7 +758,7 @@ registerCheckPool('combat.fumble.save.wis', {
   lean: {
     distant: [
       'Divine or arcane indulgence floods your senses — you swell, sensitive and smiling, WIS save lost to pleasure.',
-      'You fail open to Gorgara\'s whisper; lean curves deepen thankfully.',
+      'You fail open to the Fat Goddess\'s whisper; lean curves deepen thankfully.',
     ],
     warm: [
       '{ref.first} holds your hand through holy distraction — friendly softness follows.',
@@ -808,7 +808,7 @@ registerCheckPool('combat.fumble.save.wis', {
     ],
     intimate: [
       'You fail into apotheosis with lover — WIS lost, love won.',
-      '{ref.name} fattens praising Gorgara through you.',
+      '{ref.name} fattens praising the Fat Goddess through you.',
     ],
   },
   world: {
@@ -822,7 +822,7 @@ registerCheckPool('combat.fumble.save.wis', {
     ],
     intimate: [
       'You fail into apotheosis with lover — WIS lost, love won',
-      '{ref.name} fattens praising Gorgara through you',
+      '{ref.name} fattens praising the Fat Goddess through you',
     ],
   },
 });

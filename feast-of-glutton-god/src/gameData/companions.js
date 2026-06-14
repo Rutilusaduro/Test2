@@ -48,7 +48,7 @@ export const COMPANIONS = [
     numericId: 3,
     name: "Thalia Blackfeast",
     class: "Warlock",
-    subclass: "Pact of the Everfull",
+    subclass: "Pact of the Fat Goddess",
     bodyType: "voluptuous",
     archetype: "dominant",
     personality: "Mysterious, dominant, hedonistic witch",

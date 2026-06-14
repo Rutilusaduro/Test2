@@ -6,7 +6,7 @@ export const RACES = [
     id: 'human',
     name: 'Human',
     epithet: 'The Adaptable',
-    desc: 'Versatile and quick to embrace new pleasures. Humans adapt faster than any folk to Gorgara\'s glorious gospel.',
+    desc: 'Versatile and quick to embrace new pleasures. Humans adapt faster than any folk to the Fat Goddess\'s glorious gospel.',
     bodyType: 'hourglass',
     statBonuses: { flexible: 2 },
     features: [
@@ -130,8 +130,8 @@ export const RACES = [
   {
     id: 'bloomkin',
     name: 'Bloomkin',
-    epithet: 'Touched by Gorgara',
-    desc: 'Curvy humanoids with floral motifs, born where the Everfull stirs. Living abundance made flesh.',
+    epithet: 'Touched by the Fat Goddess',
+    desc: 'Curvy humanoids with floral motifs, born where the Fat Goddess stirs. Living abundance made flesh.',
     bodyType: 'pear',
     statBonuses: { con: 2, cha: 1 },
     features: [

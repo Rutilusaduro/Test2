@@ -10,11 +10,11 @@ function registerQuestCopy(key, lines) {
   ]);
 }
 
-// ─── Main: The First Feast of Gorgara ─────────────────────────────────────────
+// ─── Main: The First Feast of the Fat Goddess ─────────────────────────────────────────
 
-registerQuestCopy('quest.main.first_feast.title', ['The First Feast of Gorgara']);
+registerQuestCopy('quest.main.first_feast.title', ['The First Feast of the Fat Goddess']);
 registerQuestCopy('quest.main.first_feast.desc', [
-  'Harvest\'s Hearth has grown stagnant and repressed — bellies pinched, laughter muted. Awaken Gorgara\'s first major node by befriending the town\'s influential women, hosting a communal feast, and softening its stern noblewoman.',
+  'Harvest\'s Hearth has grown stagnant and repressed — bellies pinched, laughter muted. Awaken the Fat Goddess\'s first major node by befriending the town\'s influential women, hosting a communal feast, and softening its stern noblewoman.',
   'Spread abundance until the entire settlement visibly flourishes. Growth, feeding, blessing, and conversion are all paths to glory.',
 ]);
 
@@ -22,7 +22,7 @@ registerQuestCopy('quest.main.first_feast.stage.stirring.desc', [
   'Speak with Elara Warmbelly at the inn. The town\'s warmth has gone thin — someone must remind it how good fullness feels.',
 ]);
 registerQuestCopy('quest.main.first_feast.stage.stirring.complete', [
-  'Elara\'s eyes glisten with hope and hunger. The hearth stirs — Gorgara\'s influence prickles at the edges of every loaf and every waistline.',
+  'Elara\'s eyes glisten with hope and hunger. The hearth stirs — the Fat Goddess\'s influence prickles at the edges of every loaf and every waistline.',
 ]);
 
 registerQuestCopy('quest.main.first_feast.stage.circle.desc', [
@@ -36,7 +36,7 @@ registerQuestCopy('quest.main.first_feast.stage.feast.desc', [
   'Host a grand communal feast and help at least four townsfolk advance two size stages through feeding, blessing, intimacy, or combat conversion.',
 ]);
 registerQuestCopy('quest.main.first_feast.stage.feast.complete', [
-  'Tables groan. Bellies bloom. The settlement sighs in collective satisfaction — a living testament to Gorgara\'s gospel.',
+  'Tables groan. Bellies bloom. The settlement sighs in collective satisfaction — a living testament to the Fat Goddess\'s gospel.',
 ]);
 
 registerQuestCopy('quest.main.first_feast.stage.crown.desc', [
@@ -47,20 +47,20 @@ registerQuestCopy('quest.main.first_feast.stage.crown.complete', [
 ]);
 
 registerQuestCopy('quest.main.first_feast.ending.abundant', [
-  'An Aura of Plenty settles over Harvest\'s Hearth. Wheat fattens, folk glow, and Gorgara\'s first feast echoes through the land. Your own limits swell in answer.',
+  'An Aura of Plenty settles over Harvest\'s Hearth. Wheat fattens, folk glow, and the Fat Goddess\'s first feast echoes through the land. Your own limits swell in answer.',
 ]);
 registerQuestCopy('quest.main.first_feast.ending.converted', [
   'Hearts convert faster than waistlines — yet both swell together. The town\'s authority bends, and a new region opens to your pilgrimage.',
 ]);
 registerQuestCopy('quest.main.first_feast.complete.default', [
-  'The First Feast of Gorgara is complete. The town will never be repressed again — and neither will you.',
+  'The First Feast of the Fat Goddess is complete. The town will never be repressed again — and neither will you.',
 ]);
 
 // ─── Main: The Overflowing Temple ────────────────────────────────────────────
 
 registerQuestCopy('quest.main.overflowing_temple.title', ['The Overflowing Temple']);
 registerQuestCopy('quest.main.overflowing_temple.desc', [
-  'An ancient temple of restraint and denial resists Gorgara\'s awakening. Transform it into a sanctuary of indulgence — convert the priestess circle, bloom the halls with ritual abundance, and face ascetic warriors who would stop you.',
+  'An ancient temple of restraint and denial resists the Fat Goddess\'s awakening. Transform it into a sanctuary of indulgence — convert the priestess circle, bloom the halls with ritual abundance, and face ascetic warriors who would stop you.',
 ]);
 
 registerQuestCopy('quest.main.overflowing_temple.stage.approach.desc', [
@@ -85,7 +85,7 @@ registerQuestCopy('quest.main.overflowing_temple.stage.ritual.complete', [
 ]);
 
 registerQuestCopy('quest.main.overflowing_temple.stage.warriors.desc', [
-  'Ascetic guardians rush to stop the ritual. Defeat or convert them — Growth Damage and conventional valor both serve Gorgara.',
+  'Ascetic guardians rush to stop the ritual. Defeat or convert them — Growth Damage and conventional valor both serve the Fat Goddess.',
 ]);
 registerQuestCopy('quest.main.overflowing_temple.stage.warriors.complete', [
   'Armor clatters. The last ascetic kneels — converted or conquered — and the sanctuary is yours to fill.',
@@ -105,7 +105,7 @@ registerQuestCopy('quest.main.overflowing_temple.complete.default', [
 
 registerQuestCopy('quest.main.coronation.title', ["Coronation of Abundance"]);
 registerQuestCopy('quest.main.coronation.desc', [
-  'At Gorgara\'s Cradle, Thalia whispers of a final rite — crown your abundance and awaken the goddess fully.',
+  'At Shrine of the Thin Veil, Thalia whispers of a final rite — crown your abundance and awaken the goddess fully.',
   'The world has been softened. Now it must be transformed. Your body, your gospel, your feast become legend.',
 ]);
 registerQuestCopy('quest.main.coronation.stage.cradle.desc', [
@@ -124,10 +124,10 @@ registerQuestCopy('quest.main.coronation.stage.coronation.desc', [
   'Ascend to enormous size and break the famine spirits that cling to old hunger. Crown yourself in flesh and faith.',
 ]);
 registerQuestCopy('quest.main.coronation.stage.coronation.complete', [
-  'You stand vast and radiant — a living throne of abundance. Gorgara\'s voice thunders: "More."',
+  'You stand vast and radiant — a living throne of abundance. the Fat Goddess\'s voice thunders: "More."',
 ]);
 registerQuestCopy('quest.main.coronation.ending.avatar', [
-  '★ Avatar of Gorgara — you are the goddess made walkable, kissable, infinitely feastable.',
+  '★ Avatar of the Fat Goddess — you are the goddess made walkable, kissable, infinitely feastable.',
 ]);
 registerQuestCopy('quest.main.coronation.ending.herald', [
   '★ Herald of the Eternal Feast — your gospel converts nations; your body is the scripture.',
@@ -278,7 +278,7 @@ registerQuestCopy('quest.side.noblewoman.complete.default', [
 registerPool('quest.start', [
   { when: { questType: 'main' }, text: [
     '★ Main Quest begun — the world will remember this abundance.',
-    'A sacred thread of story unfurls. Gorgara watches, pleased.',
+    'A sacred thread of story unfurls. the Fat Goddess watches, pleased.',
   ]},
   { when: { questType: 'side' }, text: [
     'Side quest accepted — a personal feast of connection awaits.',
@@ -290,7 +290,7 @@ registerPool('quest.start', [
 registerPool('quest.stage_complete', [
   { when: {}, text: [
     'Quest stage complete — abundance accumulates like honey.',
-    'Another step toward glorious fullness. Gorgara approves.',
+    'Another step toward glorious fullness. the Fat Goddess approves.',
   ]},
 ]);
 
@@ -315,7 +315,7 @@ registerQuestCopy('quest.side.paths.stage.master.desc', [
   'Solve three mysteries across the regions. Each one teaches the land that abundance is clever, sensual, and unstoppable.',
 ]);
 registerQuestCopy('quest.side.paths.stage.master.complete', [
-  'Word spreads: the Chosen solves problems the way Gorgara intended — with pleasure, growth, and glorious ingenuity.',
+  'Word spreads: the Chosen solves problems the way the Fat Goddess intended — with pleasure, growth, and glorious ingenuity.',
 ]);
 registerQuestCopy('quest.side.paths.complete', [
   'Paths of Abundance complete. You are a problem-solver of divine appetite — and the world is softer for it.',

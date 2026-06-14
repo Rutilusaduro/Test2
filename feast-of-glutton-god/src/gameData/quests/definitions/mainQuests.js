@@ -9,7 +9,7 @@ export const MAIN_QUESTS = [
     type: QUEST_TYPE.MAIN,
     act: 1,
     actLabel: 'Act I',
-    title: 'The First Feast of Gorgara',
+    title: 'The First Feast of the Fat Goddess',
     titleKey: 'quest.main.first_feast.title',
     descriptionKey: 'quest.main.first_feast.desc',
     tags: [QUEST_TAG.ABUNDANCE, QUEST_TAG.GROWTH, QUEST_TAG.CONVERSION],
@@ -423,7 +423,7 @@ export const MAIN_QUESTS = [
         objectives: [
           {
             id: 'meet_thalia',
-            label: 'Seek Thalia at Gorgara\'s Cradle',
+            label: 'Seek Thalia at Shrine of the Thin Veil',
             type: OBJECTIVE_TYPE.VISIT_REGION,
             regionId: 'gorgara_cradle',
             count: 1,
@@ -503,7 +503,7 @@ export const MAIN_QUESTS = [
     endings: [
       {
         id: 'avatar_of_gorgara',
-        label: 'Avatar of Gorgara',
+        label: 'Avatar of the Fat Goddess',
         condition: { minScores: { [QUEST_SCORE.ABUNDANCE]: 5 } },
         rewards: {
           ap: 80,

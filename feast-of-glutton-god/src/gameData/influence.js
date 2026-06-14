@@ -40,7 +40,7 @@ export const INSTITUTION_TYPES = {
     desc: 'A hidden shrine where your patron\'s rites bend the faithful toward fullness.',
   },
   order: {
-    label: 'Order of the Everfull',
+    label: 'Order of the Fat Goddess',
     track: 'religious',
     minInfluence: 120,
     desc: 'A sworn order devoted to feeding the Hunger Beyond the Wheel into the world.',

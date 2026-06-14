@@ -449,7 +449,7 @@ export const SIDE_QUESTS = [
           },
           {
             id: 'corrupt_vesperia',
-            label: 'Whisper Gorgara\'s gospel past her pride',
+            label: 'Whisper the Fat Goddess\'s gospel past her pride',
             type: OBJECTIVE_TYPE.NPC_INTERACTION,
             interaction: 'corrupt',
             npcId: 'vesperia',

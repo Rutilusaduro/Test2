@@ -243,7 +243,7 @@ const APPEARANCE_BY_TYPE = {
     'incense and judgment rolling off lean armored lines in perfect unison',
     'purity made militant — slim, armored, convinced your softness is sin',
     'cold eyes above corseted discipline, every inch denying appetite',
-    'inquisitor steel catching harsh light, bodies untouched by Gorgara\'s gift',
+    'inquisitor steel catching harsh light, bodies untouched by the Fat Goddess\'s gift',
     'righteous fury in formation, waists cinched, mercy nowhere on offer',
   ],
   famine_hag: [
@@ -318,7 +318,7 @@ registerPool('dm.combat.intro.threat', [
   { when: { role: 'tank' }, text: [
     '"The temple stands," the guardian intones. "You will not pass."',
     '"Sacred ground," she warns, shield raised. "Defile it and be crushed."',
-    '"Gorgara\'s hunger ends here," the knight says, voice steady as stone.',
+    '"the Fat Goddess\'s hunger ends here," the knight says, voice steady as stone.',
     '"One more step," she murmurs, "and I make you kneel."',
   ]},
   { when: { role: 'skirmisher' }, text: [
@@ -390,7 +390,7 @@ registerPool('dm.combat.outro.converted', [
   { when: { endStageMin: 5 }, text: [
     '{subject.name} came to break you and left a plush convert — heavy, adoring, belly spilling in warm folds.',
     '{subject.first} kneels enormous now, corruption sweet as honey on {their} tongue, hunger finally aimed in your direction.',
-    'The fight ends with {subject.first} vast and trembling, every inch a testament to Gorgara\'s generosity.',
+    'The fight ends with {subject.first} vast and trembling, every inch a testament to the Fat Goddess\'s generosity.',
     'What was violence becomes worship — {subject.first} cradles {their} new mass like a gift.',
   ]},
   { when: { startStageMax: 2 }, text: [

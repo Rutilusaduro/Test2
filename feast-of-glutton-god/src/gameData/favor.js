@@ -1,5 +1,5 @@
 /**
- * Gorgara's Favor — daily ceiling for overworld growth magic.
+ * the Fat Goddess's Favor — daily ceiling for overworld growth magic.
  * favorMax grows as you fatten others; refilled by eating and long rest.
  */
 import { renderFavorWarning, renderSpecialCooldown } from '../textEngine/scenes/dm/favor.js';

@@ -2,7 +2,7 @@
 
 ## Premise
 
-The world is an **earnest, traditional high-fantasy setting** — kingdoms, dungeons, a real pantheon, classic plots played completely straight. **You are the anomaly:** a native of the Aurelan Reach who **knowingly serves and feeds an obscure patron, Gorgara the Everfull** — the Hunger Beyond the Measured Wheel — without realizing this makes you a being from the *wrong genre*.
+The world is an **earnest, traditional high-fantasy setting** — kingdoms, dungeons, a real pantheon, classic plots played completely straight. **You are the anomaly:** a native of the Aurelan Reach who **knowingly serves and feeds an obscure patron, the Fat Goddess** — the Hunger Beyond the Measured Wheel — without realizing this makes you a being from the *wrong genre*.
 
 You spread abundance because it is simply who you are. The world reacts with mounting alarm. You are trivially overpowered against everything mundane (a dragon just gets *fed*); only the cosmic and divine tier pushes back. Through your actions your patron **materializes into godhood and consumes the gods' own plane**, and the pantheon turns against you. The campaign ends in **triumphant apotheosis**.
 
@@ -33,7 +33,7 @@ The orthodox pantheon of the Aurelan Reach — gods of **balance and moderation*
 | **Lumen** | Knowledge, magic | Diviners who first detect the anomaly |
 | **Tarn** | Trade, roads | Neutral merchant law; courtable |
 
-**Gorgara** — reframed as **the Hunger Beyond the Wheel**, a patron from outside this cosmology whom the player knowingly feeds into existence. Not one of the Wheel; a heresy the player carries.
+**the Fat Goddess** — reframed as **the Hunger Beyond the Wheel**, a patron from outside this cosmology whom the player knowingly feeds into existence. Not one of the Wheel; a heresy the player carries.
 
 ## Opposition (player-facing names)
 
@@ -48,7 +48,7 @@ The orthodox pantheon of the Aurelan Reach — gods of **balance and moderation*
 | Bard | Feast-Singer | Songs that swell allies and charm enemies |
 | Wizard | School of Overflow | Arcane caloric transmutation |
 | Cleric | Domain of Plenty | Divine blessings and living altars |
-| Warlock | Pact of the Everfull | Hunger pacts and essence drain |
+| Warlock | Pact of the Fat Goddess | Hunger pacts and essence drain |
 
 ### Size Stages (12)
 Slight → Slim → Soft → Chubby → Plump → Heavy → Fat → Very Fat → Enormous → Colossal → Blob → Leviathan
@@ -100,7 +100,7 @@ Every description adapts via `createContext({ subject, ref, globals })` → `ctx
 
 ## Endings (Roadmap)
 
-- **Triumphant Apotheosis** — Gorgara fully manifests; you become her living avatar; the Wheel breaks
+- **Triumphant Apotheosis** — the Fat Goddess fully manifests; you become her living avatar; the Wheel breaks
 - **Conversion Ending** — The realm converted through feasts; orthodoxy routed
 - **Rival Ending** — Defeat the Bloom Sovereign / divine antithesis
 - **New Game+** — Retain AP bonuses and persona unlocks

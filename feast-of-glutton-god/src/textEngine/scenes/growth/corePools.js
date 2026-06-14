@@ -479,7 +479,7 @@ const MINOR_TARGET = {
     ],
     intimate: [
       'You find new softness on {subject.first} and kiss it — lover infinite.',
-      'Even infinity fattens; you praise Gorgara.',
+      'Even infinity fattens; you praise the Fat Goddess.',
     ],
   },
 };

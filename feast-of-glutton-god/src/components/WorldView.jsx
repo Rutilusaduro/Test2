@@ -210,7 +210,7 @@ export default function WorldView({ game, onUpdate, onEncounter, onHostilityEnco
         </span>
         <span className="stat">AC <strong>{derived.ac}</strong></span>
         <span className="stat">AP: <strong>{player.ap}</strong>/{derived.maxAp}</span>
-        <span className="stat" title="Gorgara's daily favor for overworld growth magic">
+        <span className="stat" title="the Fat Goddess's daily favor for overworld growth magic">
           Favor: <strong>{player.favor}/{player.favorMax}</strong>
         </span>
         {tensionLabel && (

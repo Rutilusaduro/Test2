@@ -12,10 +12,10 @@ registerPool('world.event', [
   ]},
   { when: { eventId: 'golden_overflow' }, text: [
     '★ Golden Overflow — streets gleam with caloric light, temples steam with eternal banquets, flesh becomes scripture.',
-    'Gorgara\'s influence is undeniable now: beautiful, vast, hungry.',
+    'The Fat Goddess\'s influence is undeniable now: beautiful, vast, hungry.',
   ]},
   { when: { eventId: 'gorgaras_dawn' }, text: [
-    '★ Gorgara\'s Dawn breaks — the goddess stirs, and the world answers with a collective, euphoric swell.',
+    '★ Patron\'s Stirring breaks — the Fat Goddess stirs, and the world answers with a collective, euphoric swell.',
     'You feel her smile on your skin. There will be no more thin days.',
   ]},
   { when: {}, text: [

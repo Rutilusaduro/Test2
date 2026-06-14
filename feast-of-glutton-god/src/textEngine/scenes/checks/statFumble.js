@@ -310,7 +310,7 @@ registerCheckPoolAliases(['check.fumble.wisdom', 'check.fumble.wis'], {
   lean: {
     distant: [
       'You trust the wrong feeling for a heartbeat — then laugh, soften, and trust the pleasure instead.',
-      'Gorgara winks; you misread the sign and still end rounder, blessed by accident.',
+      'the Fat Goddess winks; you misread the sign and still end rounder, blessed by accident.',
     ],
     warm: [
       '{ref.first} gently corrects your instinct — the lesson tastes sweet, hips widening in understanding.',

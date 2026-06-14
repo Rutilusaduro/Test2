@@ -1,6 +1,6 @@
 # Feast of the Glutton God
 
-An open-world text adventure RPG celebrating abundance, weight gain, and the awakening of **Gorgara the Everfull**.
+An open-world text adventure RPG celebrating abundance, weight gain, and the awakening of **the Fat Goddess**.
 
 ## Quick Start
 
@@ -35,12 +35,12 @@ npm run preview:pages
 ## Features
 
 - **Modular Text Engine** — ported from the Professor Sim reference branch; slots, phrase pools, selectors, and context-driven prose adapt to size stage, relationship, corruption, body type, and location.
-- **Four player classes** — Bard (Feast-Singer), Wizard (School of Overflow), Cleric (Domain of Plenty), Warlock (Pact of the Everfull).
+- **Four player classes** — Bard (Feast-Singer), Wizard (School of Overflow), Cleric (Domain of Plenty), Warlock (Pact of the Fat Goddess).
 - **12 size stages** — affecting stats, movement, combat tile occupancy, and all descriptive text.
 - **Deep NPC interactions** — Talk, Flirt, Observe, Feed, Bless, Feast, class Special actions, Intimate, Corrupt, Recruit.
 - **Six companions** — Mira, Lira, Sylvie, Thalia, Greta, Elara with persona-specific growth dialogue.
-- **Grid tactical combat** — 10×10 turn-based battles with growth mid-fight, feeding, conversion, and Gorgara-flavored spells.
-- **Five world regions** — Harvest's Hearth, Market Square, Fertile Heartlands, Gorgara's Cradle, Ancient Temple Ruins.
+- **Grid tactical combat** — 10×10 turn-based battles with growth mid-fight, feeding, conversion, and Fat Goddess-flavored spells.
+- **Five world regions** — Harvest's Hearth, Market Square, Fertile Heartlands, Shrine of the Thin Veil, Ancient Temple Ruins.
 - **Save system** — localStorage persistence.
 
 ## Debug Tools

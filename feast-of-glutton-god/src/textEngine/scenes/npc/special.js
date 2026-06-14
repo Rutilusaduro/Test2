@@ -17,7 +17,7 @@ registerPool('npc.special.invoke', [
     'Sacred warmth pools where you aim it — worship made flesh.',
   ]},
   { when: { playerClass: 'warlock' }, text: [
-    'You invoke Gorgara\'s Claim — hunger floods {subject.first} until she moans your name.',
+    'You invoke Claim of the Fat Goddess — hunger floods {subject.first} until she moans your name.',
     'Pact-light devours her resistance; curves arrive like tribute.',
   ]},
   { when: { consentState: 'forced' }, text: [

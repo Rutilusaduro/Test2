@@ -34,7 +34,7 @@ registerPool('npc.intimate.acts', [
     'Your mouths never leave each other — food, kisses, and worship until she swells beneath you in ecstasy.',
   ]},
   { when: { relationship: 5 }, text: [
-    'Sacred union: you feed her at the peak of pleasure, and Gorgara\'s light blesses every new pound as holy.',
+    'Sacred union: you feed her at the peak of pleasure, and the Fat Goddess\'s light blesses every new pound as holy.',
     'She cries out your name, devoted and delirious, body blossoming in waves timed to your touch.',
   ]},
   { when: {}, text: [

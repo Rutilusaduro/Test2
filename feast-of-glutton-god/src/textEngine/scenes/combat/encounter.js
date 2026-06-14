@@ -28,7 +28,7 @@ registerPool('combat.encounter', [
   ]},
   { when: { enemyId: 'famine_hag' }, text: [
     'An ancient famine hag unfolds from the shadows — rail-thin, cruel, hungry in the worst way. The air chills; your belly protests anyway.',
-    'She is all angles and malice: the famine hag, a boss of eternal hunger who hates what Gorgara is doing to the world.',
+    'She is all angles and malice: the famine hag, a boss of eternal hunger who hates what the Fat Goddess is doing to the world.',
   ]},
   { when: {}, text: [
     'Combat finds you in {regionName} — foes ahead, abundance in the air, and the DM whispers that this will get messy in the best way.',

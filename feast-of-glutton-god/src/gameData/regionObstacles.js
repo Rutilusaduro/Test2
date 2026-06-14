@@ -21,7 +21,7 @@ export const CONNECTION_GATES = [
     to: 'gorgara_cradle',
     puzzleId: 'choked_ravine',
     solvedFlag: 'puzzle_choked_ravine_solved',
-    blockedText: 'The Swollen Ravine blocks the path to Gorgara\'s Cradle — vines and swollen fruit choke the crossing. Find another way through abundance.',
+    blockedText: 'The Swollen Ravine blocks the path to Shrine of the Thin Veil — vines and swollen fruit choke the crossing. Find another way through abundance.',
     unlocks: [
       { method: 'puzzle_solved', puzzleId: 'choked_ravine' },
       { method: 'player_size_min', stage: 6, label: 'Living bridge' },
@@ -29,7 +29,7 @@ export const CONNECTION_GATES = [
       { method: 'place_giant', minStage: 11, label: 'Landmark blocks the gorge' },
       { method: 'combat', enemyId: 'harvest_harpy', label: 'Clear the harpy nest' },
     ],
-    clearMessage: '✦ The ravine yields — a new path opens toward Gorgara\'s Cradle.',
+    clearMessage: '✦ The ravine yields — a new path opens toward Shrine of the Thin Veil.',
   },
   {
     id: 'gate_marches_peak',
@@ -91,7 +91,7 @@ export const CONNECTION_GATES = [
       { method: 'feed_npc_to_stage', npcId: 'greta_smith', stage: 7, label: 'Greta forges a crossing' },
       { method: 'player_size_min', stage: 8, label: 'Span the chasm yourself' },
     ],
-    clearMessage: '✦ Iron and faith yield — Gorgara\'s Cradle draws near.',
+    clearMessage: '✦ Iron and faith yield — Shrine of the Thin Veil draws near.',
   },
 ];
 

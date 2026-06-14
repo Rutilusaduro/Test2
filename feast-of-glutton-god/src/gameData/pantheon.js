@@ -1,9 +1,14 @@
 /**
  * The Measured Wheel — homebrew pantheon of balance and moderation.
- * Gorgara is reframed as the Hunger Beyond the Wheel (outside this cosmology).
+ * Code id `gorgara` — player-facing name: the Fat Goddess (Hunger Beyond the Wheel).
  */
 
 export const PANTHEON_NAME = 'the Measured Wheel';
+
+/** Canonical player-facing patron name (code id remains `gorgara`). */
+export const FAT_GODDESS_NAME = 'The Fat Goddess';
+export const FAT_GODDESS = 'the Fat Goddess';
+export const FAT_GODDESS_POSS = "the Fat Goddess's";
 
 export const GORGARA_LORE_TITLE = 'the Hunger Beyond the Wheel';
 
@@ -63,7 +68,7 @@ export const PANTHEON_GODS = [
 
 export const GORGARA_PATRON = {
   id: 'gorgara',
-  name: 'Gorgara the Everfull',
+  name: FAT_GODDESS_NAME,
   loreTitle: GORGARA_LORE_TITLE,
   domain: 'Limitless abundance, pleasurable growth',
   role: 'The player\'s knowingly-fed patron — a hunger from beyond the Wheel, not one of its gods.',

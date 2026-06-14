@@ -17,7 +17,7 @@ registerPool('npc.bless.forced', [
 registerPool('npc.bless.minor', [
   { when: {}, text: [
     'Golden light blooms across {subject.name}\'s skin. She gasps as warmth pools in her belly.',
-    'Gorgara\'s power flows through you into {subject.first} — a gentle, pleasurable swell.',
+    'the Fat Goddess\'s power flows through you into {subject.first} — a gentle, pleasurable swell.',
   ]},
 ]);
 

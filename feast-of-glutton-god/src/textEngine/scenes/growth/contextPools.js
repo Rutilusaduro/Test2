@@ -498,7 +498,7 @@ registerSelfTargetPair('intimate', INTIMATE_SELF, INTIMATE_TARGET, { aliasCore: 
 const BLESSING_SELF = {
   lean: {
     distant: [
-      'Gorgara\'s warmth touches {subject.first} — divine softness spreading, holy and good.',
+      'the Fat Goddess\'s warmth touches {subject.first} — divine softness spreading, holy and good.',
       '{subject.name} swells from blessing, light pooling in new curves.',
     ],
     warm: [
@@ -527,7 +527,7 @@ const BLESSING_SELF = {
   heavy: {
     distant: [
       'Titan blessed — {subject.first} ripples grander, temple flesh.',
-      '{subject.name} swells from Gorgara like offering accepted.',
+      '{subject.name} swells from the Fat Goddess like offering accepted.',
     ],
     warm: [
       'Festival blessing fattens {subject.first}; crowd converts.',
@@ -544,7 +544,7 @@ const BLESSING_SELF = {
       '{subject.name} ascends in golden fat; world kneels.',
     ],
     warm: [
-      'Gorgara pours through {subject.first}; everyone swells cheering.',
+      'the Fat Goddess pours through {subject.first}; everyone swells cheering.',
       'Myth blessed; {subject.name} eternal feast.',
     ],
     intimate: [

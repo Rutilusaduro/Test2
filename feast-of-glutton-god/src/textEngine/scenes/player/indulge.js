@@ -20,7 +20,7 @@ registerPool('player.indulge.frame', [
     'You settle into indulgence vast enough to match your size; every bite restores divine favor.',
   ]},
   { when: {}, text: [
-    'You find food, privacy, and permission — then eat until Gorgara\'s attention returns.',
+    'You find food, privacy, and permission — then eat until the Fat Goddess\'s attention returns.',
     'The meal is unhurried, sensual, deserved; favor seeps back with every swallowed sweetness.',
     'You feast on your own behalf for once — warm, full, and briefly, purely yours.',
   ]},
@@ -48,12 +48,12 @@ registerPool('player.indulge.sensation', [
 // ── indulge coda (FULL SENTENCE) ───────────────────────────────
 registerPool('player.indulge.coda', [
   { when: { stageMin: 8 }, text: [
-    'You lean back vast and sated — Gorgara\'s favor floods back like afterglow.',
+    'You lean back vast and sated — the Fat Goddess\'s favor floods back like afterglow.',
     'The goddess purrs approval; your body and your magic both feel fed.',
   ]},
   { when: {}, text: [
     'Sated, you feel her attention return — favor restored, appetite balanced.',
-    'You wipe your lips smiling; the Everfull shares her power with those who eat.',
+    'You wipe your lips smiling; the Fat Goddess shares her power with those who eat.',
     'Fullness becomes fuel again — you may lavish growth once more.',
   ]},
 ]);

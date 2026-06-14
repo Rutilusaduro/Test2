@@ -46,7 +46,7 @@ const ARTIFACTS = [
 ];
 
 const MOCK_PLAYER = {
-  name: 'Chosen of Gorgara',
+  name: 'Chosen of the Fat Goddess',
   lbs: 195,
   corruption: 40,
   bodyType: 'hourglass',

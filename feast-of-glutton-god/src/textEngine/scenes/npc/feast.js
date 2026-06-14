@@ -7,7 +7,7 @@ import '../../modules.js';
 registerPool('npc.feast.intro', [
   { when: {}, text: [
     'The feast hall fills with golden light and impossible aromas.',
-    'Tables groan under enchanted delicacies — every dish a prayer to Gorgara.',
+    'Tables groan under enchanted delicacies — every dish a prayer to the Fat Goddess.',
   ]},
 ]);
 

@@ -20,7 +20,7 @@ export function buildAsiOptions(character) {
         ? 'Deepen your capacity for pleasurable growth and endurance.'
         : key === 'cha'
           ? 'Amplify your power to seduce, convert, and spread indulgence.'
-          : `Raise ${STAT_LABELS[key]} — broaden how you spread Gorgara's gospel.`,
+          : `Raise ${STAT_LABELS[key]} — broaden how you spread the Fat Goddess's gospel.`,
   }));
 }
 
@@ -45,7 +45,7 @@ export const ROLEPLAY_OPTIONS = {
   herald: {
     id: 'herald',
     label: 'Herald abundance',
-    desc: 'You preach Gorgara\'s gospel louder — your body now proof of her blessings.',
+    desc: 'You preach the Fat Goddess\'s gospel louder — your body now proof of her blessings.',
   },
   intimate: {
     id: 'intimate',

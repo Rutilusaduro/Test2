@@ -5,7 +5,7 @@ export default function TitleScreen({ onNew, onContinue }) {
     <div className="app">
       <div className="header" style={{ marginTop: "4rem" }}>
         <h1>Feast of the Glutton God</h1>
-        <p className="subtitle">You serve Gorgara the Everfull — the Hunger Beyond the Wheel. The Reach does not know what you are.</p>
+        <p className="subtitle">You serve the Fat Goddess — the Hunger Beyond the Wheel. The Reach does not know what you are.</p>
       </div>
       <div className="panel" style={{ textAlign: "center", maxWidth: 480, margin: "2rem auto" }}>
         <p className="prose" style={{ marginBottom: "1.5rem" }}>

@@ -488,7 +488,7 @@ export function checkVictory(combat) {
     combat.log.push("Your party has been overwhelmed...");
   } else if (combat.enemies.every((e) => e.converted || e.hp <= 0)) {
     combat.victory = "converted";
-    combat.log.push("All enemies converted to Gorgara's gospel!");
+    combat.log.push("All enemies converted to the Fat Goddess's gospel!");
   }
   return combat;
 }

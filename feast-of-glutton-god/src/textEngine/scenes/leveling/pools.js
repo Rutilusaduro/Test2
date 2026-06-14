@@ -9,7 +9,7 @@ function registerLevelCopy(key, lines) {
 
 registerLevelCopy('levelup.default', [
   'Level up! Your body hums with new power — abundance settles into your curves like warm honey.',
-  'Gorgara smiles. You have grown not only softer, but stronger in her gospel.',
+  'the Fat Goddess smiles. You have grown not only softer, but stronger in her gospel.',
 ]);
 
 registerPool('levelup.celebration', [
@@ -19,7 +19,7 @@ registerPool('levelup.celebration', [
   ]},
   { when: {}, text: [
     'A golden warmth spreads through you. Another milestone of abundance achieved.',
-    'Your pilgrimage deepens. The Everfull rewards her faithful with power and plushness.',
+    'Your pilgrimage deepens. The Fat Goddess rewards her faithful with power and plushness.',
   ]},
 ]);
 
@@ -49,7 +49,7 @@ registerPool('levelup.bard', [
 
 registerPool('levelup.cleric', [
   { when: {}, text: [
-    'Gorgara whispers new prayers through you. Divine fullness answers every invocation.',
+    'the Fat Goddess whispers new prayers through you. Divine fullness answers every invocation.',
     'Your domain expands. The goddess grants another sacrament of swelling joy.',
   ]},
 ]);

@@ -16,7 +16,7 @@ registerPool('combat.action', [
   ]},
   { when: { interaction: 'convert' }, text: [
     '{subject.name} drops her weapon, hands on her swollen belly. "I… I surrender to the feast."',
-    'Overfed and overwhelmed, {subject.first} kneels — a convert to Gorgara\'s gospel.',
+    'Overfed and overwhelmed, {subject.first} kneels — a convert to the Fat Goddess\'s gospel.',
   ]},
   { when: { interaction: 'spell' }, text: [
     'Spell-light drapes {subject.name} in caloric radiance — magic and flesh intertwine.',

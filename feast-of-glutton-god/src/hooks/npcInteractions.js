@@ -503,7 +503,7 @@ export function doCorrupt(npc, player, game) {
   if (!spendAP(game, 10)) return { text: 'Not enough AP.', npc, ok: false };
   addCorruption(npc, 15);
   return withQuestProgress(game, npc, 'corrupt', null, {
-    text: `You whisper Gorgara's gospel into ${npc.name}'s ear until resistance crumbles into hungry devotion.`, npc, ok: true,
+    text: `You whisper the Fat Goddess's gospel into ${npc.name}'s ear until resistance crumbles into hungry devotion.`, npc, ok: true,
   });
 }
 

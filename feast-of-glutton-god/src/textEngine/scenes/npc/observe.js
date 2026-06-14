@@ -51,7 +51,7 @@ registerPool('npc.observe.body', [
     'You loom in {their} gaze — vast enough that {they} {verb:look} up as if addressing weather.',
   ]},
   { when: {}, text: [
-    '{Their} body speaks of Gorgara\'s blessing — soft, full, and beautiful.',
+    '{Their} body speaks of the Fat Goddess\'s blessing — soft, full, and beautiful.',
   ]},
 ]);
 
