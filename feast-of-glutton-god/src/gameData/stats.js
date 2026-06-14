@@ -10,12 +10,6 @@
  */
 import { getStage } from "./stages.js";
 import { getRaceSizeStatModifiers } from "./raceFeatures.js";
-import {
-  resolveAbilityCheck,
-  resolveSavingThrow as resolveSave,
-  resolveContestedCheck,
-  formatCheckSummary,
-} from "./skillChecks.js";
 
 export const STAT_KEYS = ["str", "dex", "con", "int", "wis", "cha"];
 
@@ -116,60 +110,6 @@ export function hpPerLevel(character, hitDie = 8) {
   const stageId = getStage(character.lbs).id;
   const sizeHp = stageId >= 6 ? 2 : stageId >= 3 ? 1 : 0;
   return Math.max(1, hitDie + con + sizeHp);
-}
-
-/** Skill / save check — delegates to skill check system. */
-export function abilityCheck(character, statKey, dc = 10, rng = Math.random) {
-  const result = resolveAbilityCheck(character, statKey, dc, { rng });
-  return {
-    roll: result.naturalRoll,
-    mod: result.modifierTotal,
-    prof: result.breakdown.find((b) => b.source === "proficiency")?.value ?? 0,
-    total: result.total,
-    dc,
-    success: result.success,
-    critical: result.critical,
-    result,
-    summary: formatCheckSummary(result),
-  };
-}
-
-export function savingThrow(character, statKey, dc = 10, rng = Math.random) {
-  const result = resolveSave(character, statKey, dc, { rng });
-  return {
-    roll: result.naturalRoll,
-    mod: result.modifierTotal,
-    total: result.total,
-    dc,
-    success: result.success,
-    critical: result.critical,
-    result,
-    summary: formatCheckSummary(result),
-  };
-}
-
-/** Force-feed / grapple — Overwhelm (Str) vs Athletics or Grace (defender's better stat). */
-export function forceFeedCheck(attacker, target, rng = Math.random) {
-  const strMod = getEffectiveStatMod(target, "str");
-  const dexMod = getEffectiveStatMod(target, "dex");
-  const defenderSkillId = strMod >= dexMod ? "athletics" : "grace";
-
-  const contested = resolveContestedCheck(attacker, target, {
-    attackerSkillId: "overwhelm",
-    defenderSkillId,
-    rng,
-    label: "Force Feed",
-  });
-
-  return {
-    success: contested.attackerWins,
-    attacker: contested.attackerResult.total,
-    defender: contested.defenderResult.total,
-    contested,
-    summary: `${contested.label}: ${contested.attackerResult.total} vs ${contested.defenderResult.total} — ${
-      contested.attackerWins ? "SUCCESS" : "FAIL"
-    }`,
-  };
 }
 
 /** Max AP scales with Cha and level */
