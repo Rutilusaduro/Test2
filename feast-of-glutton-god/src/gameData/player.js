@@ -92,6 +92,15 @@ export function createNewGame(name, classId, options = {}) {
     worldFlags: {
       regions_unlocked: ['harvest_hearth', 'market_square', 'fertile_heartlands'],
       abundanceSpread: 0,
+      regionTransformation: {},
+    },
+    influence: {
+      political: 0,
+      religious: 0,
+      cultural: 0,
+      holdings: [],
+      institutions: [],
+      titles: [],
     },
     lastQuestMessage: null,
   };

@@ -4,6 +4,7 @@
  */
 import { getAbundanceSpread, awardAbundanceSpread } from './abundanceSpread.js';
 import { addAbundancePoints } from './player.js';
+import { getRegion } from './regions.js';
 import { renderWorldEvent } from '../textEngine/scenes/world/events.js';
 
 export const MILESTONE_WORLD_EVENTS = {
@@ -18,23 +19,41 @@ export const MILESTONE_WORLD_EVENTS = {
     id: 'feast_tide',
     label: 'Feast Tide',
     rewards: { ap: 20 },
-    worldFlags: { feast_tide_active: true },
-    unlockRegions: [],
+    worldFlags: { feast_tide_active: true, unlock_northern_marches: true },
+    unlockRegions: ['northern_marches'],
   },
   250: {
     id: 'golden_overflow',
     label: 'Golden Overflow',
     rewards: { ap: 30 },
-    worldFlags: { golden_overflow_blessing: true },
+    worldFlags: { golden_overflow_blessing: true, unlock_sapphire_coast: true, unlock_iron_peak: true },
+    unlockRegions: ['sapphire_coast', 'iron_peak_hold'],
     playerFlags: { golden_overflow_witness: true },
   },
   500: {
     id: 'gorgaras_dawn',
     label: "Gorgara's Dawn",
     rewards: { ap: 50 },
-    worldFlags: { gorgaras_dawn: true },
-    playerSizeCapBonus: 1,
+    worldFlags: { gorgaras_dawn: true, unlock_ember_duchy: true },
+    unlockRegions: ['ember_duchy'],
+    playerSizeCapBonus: 2,
     playerFlags: { dawn_of_gorgara: true },
+  },
+  900: {
+    id: 'continental_surge',
+    label: 'Continental Surge',
+    rewards: { ap: 75 },
+    worldFlags: { continental_surge: true, unlock_gilded_citadel: true },
+    unlockRegions: ['gilded_citadel'],
+    playerSizeCapBonus: 1,
+  },
+  1500: {
+    id: 'matriarch_shadow',
+    label: "Matriarch's Shadow",
+    rewards: { ap: 100 },
+    worldFlags: { matriarch_shadow: true },
+    playerSizeCapBonus: 1,
+    playerFlags: { rival_goddess_rising: true },
   },
 };
 
@@ -70,6 +89,10 @@ export function checkMilestoneWorldEvent(game, spreadResult) {
   for (const regionId of eventDef.unlockRegions ?? []) {
     if (!game.worldFlags.regions_unlocked.includes(regionId)) {
       game.worldFlags.regions_unlocked.push(regionId);
+    }
+    const region = getRegion(regionId);
+    if (region?.unlockFlag) {
+      game.worldFlags[region.unlockFlag] = true;
     }
   }
 

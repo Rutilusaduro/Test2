@@ -19,6 +19,7 @@ import { resolveSkillCheck } from './skillChecks.js';
 import { getCombinedPuzzleBonuses } from './worldAuras.js';
 import { getAbundanceSpread } from './abundanceSpread.js';
 import { getPuzzleCapabilities } from './stagePerks.js';
+import { getTightSpacePenalty } from './stageMechanics.js';
 import { renderPuzzleText } from '../textEngine/scenes/puzzles/index.js';
 import { awardAbundanceSpreadWithEvents } from './worldEvents.js';
 import { getSpell, getSpellEnvironmentTags } from './spells.js';
@@ -254,7 +255,7 @@ function getTightSpaceModifiers(game, puzzle, solution) {
   if (!perks.tightSpacePenalty) return { dcPenalty: 0, bonuses: [], note: null };
 
   const stageId = getStage(game.player.lbs).id;
-  const penalty = stageId >= 10 ? 4 : stageId >= 8 ? 3 : 2;
+  const penalty = getTightSpacePenalty(stageId);
 
   return {
     dcPenalty: penalty,

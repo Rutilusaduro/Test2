@@ -1,7 +1,9 @@
-import { getStage, isAtSizeCap } from '../gameData/stages.js';
+import { getStage, isAtSizeCap, getStageProgress } from '../gameData/stages.js';
 import { getStagePerk } from '../gameData/stagePerks.js';
+import { getStageMechanics, getMobilityLabel } from '../gameData/stageMechanics.js';
 import { getCharacterSpells } from '../gameData/spellLearning.js';
 import { getAbundanceProgress } from '../gameData/abundanceSpread.js';
+import { getInfluenceProgress } from '../gameData/influence.js';
 import { getTier } from '../gameData/relationships.js';
 import { getCorruptionTier } from '../gameData/corruption.js';
 import { STAT_LABELS } from '../gameData/stats.js';
@@ -9,8 +11,11 @@ import { STAT_LABELS } from '../gameData/stats.js';
 export default function CharacterSheet({ game, onClose }) {
   const player = game.player;
   const stage = getStage(player.lbs);
+  const stageProg = getStageProgress(player.lbs);
   const perk = getStagePerk(player);
+  const mech = getStageMechanics(player);
   const abundance = getAbundanceProgress(game);
+  const influence = getInfluenceProgress(game);
   const spells = getCharacterSpells(player);
   const atCap = isAtSizeCap(player);
 
@@ -27,6 +32,32 @@ export default function CharacterSheet({ game, onClose }) {
           <span className="stat">HP {player.hp}/{player.maxHp}</span>
           <span className="stat">AP {player.ap}</span>
           {atCap && <span className="stat" style={{ color: 'var(--gold)' }}>Size cap {player.sizeCap}</span>}
+        </div>
+
+        <div className="panel" style={{ marginTop: '0.75rem' }}>
+          <h3 style={{ fontSize: '1rem' }}>Size — {stage.label}</h3>
+          <p className="prose" style={{ fontSize: '0.85rem' }}>{mech.desc}</p>
+          <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
+            Mobility: {getMobilityLabel(mech.stageId)} · Presence +{mech.influencePresence} influence
+            {mech.immobile ? ' · Command play active' : ''}
+          </p>
+          {stageProg.next && (
+            <p style={{ fontSize: '0.75rem', color: 'var(--text-dim)' }}>
+              Next: {stageProg.next.label} ({stageProg.lbsToNext} lbs to go)
+            </p>
+          )}
+        </div>
+
+        <div className="panel" style={{ marginTop: '0.75rem' }}>
+          <h3 style={{ fontSize: '1rem' }}>Influence</h3>
+          <p style={{ fontSize: '0.85rem' }}>
+            Political {influence.political} · Religious {influence.religious} · Cultural {influence.cultural}
+          </p>
+          {influence.titles.length > 0 && (
+            <p style={{ fontSize: '0.8rem', color: 'var(--gold)' }}>
+              {influence.titles.map((t) => t.label).join(' · ')}
+            </p>
+          )}
         </div>
 
         <div className="panel" style={{ marginTop: '0.75rem' }}>

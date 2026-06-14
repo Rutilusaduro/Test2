@@ -478,7 +478,7 @@ export const MAIN_QUESTS = [
         objectives: [
           {
             id: 'player_stage_8',
-            label: 'Ascend to Enormous size (stage 8+)',
+            label: 'Ascend to Leviathan size (stage 8+)',
             type: OBJECTIVE_TYPE.PLAYER_STAGE_MIN,
             stage: 8,
             count: 1,

@@ -1,7 +1,7 @@
 /**
  * Connection gates — travel blocked until puzzle solved or flag set.
  */
-import { getRegion } from './regions.js';
+import { getRegion, isRegionLocked } from './regions.js';
 
 export const CONNECTION_GATES = [
   {
@@ -37,7 +37,7 @@ export function getTravelOptions(game, regionId) {
   const unlocked = game.worldFlags?.regions_unlocked ?? [];
   return region.connections.map((toId) => {
     const gateCheck = isConnectionBlocked(game, regionId, toId);
-    const regionLocked = !unlocked.includes(toId);
+    const regionLocked = !unlocked.includes(toId) || isRegionLocked(game, toId);
     return {
       regionId: toId,
       name: getRegion(toId).name,

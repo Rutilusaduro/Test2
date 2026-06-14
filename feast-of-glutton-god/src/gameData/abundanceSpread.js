@@ -8,7 +8,9 @@ export const ABUNDANCE_MILESTONES = [
   { points: 50, label: 'Warm Hearth', desc: 'Homes grow softer; kitchens never empty.' },
   { points: 120, label: 'Feast Tide', desc: 'Whole neighborhoods swell with shared appetite.' },
   { points: 250, label: 'Golden Overflow', desc: 'Abundance spills into streets and temples alike.' },
-  { points: 500, label: 'Gorgara\'s Dawn', desc: 'The goddess stirs — the world hungers beautifully.' },
+  { points: 500, label: "Gorgara's Dawn", desc: 'The goddess stirs — the world hungers beautifully.' },
+  { points: 900, label: 'Continental Surge', desc: 'Nations feel your rival gospel on the wind.' },
+  { points: 1500, label: 'Matriarch\'s Shadow', desc: 'Gorgara is not the only hunger the continent knows.' },
 ];
 
 export const ABUNDANCE_AWARDS = {

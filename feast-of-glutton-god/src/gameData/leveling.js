@@ -40,9 +40,9 @@ export const XP_SOURCES = {
   quest_complete: 100,
 };
 
-/** Size stage caps unlocked by level milestones */
+/** Size stage caps unlocked by level milestones (tier ids on new ladder) */
 export const SIZE_CAP_BY_LEVEL = {
-  1: 5, 3: 7, 6: 9, 9: 11, 12: 11,
+  1: 3, 3: 5, 5: 7, 7: 9, 9: 11, 12: 13,
 };
 
 const LEVEL_UP_FLAVOR = [

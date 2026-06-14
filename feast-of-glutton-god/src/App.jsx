@@ -12,6 +12,8 @@ import { pickEncounter } from "./gameData/enemies.js";
 import { awardCombatXp, initializeStartingSpells } from "./gameData/leveling.js";
 import { initSpellSlots } from "./gameData/spellSlots.js";
 import { ensureQuestState } from "./gameData/questEngine.js";
+import { ensureInfluenceState } from "./gameData/influence.js";
+import { ensureTransformationState } from "./gameData/worldTransformation.js";
 import { recordCombatEndForQuests } from "./hooks/questHooks.js";
 import { recordPuzzleSolvedForQuests } from "./hooks/puzzleHooks.js";
 import { applySolutionImmediate } from "./gameData/puzzleEngine.js";
@@ -59,7 +61,9 @@ export default function App() {
     const g = loadGame();
     if (g) {
       if (!g.player.spellSlots) initSpellSlots(g.player);
-      if (!g.player.sizeCap) g.player.sizeCap = 5;
+      if (!g.player.sizeCap) g.player.sizeCap = 3;
+      ensureInfluenceState(g);
+      ensureTransformationState(g);
       if (!g.player.raceId) g.player.raceId = 'human';
       if (!g.player.raceName) g.player.raceName = 'Human';
       migratePlayerSpells(g.player);

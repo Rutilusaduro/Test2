@@ -26,6 +26,8 @@ import { spendAP } from '../gameData/player.js';
 import { checkSeduce, formatCheckSummary, toTextContext, DC } from '../gameData/skillChecks.js';
 import { recordNpcInteractionForQuests, recordNpcGrowthForQuests } from './questHooks.js';
 import { awardAbundanceSpreadWithEvents } from '../gameData/worldEvents.js';
+import { awardInfluence, getRelationshipInfluenceBonus } from '../gameData/influence.js';
+import { awardRegionTransformation } from '../gameData/worldTransformation.js';
 import { appendPuzzleHintToTalk } from '../gameData/puzzleHints.js';
 
 function withQuestProgress(game, npc, interaction, meta, result) {
@@ -72,6 +74,19 @@ function withQuestProgress(game, npc, interaction, meta, result) {
     if (spread?.worldEvent?.triggered && spread.worldEvent.message) {
       result.text = (result.text || '') + `\n\n---\n${spread.worldEvent.message}`;
       if (result.narrative) result.narrative += `\n\n---\n${spread.worldEvent.message}`;
+    }
+    const transform = awardRegionTransformation(game, game.region, key);
+    if (transform.levelUp && transform.message) {
+      result.text = (result.text || '') + `\n\n---\n${transform.message}`;
+      if (result.narrative) result.narrative += `\n\n---\n${transform.message}`;
+    }
+    const relBonus = getRelationshipInfluenceBonus(result.npc ?? npc);
+    if (interaction === 'feast' || interaction === 'bless' || interaction?.startsWith('bless')) {
+      awardInfluence(game, 'religious', 2 + relBonus, key);
+    } else if (interaction === 'feed' || interaction?.startsWith('feed')) {
+      awardInfluence(game, 'cultural', 1 + relBonus, key);
+    } else if (interaction === 'flirt' || interaction === 'intimate') {
+      awardInfluence(game, 'cultural', 1 + relBonus, key);
     }
   }
   result.questNotes = quest;
