@@ -208,10 +208,21 @@ export function createNpc(template) {
 
 export function getNpcsInRegion(regionId, gameState) {
   const recruitedCompanionIds = new Set((gameState.party || []).map((c) => c.id));
-  const npcs = WORLD_NPCS
+  let worldNpcs = WORLD_NPCS
     .filter((n) => n.location === regionId)
-    .filter((n) => !n.companionId || !recruitedCompanionIds.has(n.companionId))
-    .map(createNpc);
+    .filter((n) => !n.companionId || !recruitedCompanionIds.has(n.companionId));
+
+  if (
+    regionId === 'divine_plane_vestibule'
+    && gameState?.worldFlags?.main_act3_complete
+    && !gameState?.quests?.completed?.includes('side_lyra_last_duel')
+    && !worldNpcs.some((n) => n.id === 'rival_lyra')
+  ) {
+    const lyra = WORLD_NPCS.find((n) => n.id === 'rival_lyra');
+    if (lyra) worldNpcs = [...worldNpcs, { ...lyra, location: regionId }];
+  }
+
+  const npcs = worldNpcs.map(createNpc);
   const recruited = (gameState.party || [])
     .filter((c) => c.location === regionId || !c.location)
     .map((c) => ({ ...c, isCompanion: true }));

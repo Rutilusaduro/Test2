@@ -9,6 +9,7 @@ import {
   renderEndingEchoStamp,
   renderEndingEchoArrival,
 } from '../textEngine/scenes/endings/index.js';
+import { recordEndingArchive, syncPrestigeRank } from './prestige.js';
 
 export const ENDING_ARCHETYPE_LABELS = {
   conversion_ending: 'The Conversion Crown',
@@ -79,9 +80,14 @@ export function stampEndingEchoIfNeeded(game) {
   const archetype = resolveEndingArchetype(game);
   game.worldFlags.ending_archetype = archetype;
   applyArchetypeMutations(game, archetype);
+  recordEndingArchive(game, archetype);
+  const prestige = syncPrestigeRank(game);
 
-  const message = renderEndingEchoStamp(game, archetype);
-  return { archetype, message, newlyStamped: true };
+  let message = renderEndingEchoStamp(game, archetype);
+  if (prestige.rankUp && prestige.message) {
+    message = `${message}\n\n${prestige.message}`;
+  }
+  return { archetype, message, newlyStamped: true, prestige };
 }
 
 /** +1 effective transform depth cap for conversion ending. */

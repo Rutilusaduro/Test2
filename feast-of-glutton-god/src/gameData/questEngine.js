@@ -20,6 +20,7 @@ import { renderQuestText } from '../textEngine/scenes/quests/index.js';
 import { onRedemptionQuestComplete } from '../hooks/questHooks.js';
 import { getDivineAttention } from './divineAttention.js';
 import { stampEndingEchoIfNeeded } from './endingEcho.js';
+import { syncPrestigeRank } from './prestige.js';
 import { COMPANIONS } from './companions.js';
 import { ensureCompanionDevotion } from './companionDevotion.js';
 import { getPuzzleDefinition } from './puzzles/registry.js';
@@ -562,9 +563,12 @@ export function notifyQuestEvent(game, event = {}) {
       } else if (obj.type === OBJECTIVE_TYPE.VISIT_REGION) {
         matched = event.type === 'visit_region' && event.regionId === obj.regionId;
       } else if (obj.type === OBJECTIVE_TYPE.COMBAT_VICTORY) {
+        const enemyIds = obj.enemyIds ?? (obj.enemyId ? [obj.enemyId] : []);
+        const enemyMatch = enemyIds.length === 0
+          || enemyIds.some((id) => (event.defeatedEnemyIds ?? []).includes(id));
         matched = event.type === 'combat_end'
           && (!obj.victoryType || event.victoryType === obj.victoryType)
-          && (!obj.enemyId || (event.defeatedEnemyIds ?? []).includes(obj.enemyId));
+          && enemyMatch;
       } else if (obj.type === OBJECTIVE_TYPE.COMBAT_TRIVIALIZE) {
         matched = event.type === 'combat_end'
           && event.trivialized
@@ -725,12 +729,16 @@ export function completeQuest(game, questId, opts = {}) {
   }
 
   const echoResult = stampEndingEchoIfNeeded(game);
+  const prestigeResult = syncPrestigeRank(game);
   const textKey = ending?.textKey ?? rewardBundle.textKey ?? 'quest.complete';
   let completionMessage = opts.stageMessage
     ? `${opts.stageMessage}\n\n${renderQuestText(textKey, game, { questId, endingId: ending?.id })}`
     : renderQuestText(textKey, game, { questId, endingId: ending?.id });
   if (echoResult?.newlyStamped && echoResult.message) {
     completionMessage = `${completionMessage}\n\n${echoResult.message}`;
+  }
+  if (prestigeResult.rankUp && prestigeResult.message) {
+    completionMessage = `${completionMessage}\n\n${prestigeResult.message}`;
   }
 
   return {
@@ -741,6 +749,7 @@ export function completeQuest(game, questId, opts = {}) {
     completionMessage,
     rewardMsgs,
     endingEcho: echoResult,
+    prestige: prestigeResult,
   };
 }
 

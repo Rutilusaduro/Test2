@@ -5,6 +5,7 @@ import WorldView from "./components/WorldView.jsx";
 import CombatView from "./components/CombatView.jsx";
 import CombatScenePopup from "./components/CombatScenePopup.jsx";
 import LevelUpModal from "./components/LevelUpModal.jsx";
+import PrestigeModal from "./components/PrestigeModal.jsx";
 import GameDebugShell from "./components/GameDebugShell.jsx";
 import { createNewGame, addAbundancePoints, syncPlayerFromCombat, ensureDmState, ensureScarcityState } from "./gameData/player.js";
 import { clearTransient, narrateEvent } from "./gameData/narrator.js";
@@ -30,6 +31,7 @@ import { renderTrivializeGag } from "./textEngine/scenes/dm/combat_gag.js";
 import { ensureSpellState, getCharacterSpells, ensureDamageCantrip } from "./gameData/spellLearning.js";
 import { autoPrepareSpells } from "./gameData/spellPreparation.js";
 import { completePendingLevelUp as completeLevelUpChoice } from "./gameData/levelUpChoices.js";
+import { applyCosmicSatiety, getPrestigeProgress } from "./gameData/prestige.js";
 import "./textEngine/scenes/index.js";
 
 function migratePlayerSpells(player) {
@@ -73,6 +75,11 @@ function applyCombatEndState(prev, combat) {
   const quest = recordCombatEndForQuests(next, combat);
   if (quest.questMessages) {
     narrateEvent(next, quest.questMessages, 'quest');
+  }
+
+  const satietyMsg = applyCosmicSatiety(next, combat);
+  if (satietyMsg) {
+    narrateEvent(next, satietyMsg, 'growth');
   }
 
   if (combat.victory === 'win' || combat.victory === 'converted') {
@@ -299,7 +306,7 @@ export default function App() {
 
   const randomEncounter = useCallback(() => {
     if (!game) return;
-    const enemy = pickEncounter(game.region);
+    const enemy = pickEncounter(game.region, game);
     startCombat(enemy.id);
   }, [game, startCombat]);
 
@@ -309,6 +316,17 @@ export default function App() {
 
   const levelUpPending = game?.player?.levelUpsPending?.[0] ?? null;
   const showLevelUp = game && (levelUpPending || game.lastLevelUpResult);
+  const prestigeProgress = game ? getPrestigeProgress(game) : null;
+  const showPrestige = game && prestigeProgress?.talentsAvailable > 0;
+
+  const handlePrestigeComplete = useCallback((result) => {
+    setGame((prev) => {
+      const next = { ...prev };
+      if (result?.message) narrateEvent(next, result.message, 'levelup');
+      saveGame(next);
+      return next;
+    });
+  }, []);
 
   const worldContent = game ? (
     <>
@@ -327,6 +345,12 @@ export default function App() {
           pending={levelUpPending}
           levelUpResult={game.lastLevelUpResult}
           onComplete={handleLevelUpComplete}
+        />
+      )}
+      {showPrestige && (
+        <PrestigeModal
+          game={game}
+          onComplete={handlePrestigeComplete}
         />
       )}
     </>

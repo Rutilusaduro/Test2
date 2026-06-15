@@ -694,3 +694,40 @@ registerQuestCopy('quest.side.companion_apotheosis.stage.six.complete', [
 registerQuestCopy('quest.side.companion_apotheosis.complete', [
   'Six Who Walk Beside — complete. Your pilgrimage was never solitary.',
 ]);
+
+// ─── Side: Lyra Last Duel (post-Act III ascension arc) ─────────────────────
+
+registerQuestCopy('quest.side.lyra_last_duel.title', ['The Last Duel of Curves']);
+registerQuestCopy('quest.side.lyra_last_duel.desc', [
+  'Lyra Swiftblade returns at the threshold — jealous rival, Church champion, or cosmic apostate. One last duel decides her fate.',
+]);
+registerQuestCopy('quest.side.lyra_last_duel.stage.threshold.desc', [
+  'Face Lyra where the Wheel meets appetite. She has ascended the way you ascended — and she is furious you got there first.',
+]);
+registerQuestCopy('quest.side.lyra_last_duel.stage.threshold.complete', [
+  'Steel and scripture and hunger collide at the vestibule. Lyra names you rival, lover, or obstacle. The duel is inevitable.',
+]);
+registerQuestCopy('quest.side.lyra_last_duel.stage.duel.desc', [
+  'Fight Lyra in her ascended form — Champion of Measure at lower prestige, Apostate of Excess when the pilgrimage deepens.',
+]);
+registerQuestCopy('quest.side.lyra_last_duel.stage.duel.complete', [
+  'Lyra falls — not broken, softened. The blade clatters; the curves remain. What you do next writes her ending.',
+]);
+registerQuestCopy('quest.side.lyra_last_duel.stage.fate.desc', [
+  'Feed her, flirt with mercy, or crown dominance. Romance or rivalry — the last curve is hers to accept.',
+]);
+registerQuestCopy('quest.side.lyra_last_duel.stage.fate.complete', [
+  'Lyra\'s fate is sealed in flesh and feeling. The tutorial rival becomes epilogue.',
+]);
+registerQuestCopy('quest.side.lyra_last_duel.ending.lover', [
+  'Lyra, Lover — the duel ends in shared hunger. Rivalry becomes devotion; steel becomes silk.',
+]);
+registerQuestCopy('quest.side.lyra_last_duel.ending.champion', [
+  'Lyra, Champion — she kneels not in defeat but allegiance. Your rival walks beside you as sworn blade.',
+]);
+registerQuestCopy('quest.side.lyra_last_duel.ending.converted', [
+  'Lyra, Converted — abundance wins where measure failed. She blooms at the threshold, apostate to appetite.',
+]);
+registerQuestCopy('quest.side.lyra_last_duel.complete.default', [
+  'The Last Duel of Curves — complete. Lyra\'s story no longer mirrors yours from a distance. It touches.',
+]);

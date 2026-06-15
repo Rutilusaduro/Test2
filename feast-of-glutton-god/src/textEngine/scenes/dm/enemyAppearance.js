@@ -43,6 +43,18 @@ export const APPEARANCE_BY_TYPE = {
     'competitive hunger masked as contempt — athletic lines trembling, nipples hard against linen',
     'a mirror of who you were — angry, athletic, terrified of becoming glorious and moaning for more',
   ],
+  lyra_champion: [
+    'Lyra Swiftblade in Church champion plate — mythic steel, athletic fury, hips still narrow, eyes promising this duel matters',
+    'your tutorial rival ascended — blade mirror-sharp, waist cinched, breasts strapped flat, jealousy burning holy',
+    'Champion of Measure made flesh — Lyra\'s thighs disciplined, ass round with honest muscle, terror of softness unspoken',
+    'mythic rival blocking the road — Lyra\'s jaw set, nipples peaked beneath blessed mail, gaze lingering where it shouldn\'t',
+  ],
+  lyra_apostate: [
+    'Lyra Apostate on the threshold — cosmic curves crowned, blade hungry, law broken in voluptuous rebellion',
+    'voluptuous apostate fury — Lyra\'s hips wide now, breasts spilling, steel and scripture both surrendered to appetite',
+    'cosmic duelist Lyra — thighs softening mid-stance, eyes wet, fury and hunger braided into one last challenge',
+    'the Wheel\'s threshold frames Lyra — apostate curves, legendary blade, smile that says she already knows who feeds whom',
+  ],
   purity_inquisitor: [
     'fanatical paladins in white trim advancing — hard bodies, harder stares, corsets denying what you will gift',
     'incense and judgment rolling off lean armored lines that ache to be unlaced',

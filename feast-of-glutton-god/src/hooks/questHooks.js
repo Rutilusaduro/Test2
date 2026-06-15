@@ -15,6 +15,7 @@ import {
   checkCompanionMilestones,
   formatCompanionMilestoneMessages,
 } from '../gameData/companionMilestones.js';
+import { syncPrestigeRank } from '../gameData/prestige.js';
 
 /**
  * Record an NPC interaction for quest objective progress.
@@ -24,6 +25,12 @@ export function flushCompanionMilestoneBeats(game) {
   const fired = checkCompanionMilestones(game);
   const message = formatCompanionMilestoneMessages(fired);
   if (message) narrateEvent(game, message, 'devotion');
+  if (fired.length) {
+    const prestige = syncPrestigeRank(game);
+    if (prestige.rankUp && prestige.message) {
+      narrateEvent(game, prestige.message, 'levelup');
+    }
+  }
   return fired;
 }
 
@@ -88,6 +95,10 @@ export function recordCombatEndForQuests(game, combat) {
   if (defeatedEnemyIds.includes('dream_echo')) {
     game.player.storyFlags = game.player.storyFlags || {};
     game.player.storyFlags.dream_echo_faced = true;
+  }
+  if (defeatedEnemyIds.includes('lyra_champion') || defeatedEnemyIds.includes('lyra_apostate')) {
+    game.player.storyFlags = game.player.storyFlags || {};
+    game.player.storyFlags.lyra_ascended_defeated = true;
   }
   const { lines, growthSnippets } = notifyQuestEvent(game, {
     type: 'combat_end',

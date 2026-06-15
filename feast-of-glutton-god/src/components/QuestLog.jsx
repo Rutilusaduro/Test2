@@ -14,6 +14,7 @@ import {
 } from '../textEngine/scenes/quests/index.js';
 import { QUEST_TAG } from '../gameData/quests/constants.js';
 import { narrateEvent } from '../gameData/narrator.js';
+import { getPrestigeProgress, PRESTIGE_TALENT_LIST } from '../gameData/prestige.js';
 
 const TAG_LABELS = {
   [QUEST_TAG.ABUNDANCE]: 'Abundance',
@@ -26,6 +27,7 @@ const TAG_LABELS = {
 export default function QuestLog({ game, regionId, onUpdate }) {
   const { main, side, completed } = getQuestLogData(game);
   const available = getAvailableQuestsInRegion(game, regionId);
+  const prestige = getPrestigeProgress(game);
 
   const startQuest = (questId) => {
     onUpdate((g) => {
@@ -86,6 +88,29 @@ export default function QuestLog({ game, regionId, onUpdate }) {
   return (
     <div className="panel panel--log">
       <h2>Quest Log</h2>
+
+      {prestige.rank > 0 && (
+        <div className="panel" style={{ marginBottom: '1rem', borderColor: 'var(--gold)' }}>
+          <h3 style={{ color: 'var(--gold-bright)', fontSize: '1rem', marginBottom: '0.5rem' }}>
+            Prestige Pilgrimage — Rank {prestige.rank}/5
+          </h3>
+          <p className="prose" style={{ fontSize: '0.85rem', marginBottom: '0.5rem' }}>
+            Scaling quests: {prestige.scaling}/{prestige.scalingMax} ·
+            Milestones: {prestige.milestones}/{prestige.milestonesMax} ·
+            Endings archived: {prestige.archive}/{prestige.archiveTarget}
+          </p>
+          {prestige.talents.length > 0 && (
+            <p style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>
+              Talents: {prestige.talents.map((id) => PRESTIGE_TALENT_LIST.find((t) => t.id === id)?.name ?? id).join(' · ')}
+            </p>
+          )}
+          {prestige.talentsAvailable > 0 && (
+            <p style={{ fontSize: '0.85rem', color: 'var(--rose)', marginTop: '0.5rem' }}>
+              ★ {prestige.talentsAvailable} prestige talent pick{prestige.talentsAvailable > 1 ? 's' : ''} awaiting — check the modal.
+            </p>
+          )}
+        </div>
+      )}
 
       {main.length > 0 && (
         <>

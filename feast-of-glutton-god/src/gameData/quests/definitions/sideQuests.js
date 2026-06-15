@@ -1701,4 +1701,141 @@ export const SIDE_QUESTS = [
       textKey: 'quest.side.companion_apotheosis.complete',
     },
   },
+
+  {
+    id: 'side_lyra_last_duel',
+    type: QUEST_TYPE.SIDE,
+    title: 'The Last Duel of Curves',
+    titleKey: 'quest.side.lyra_last_duel.title',
+    descriptionKey: 'quest.side.lyra_last_duel.desc',
+    tags: [QUEST_TAG.GROWTH, QUEST_TAG.ROMANCE, QUEST_TAG.ABUNDANCE],
+    region: 'divine_plane_vestibule',
+    giverNpcId: 'rival_lyra',
+    prerequisites: {
+      minPlayerLevel: 17,
+      flags: ['main_act3_complete'],
+      questsCompleted: ['side_duel_of_curves'],
+    },
+    stages: [
+      {
+        id: 'threshold_challenge',
+        title: 'Challenge at the Threshold',
+        descriptionKey: 'quest.side.lyra_last_duel.stage.threshold.desc',
+        approaches: [QUEST_APPROACH.SOCIAL, QUEST_APPROACH.COMBAT],
+        objectives: [
+          {
+            id: 'talk_lyra_vestibule',
+            label: 'Face Lyra at the divine threshold',
+            type: OBJECTIVE_TYPE.NPC_INTERACTION,
+            interaction: 'talk',
+            npcId: 'rival_lyra',
+            count: 2,
+            score: { [QUEST_SCORE.DOMINANCE]: 1 },
+          },
+          {
+            id: 'visit_vestibule',
+            label: 'Stand in the divine vestibule',
+            type: OBJECTIVE_TYPE.VISIT_REGION,
+            regionId: 'divine_plane_vestibule',
+            count: 1,
+          },
+        ],
+        onComplete: {
+          rewards: { ap: 15, xp: 80 },
+          textKey: 'quest.side.lyra_last_duel.stage.threshold.complete',
+        },
+      },
+      {
+        id: 'champion_duel',
+        title: 'Champion or Apostate',
+        descriptionKey: 'quest.side.lyra_last_duel.stage.duel.desc',
+        approaches: [QUEST_APPROACH.COMBAT, QUEST_APPROACH.GROWTH],
+        objectives: [
+          {
+            id: 'defeat_lyra_ascended',
+            label: 'Defeat Lyra in her ascended form (Champion or Apostate)',
+            type: OBJECTIVE_TYPE.COMBAT_VICTORY,
+            enemyIds: ['lyra_champion', 'lyra_apostate'],
+            count: 1,
+            score: { [QUEST_SCORE.DOMINANCE]: 2 },
+          },
+        ],
+        onComplete: {
+          rewards: { ap: 25, xp: 120 },
+          textKey: 'quest.side.lyra_last_duel.stage.duel.complete',
+        },
+      },
+      {
+        id: 'fate_sealed',
+        title: 'Fate Sealed',
+        descriptionKey: 'quest.side.lyra_last_duel.stage.fate.desc',
+        approaches: [QUEST_APPROACH.ROMANCE, QUEST_APPROACH.FEEDING, QUEST_APPROACH.GROWTH],
+        objectives: [
+          {
+            id: 'feed_lyra_final',
+            label: 'Feed Lyra after the duel — mercy or dominance',
+            type: OBJECTIVE_TYPE.NPC_INTERACTION,
+            interaction: 'feed',
+            npcId: 'rival_lyra',
+            count: 2,
+            growth: { target: 'npc', npcId: 'rival_lyra', stages: 1, proseKey: 'growth.target.feeding' },
+            score: { [QUEST_SCORE.ABUNDANCE]: 2, [QUEST_SCORE.MERCY]: 1 },
+          },
+          {
+            id: 'lyra_soft_final',
+            label: 'Guide Lyra to willing softness (stage 3+)',
+            type: OBJECTIVE_TYPE.NPC_STAGE_MIN,
+            npcId: 'rival_lyra',
+            stage: 3,
+            count: 1,
+          },
+        ],
+        onComplete: {
+          rewards: { ap: 20, xp: 100 },
+          textKey: 'quest.side.lyra_last_duel.stage.fate.complete',
+        },
+      },
+    ],
+    endings: [
+      {
+        id: 'lyra_lover',
+        label: 'Lyra, Lover',
+        condition: { minScores: { [QUEST_SCORE.ABUNDANCE]: 2, [QUEST_SCORE.MERCY]: 1 } },
+        rewards: {
+          ap: 30,
+          xp: 150,
+          playerFlags: { lyra_fate: 'lover', lyra_romance: true },
+        },
+        textKey: 'quest.side.lyra_last_duel.ending.lover',
+      },
+      {
+        id: 'lyra_champion_fate',
+        label: 'Lyra, Champion',
+        condition: { minScores: { [QUEST_SCORE.DOMINANCE]: 2 } },
+        rewards: {
+          ap: 28,
+          xp: 140,
+          playerFlags: { lyra_fate: 'champion', lyra_ally: true },
+        },
+        textKey: 'quest.side.lyra_last_duel.ending.champion',
+      },
+      {
+        id: 'lyra_converted',
+        label: 'Lyra, Converted',
+        condition: { minScores: { [QUEST_SCORE.ABUNDANCE]: 3 } },
+        rewards: {
+          ap: 32,
+          xp: 160,
+          playerFlags: { lyra_fate: 'converted' },
+        },
+        textKey: 'quest.side.lyra_last_duel.ending.converted',
+      },
+    ],
+    rewards: {
+      ap: 25,
+      xp: 120,
+      playerFlags: { lyra_last_duel_complete: true, lyra_fate: 'rival' },
+      textKey: 'quest.side.lyra_last_duel.complete.default',
+    },
+  },
 ];

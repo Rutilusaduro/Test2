@@ -12,6 +12,8 @@ export const ENEMY_GROWTH_KIND = {
   gluttonous_goblin: 'goblin',
   temple_guardian: 'armored_knight',
   rival_adventurer: 'adventurer',
+  lyra_champion: 'adventurer',
+  lyra_apostate: 'mirror_self',
   purity_inquisitor: 'inquisitor',
   famine_hag: 'famine_wraith',
   champion_aurelan: 'divine_champion',

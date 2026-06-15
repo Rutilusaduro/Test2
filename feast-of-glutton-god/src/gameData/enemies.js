@@ -81,6 +81,42 @@ export const ENEMY_TYPES = {
     desc: "Proud slim rivals who hate what you're becoming — athletic fury masking envy and wet, secret curiosity.",
     ...MUNDANE,
   },
+  lyra_champion: {
+    id: "lyra_champion",
+    name: "Lyra Swiftblade, Champion of Measure",
+    bodyType: "athletic",
+    startLbs: 135,
+    hp: 55,
+    mp: 20,
+    movement: 4,
+    role: "elite",
+    conversion: 0.5,
+    desc: "Your old rival ascended — Church champion, mirror of your path, fury and envy forged into mythic steel.",
+    cosmicAbility: "mirror_blade",
+    growthResist: 0.55,
+    phases: [{ id: "rival_surge", hpPct: 0.4, label: "Rival Surge" }],
+    ...MYTHIC,
+  },
+  lyra_apostate: {
+    id: "lyra_apostate",
+    name: "Lyra Swiftblade, Apostate of Excess",
+    bodyType: "voluptuous",
+    startLbs: 150,
+    hp: 88,
+    mp: 32,
+    movement: 3,
+    role: "boss",
+    conversion: 0.15,
+    desc: "Lyra chose her own apotheosis — cosmic apostate on the Wheel's threshold, curves crowned, blade hungry for one last duel.",
+    cosmicAbility: "apostate_duel",
+    growthResist: 0.7,
+    legendaryResistances: 2,
+    phases: [
+      { id: "measured_rebellion", hpPct: 0.6, label: "Measured Rebellion" },
+      { id: "last_curve", hpPct: 0.25, label: "The Last Curve" },
+    ],
+    ...COSMIC,
+  },
   purity_inquisitor: {
     id: "purity_inquisitor",
     name: "Inquisitor of the Measured Hand",
@@ -642,6 +678,24 @@ export function createEnemy(typeId) {
   };
 }
 
+export function pickLyraEncounterType(game) {
+  if (!game?.worldFlags?.main_act3_complete) return 'rival_adventurer';
+  const rank = game.worldFlags?.prestige_rank ?? 0;
+  if (rank >= 4) return 'lyra_apostate';
+  if (rank >= 2) return 'lyra_champion';
+  return 'rival_adventurer';
+}
+
+function swapLyraInPool(pool, game) {
+  const lyraType = pickLyraEncounterType(game);
+  if (lyraType === 'rival_adventurer') return pool;
+  const idx = pool.indexOf('rival_adventurer');
+  if (idx < 0) return pool;
+  const next = [...pool];
+  next[idx] = lyraType;
+  return next;
+}
+
 export function pickEncounter(regionId, game = null) {
   const escalation = game?.worldFlags?.escalationTier ?? 0;
   const playerLevel = game?.player?.level ?? 1;
@@ -697,9 +751,12 @@ export function pickEncounter(regionId, game = null) {
       ? ["wheel_incarnate", "avatar_aurelan", "bloom_sovereign"]
       : escalation >= 3
         ? ["sylwen_revenant", "divine_inquisitor_supreme", "herald_of_starvation"]
-        : ["divine_inquisitor_supreme", "herald_of_starvation", "void_appetite"],
+        : (game?.worldFlags?.prestige_rank ?? 0) >= 4
+          ? ["lyra_apostate", "divine_inquisitor_supreme", "void_appetite"]
+          : ["divine_inquisitor_supreme", "herald_of_starvation", "void_appetite"],
   };
-  const pool = pools[regionId] || ["harvest_harpy"];
+  let pool = pools[regionId] || ["harvest_harpy"];
+  if (game) pool = swapLyraInPool(pool, game);
   const id = pool[Math.floor(Math.random() * pool.length)];
   return createEnemy(id);
 }

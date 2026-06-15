@@ -44,7 +44,7 @@ When `main_act3_complete` fires, stamp an **ending archetype** from existing fla
 - Wire into `combat.js`, `worldTransformation.js`, `divineAttention.js`  
 - Text: `textEngine/scenes/endings/echo.js` — one arrival line per archetype per region
 
-### 9b. Prestige Pilgrimage (Paragon Lite)
+### 9b. Prestige Pilgrimage (Paragon Lite) — ✅ SHIPPED (`Expedimental`)
 
 **Not full New Game+** — a **prestige track** within the same save after Act III:
 
@@ -59,7 +59,7 @@ When `main_act3_complete` fires, stamp an **ending archetype** from existing fla
 
 **Files:** `prestige.js`, `PrestigeModal.jsx`, `levelFeatures.js` extension bucket `PRESTIGE_TALENTS`
 
-### 9c. Rival Adventurer Ascension (`lyra_ascension` arc)
+### 9c. Rival Adventurer Ascension (`lyra_ascension` arc) — ✅ SHIPPED (`Expedimental`)
 
 Lyra Swiftblade was the tutorial rival. Phase 9 promotes her to **scaling nemesis**:
 

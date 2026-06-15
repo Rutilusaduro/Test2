@@ -13,6 +13,7 @@ import {
   tryClearObstacle,
   describeUnlockOptions,
 } from './obstacleUnlocks.js';
+import { isGateIgnoredByPrestige } from './prestige.js';
 
 export const CONNECTION_GATES = [
   {
@@ -159,6 +160,7 @@ export function isConnectionBlocked(game, fromRegionId, toRegionId) {
   syncGateUnlocks(game, { regionId: fromRegionId });
   const gate = getGateForConnection(fromRegionId, toRegionId);
   if (!gate) return { blocked: false };
+  if (isGateIgnoredByPrestige(game, gate.id)) return { blocked: false };
   if (game.worldFlags?.[gate.solvedFlag]) return { blocked: false };
   if (isAnyUnlockSatisfied(game, gate.unlocks, { regionId: fromRegionId })) {
     tryClearObstacle(game, gate, { regionId: fromRegionId });

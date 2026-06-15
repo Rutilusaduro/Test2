@@ -56,6 +56,25 @@ export const SUBCLASS_FEATURES = {
   honeyed_tongue: { 6: [{ id: 'honeyed_contract', name: 'Honeyed Contract', desc: 'Social victories can bind targets to willing growth.' }] },
 };
 
+/** Post-Act III prestige talents — chosen via PrestigeModal, not level gates. */
+export const PRESTIGE_TALENTS = {
+  feast_momentum: {
+    id: 'feast_momentum',
+    name: 'Feast Momentum',
+    desc: 'First communal feast each day grants +2 devotion party-wide.',
+  },
+  cosmic_satiety: {
+    id: 'cosmic_satiety',
+    name: 'Cosmic Satiety',
+    desc: 'Cosmic conversion grants +25 AP once per rest.',
+  },
+  wheel_splinter: {
+    id: 'wheel_splinter',
+    name: 'Wheel Splinter',
+    desc: 'Permanently ignore one region connection gate.',
+  },
+};
+
 export function getFeaturesForLevel(classId, subclassId, level) {
   const classFeats = CLASS_FEATURES[classId]?.[level] ?? [];
   const subFeats = SUBCLASS_FEATURES[subclassId]?.[level] ?? [];

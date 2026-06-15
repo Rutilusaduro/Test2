@@ -22,6 +22,14 @@ registerPool('combat.encounter', [
     'A rival adventurer steps into your path — proud, athletic, furious at what you are becoming. "I won\'t let abundance win," she says, though her gaze lingers on your curves.',
     'Steel meets appetite: a slim rival blocks the way in {regionName}, jaw set, hips narrow, envy barely hidden behind bravado.',
   ]},
+  { when: { enemyId: 'lyra_champion' }, text: [
+    'Lyra Swiftblade stands crowned in Church steel — mythic champion, mirror of your path, thighs disciplined and eyes blazing. "I trained for gods," she says. "I will not lose to dessert."',
+    'Your oldest rival ascended. Lyra Swiftblade, Champion of Measure, blocks the {regionName} with blade high and waist still narrow — for now.',
+  ]},
+  { when: { enemyId: 'lyra_apostate' }, text: [
+    'Lyra waits on the Wheel\'s threshold — voluptuous, cosmic, apostate to excess. Blade in one hand, pastry in the other. "One last duel," she breathes. "Winner feeds the loser."',
+    'Lyra Swiftblade, Apostate of Excess — curves crowned, law broken beautifully. The vestibule holds its breath.',
+  ]},
   { when: { enemyId: 'purity_inquisitor' }, text: [
     'Inquisitors of the Measured Hand advance in white trim — lean, armored, sincerely convinced your fullness is catastrophe.',
     'Church steel blocks the road in {regionName}: incense, warrants, and horror that does not wink.',

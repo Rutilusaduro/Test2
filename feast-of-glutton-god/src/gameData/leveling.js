@@ -22,6 +22,7 @@ import {
 } from "./levelUpChoices.js";
 import { autoPrepareSpells } from "./spellPreparation.js";
 import { restoreFavorFromRest } from "./favor.js";
+import { resetCosmicSatietyOnRest } from "./prestige.js";
 import { tickRegionHostility } from "./regionHostility.js";
 import { buildMulticlassSpellOptions } from "./spellLearning.js";
 import { resetDivineResonance } from "./divineResonance.js";
@@ -283,6 +284,7 @@ export function longRest(character, game = null) {
   if (character.restFlags) {
     character.restFlags.hungerForMoreUsed = false;
     character.restFlags.indulgeUsed = false;
+    resetCosmicSatietyOnRest(character);
   }
   if (game) {
     restoreFavorFromRest(character);

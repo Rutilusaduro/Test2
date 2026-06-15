@@ -23,6 +23,16 @@ registerPool('dm.gag.trivialize', [
     'Rival adventurer, rival appetite: pride lasts until the pastry does not.',
     'The duel was meant to be epic. It was — for her waistline.',
   ]},
+  { when: { enemyType: 'lyra_champion' }, text: [
+    'Lyra trained for gods — you trained her appetite. Champion plate creaks; pride submits.',
+    'Champion of Measure, measured in pastries now. The Church will need a new poster.',
+    'Mythic rival, mythic softness — Lyra\'s blade clatters; her blush does not.',
+  ]},
+  { when: { enemyType: 'lyra_apostate' }, text: [
+    'Cosmic apostate Lyra surrenders at the threshold — law, blade, and corset all undone.',
+    'She chose excess. You chose seconds. The Wheel files this under "expected."',
+    'Last duel, last curve — Lyra blooms where measure failed, moaning through apostasy.',
+  ]},
   { when: { enemyType: 'harvest_harpy' }, text: [
     'Wings beat, claws flash — then crumbs win. The farmyard terror becomes a farmyard regular.',
     'She shrieked menace. You answered with honey. The genre shifted mid-screech.',
