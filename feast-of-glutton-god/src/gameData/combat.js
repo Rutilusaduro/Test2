@@ -69,7 +69,7 @@ export function createCombatState(player, party, enemyTypeId, regionId, game = n
 
   const allies = [
     prepareCombatUnit({ ...player, x: 1, y: 4, isPlayer: true }, "ally", 0),
-    ...party.map((c, i) => prepareCombatUnit({ ...c, x: 1, y: 6 + i * 2, isPlayer: false }, "ally", i + 1)),
+    ...((party ?? []).map((c, i) => prepareCombatUnit({ ...c, x: 1, y: 6 + i * 2, isPlayer: false }, "ally", i + 1))),
   ];
   const preparedEnemies = enemies.map((e, i) => {
     const unit = prepareCombatUnit(e, "enemy", i);
@@ -123,6 +123,10 @@ function skipToPlayerTurn(combat) {
     if (!entry || entry.unit.isPlayer) break;
     if (entry.team === "enemy") {
       runEnemyAction(combat, entry.unit);
+      checkVictory(combat);
+      if (combat.victory) break;
+    } else if (entry.team === "ally") {
+      runAllyAction(combat, entry.unit);
       checkVictory(combat);
       if (combat.victory) break;
     }
@@ -732,6 +736,10 @@ export function advanceTurn(combat) {
       runEnemyAction(combat, entry.unit);
       checkVictory(combat);
       if (combat.victory) break;
+    } else if (entry.team === "ally") {
+      runAllyAction(combat, entry.unit);
+      checkVictory(combat);
+      if (combat.victory) break;
     }
 
     endTurn(combat.turnState, combat.allies, combat.enemies);
@@ -803,6 +811,33 @@ function runCosmicAbility(combat, enemy, target) {
     player.favor = Math.max(0, (player.favor || 0) - 1);
     addCorruption(target, 5);
     combat.log.push(`${enemy.name} tastes your gospel on the air — cold lips parting, thirst dressed as disdain.`);
+  }
+}
+
+function runAllyAction(combat, ally) {
+  const target = combat.enemies.find((e) => e.hp > 0 && !e.converted);
+  if (!target) return;
+
+  const dist = Math.abs(ally.x - target.x) + Math.abs(ally.y - target.y);
+  const allySize = getTileSize(getStage(ally.lbs).id);
+  const reach = getAttackReach(ally, ATTACK_TYPES.MELEE);
+  if (dist <= reach + allySize + 1) {
+    attackUnit(combat, ally, target);
+    return;
+  }
+
+  const dx = target.x > ally.x ? 1 : target.x < ally.x ? -1 : 0;
+  const dy = target.y > ally.y ? 1 : target.y < ally.y ? -1 : 0;
+  const candidates = [
+    { x: ally.x + dx, y: ally.y + dy },
+    { x: ally.x + dx, y: ally.y },
+    { x: ally.x, y: ally.y + dy },
+  ];
+  for (const { x, y } of candidates) {
+    if (canMoveTo(combat, ally, x, y)) {
+      moveUnit(combat, ally, x, y);
+      return;
+    }
   }
 }
 

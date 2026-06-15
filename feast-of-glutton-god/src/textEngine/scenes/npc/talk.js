@@ -4,7 +4,7 @@ import '../../modules.js';
 registerPool('npc.talk.greeting', [
   { when: { hasMet: true, relationship: 0 }, text: [
     '"Oh — it\'s you again." She remembers you, even if the bond is still thin.',
-    '"Back so soon?" {subject.first} eyes you with wary recognition — not strangers, not friends yet.',
+    '"Back so soon?" She eyes you with wary recognition — not strangers, not friends yet.',
     '"I remember you," she says quietly. "What do you want this time?"',
   ]},
   { when: { hasMet: false, relationship: 0 }, text: [
@@ -12,12 +12,12 @@ registerPool('npc.talk.greeting', [
     '"Can I help you with something?"',
   ]},
   { when: { relationship: 1 }, text: [
-    '"{subject.first}! Good to see a friendly face."',
+    '"{subject.first:ref}! Good to see a friendly face."',
     '"You again — I\'m glad you stopped by."',
   ]},
   { when: { relationship: 2 }, text: [
     '"There you are. I was hoping you\'d come by."',
-    '"{subject.first}! Come sit — I saved you something sweet."',
+    '"{subject.first:ref}! Come sit — I saved you something sweet."',
   ]},
   { when: { relationship: 3 }, text: [
     '"There you are, my dear. I\'ve been thinking about you."',

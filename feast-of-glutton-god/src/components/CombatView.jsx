@@ -101,6 +101,7 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onVict
   const [flashAction, setFlashAction] = useState(null);
   const [pendingSpell, setPendingSpell] = useState(null);
   const [inspectSpell, setInspectSpell] = useState(null);
+  const [spellTargetIds, setSpellTargetIds] = useState([]);
 
   const activeUnit = getActiveUnit(combat);
   const playerTurn = isPlayerTurn(combat);
