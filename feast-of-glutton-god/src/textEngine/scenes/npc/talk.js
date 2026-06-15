@@ -2,7 +2,12 @@ import { registerPool, createContext, render } from '../../engine.js';
 import '../../modules.js';
 
 registerPool('npc.talk.greeting', [
-  { when: { relationship: 0 }, text: [
+  { when: { hasMet: true, relationship: 0 }, text: [
+    '"Oh — it\'s you again." She remembers you, even if the bond is still thin.',
+    '"Back so soon?" {subject.first} eyes you with wary recognition — not strangers, not friends yet.',
+    '"I remember you," she says quietly. "What do you want this time?"',
+  ]},
+  { when: { hasMet: false, relationship: 0 }, text: [
     '"Oh — hello. I don\'t think we\'ve met."',
     '"Can I help you with something?"',
   ]},
@@ -95,6 +100,7 @@ export function renderTalk(npc, player, opts = {}) {
       level: player?.level ?? 1,
       escalationTier: wf.escalationTier ?? 0,
       act,
+      hasMet: Boolean(opts.hasMet ?? npc.met),
       consentState: opts.consentState,
       gainDesire: opts.gainDesire ?? npc.gainDesire,
       ...(opts.reactivity ?? {}),

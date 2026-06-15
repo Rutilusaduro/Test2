@@ -212,6 +212,10 @@ export function doObserve(npc, player, game) {
   const reactivity = getReactivityGlobals(game, game.region);
   const text = renderObserve(npc, player, { pose, location: game.region, history: getTextHistory(game), reactivity });
   addCorruption(npc, 1);
+  if (!npc.met) {
+    npc.met = true;
+    if (game.npcStates?.[npc.id]) game.npcStates[npc.id].met = true;
+  }
   const relResult = applyRelationshipGain(npc, 'observe', null, game);
   return withQuestProgress(game, npc, 'observe', null, appendTierUp({ text, npc }, npc, relResult));
 }
@@ -221,8 +225,15 @@ export function doTalk(npc, player, game) {
     const beat = renderRegionHostilityBeat(game, game.region, { hostilityTier: 1 });
     return { text: beat, npc, ok: false, declined: true };
   }
+  const wasMet = Boolean(npc.met);
+  if (!wasMet) {
+    npc.met = true;
+    if (game.npcStates?.[npc.id]) game.npcStates[npc.id].met = true;
+  }
   const reactivity = getReactivityGlobals(game, game.region);
-  const text = renderTalk(npc, player, { location: game.region, history: getTextHistory(game), reactivity, game });
+  const text = renderTalk(npc, player, {
+    location: game.region, history: getTextHistory(game), reactivity, game, hasMet: wasMet,
+  });
   const relResult = applyRelationshipGain(npc, 'talk', null, game);
   const offers = getQuestOffersForNpc(game, npc);
   let questOfferText = '';

@@ -218,7 +218,7 @@ registerPool('ge.clothingFail', [
 registerPool('ge.reactionBody', [
   { when: {}, text: [
     '{subject.first} runs both hands down her new shape, taking stock.',
-    '{subject.first} goes still, feeling the size of what just happened.',
+    '{subject.first} goes still, feeling the new weight settle.',
     '{subject.first} presses a hand to herself and just breathes.',
   ] },
   { when: { shameTierMin: 2 }, weight: 2, text: [
@@ -240,7 +240,6 @@ registerPool('ge.reactionBody', [
 registerPool('ge.reactionDialogue', [
   { when: {}, priority: 1, text: [
     '"...okay," she manages. "That\'s — okay."',
-    '"That just happened," she says, mostly to herself.',
   ] },
   { when: { corruption: 0 }, priority: 1, text: [
     '"I shouldn\'t — that\'s too much," she says, not quite believing it.',

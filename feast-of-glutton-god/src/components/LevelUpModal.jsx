@@ -7,7 +7,7 @@ export default function LevelUpModal({ pending, levelUpResult, onComplete }) {
 
   if (!pending && !levelUpResult) return null;
 
-  const narrative = pending?.narrative || levelUpResult?.narrative;
+  const narrative = pending?.narrative ?? (!pending ? levelUpResult?.narrative : null);
   const type = pending?.type;
 
   const confirmSpells = () => {
@@ -45,7 +45,7 @@ export default function LevelUpModal({ pending, levelUpResult, onComplete }) {
           ★ Level {pending?.level ?? levelUpResult?.level} — Abundance Ascendant
         </h2>
 
-        {narrative && type !== 'celebration' && (
+        {narrative && type !== 'celebration' && type !== 'spell_choice' && type !== 'multiclass_spell_choice' && (
           <div className="panel prose" style={{ marginBottom: '1rem', borderColor: 'var(--gold)' }}>
             {narrative}
           </div>
@@ -74,10 +74,10 @@ export default function LevelUpModal({ pending, levelUpResult, onComplete }) {
             )}
             <p className="prose" style={{ fontSize: '0.95rem', marginBottom: '0.75rem' }}>
               {pending.description || 'Choose new spells to learn.'}
-              {' '}Select <strong>{pending.pickCount}</strong> ({selectedSpells.length}/{pending.pickCount}).
+              {' '}Pick <strong>{pending.pickCount}</strong> from your unlocked pool ({selectedSpells.length}/{pending.pickCount}).
               Growth-themed spells are marked with ✦.
             </p>
-            <div className="btn-grid" style={{ gridTemplateColumns: '1fr' }}>
+            <div className="spell-levelup-pool">
               {(pending.options || []).map((spell) => (
                 <button
                   key={spell.id}

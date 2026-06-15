@@ -191,6 +191,49 @@ button.primary:hover:not(:disabled) {
   margin-top: 0.75rem;
 }
 
+.combat-finisher-modal {
+  max-width: 560px;
+}
+
+.combat-finisher-modal__note {
+  font-size: 0.9rem;
+  color: var(--text-dim);
+  margin: 0.5rem 0 1rem;
+}
+
+.combat-finisher-modal__choices {
+  display: grid;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+.combat-finisher-modal__choices button {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.35rem;
+  text-align: left;
+  padding: 1rem;
+}
+
+.combat-finisher-modal__choices button span {
+  font-size: 0.88rem;
+  color: var(--text-dim);
+  font-weight: normal;
+}
+
+.combat-finisher-modal__fatten {
+  border-color: var(--rose);
+}
+
+.spell-levelup-pool {
+  display: grid;
+  gap: 0.65rem;
+  max-height: 50vh;
+  overflow-y: auto;
+  padding-right: 0.25rem;
+}
+
 .log {
   max-height: 200px;
   overflow-y: auto;

@@ -3,7 +3,13 @@ import TitleScreen from "./components/TitleScreen.jsx";
 import CharacterCreation from "./components/CharacterCreation.jsx";
 import WorldView from "./components/WorldView.jsx";
 import CombatView from "./components/CombatView.jsx";
+import CombatFinisherModal from "./components/CombatFinisherModal.jsx";
 import CombatScenePopup from "./components/CombatScenePopup.jsx";
+import {
+  needsCombatFinisher,
+  buildFinisherState,
+  applyCombatFinisher,
+} from "./gameData/combatFinisher.js";
 import LevelUpModal from "./components/LevelUpModal.jsx";
 import PrestigeModal from "./components/PrestigeModal.jsx";
 import PilgrimageModal from "./components/PilgrimageModal.jsx";
@@ -244,7 +250,7 @@ export default function App() {
         narrateEvent(next, asiMsg, 'levelup');
       }
       const pending = next.player.levelUpsPending?.[0];
-      if (pending) {
+      if (pending?.narrative) {
         next.lastLevelUpResult = { level: pending.level, narrative: pending.narrative };
       } else {
         next.lastLevelUpResult = null;
@@ -307,11 +313,38 @@ export default function App() {
       if (prev.settings?.skipCombatScenes) {
         return prev;
       }
+      if (needsCombatFinisher(combat)) {
+        const finisher = buildFinisherState(prev, combat);
+        if (finisher) {
+          return { ...prev, combatFinisher: finisher };
+        }
+      }
       const wrapup = buildCombatWrapup(prev, combat);
-      const next = { ...prev, combatWrapup: wrapup };
+      return { ...prev, combatWrapup: wrapup };
+    });
+  }, []);
+
+  const handleFinisherChoose = useCallback((choice, meta = {}) => {
+    if (meta.done) {
+      setGame((prev) => {
+        if (!prev.combat) return prev;
+        const next = applyCombatEndState(prev, prev.combat);
+        saveGame({ ...next, combatFinisher: null, combatWrapup: null });
+        return { ...next, combatFinisher: null, combatWrapup: null };
+      });
+      setScreen("world");
+      return null;
+    }
+    let prose = '';
+    setGame((prev) => {
+      if (!prev.combat) return prev;
+      const applied = applyCombatFinisher(prev, prev.combat, choice);
+      prose = applied.prose;
+      const next = { ...prev, combat: applied.combat };
       saveGame(next);
       return next;
     });
+    return prose;
   }, []);
 
   const finalizeCombat = useCallback((combat) => {
@@ -391,7 +424,8 @@ export default function App() {
 
   if (screen === "combat" && game?.combat) {
     const showIntro = game.combatIntro && !game.combat.introDismissed;
-    const showWrapup = game.combatWrapup && game.combat.victory && !game.settings?.skipCombatScenes;
+    const showFinisher = game.combatFinisher && game.combat?.victory === 'win';
+    const showWrapup = !showFinisher && game.combatWrapup && game.combat.victory && !game.settings?.skipCombatScenes;
 
     return (
       <GameDebugShell game={game} onUpdateGame={updateGame} screen="combat" debugContext={debugContext}>
@@ -401,7 +435,7 @@ export default function App() {
           onUpdateCombat={(c) => updateGame((g) => ({ ...g, combat: c }))}
           onEnd={endCombat}
           onVictory={handleCombatVictory}
-          introBlocking={showIntro}
+          introBlocking={showIntro || showFinisher}
           onDebugContext={updateDebugContext}
         />
         {showIntro && (
@@ -409,6 +443,14 @@ export default function App() {
             variant="intro"
             prose={game.combatIntro.prose}
             onContinue={dismissCombatIntro}
+          />
+        )}
+        {showFinisher && (
+          <CombatFinisherModal
+            prompt={game.combatFinisher.prompt}
+            targetName={game.combatFinisher.targetName}
+            enemyCount={game.combatFinisher.enemyCount}
+            onChoose={handleFinisherChoose}
           />
         )}
         {showWrapup && (

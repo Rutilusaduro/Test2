@@ -30,4 +30,5 @@ registerSelectors(
   'isMilestone',
   // combat growth hindrance — movement/tile deltas from buildCombatGrowthGlobals
   'movementDropped', 'tileExpanded', 'prevMovement', 'nextMovement', 'prevTileSize', 'nextTileSize',
+  'hasMet',
 );

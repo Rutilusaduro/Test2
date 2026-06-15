@@ -21,16 +21,16 @@ export const SPELL_LEARNING_MODEL = {
   bard: {
     type: 'known',
     label: 'Spells Known',
-    spellsPerLevel: 1,
+    spellsPerLevel: 2,
     magicalSecretsLevels: [10, 14, 18],
     magicalSecretsCount: 2,
-    description: 'Learn one new spell per level from the bard list.',
+    description: 'Learn two new spells per level from your growing curriculum.',
   },
   warlock: {
     type: 'known',
     label: 'Pact Spells',
-    spellsPerLevel: 1,
-    description: 'Learn one powerful pact spell when your pact magic deepens.',
+    spellsPerLevel: 2,
+    description: 'Learn two powerful pact spells when your pact magic deepens.',
   },
 };
 
@@ -171,6 +171,15 @@ export function getLearningModel(classId) {
 
 export function getCurriculumForLevel(classId, level) {
   return CLASS_SPELL_CURRICULUM[classId]?.[level] ?? [];
+}
+
+/** All leveled spells unlocked in the curriculum up to this character level. */
+export function getUnlockedSpellPool(classId, upToLevel) {
+  const ids = new Set();
+  for (let lvl = 1; lvl <= upToLevel; lvl++) {
+    for (const id of getCurriculumForLevel(classId, lvl)) ids.add(id);
+  }
+  return [...ids];
 }
 
 export function getSubclassGrantsAtLevel(subclassId, level) {

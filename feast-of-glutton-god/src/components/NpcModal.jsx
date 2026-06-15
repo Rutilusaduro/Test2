@@ -28,7 +28,7 @@ export default function NpcModal({ npc, player, game, onClose, onUpdate, onGameR
   const menu = getInteractionMenu(npc, player, game);
   const tierZero = new Set(['talk', 'observe', 'feed']);
   const visibleMenu = menu.filter((item) => item.enabled || tierZero.has(item.id));
-  const isFirstMeeting = (npc.relationship || 0) === 0;
+  const isFirstMeeting = !npc.met;
 
   const finishApply = (result, interaction) => {
     if (result.npc) onUpdate(result.npc);

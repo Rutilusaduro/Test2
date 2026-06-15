@@ -504,6 +504,10 @@ export function renderCombatOutro(game, wrapup, opts = {}) {
     : wrapup.victory === 'flee' ? 'flee'
     : 'win';
 
+  if (wrapup.finisherProse) {
+    return wrapup.finisherProse;
+  }
+
   if (victoryType === 'defeat' || victoryType === 'flee') {
     const ctx = createContext({
       subject: game.player,
@@ -522,6 +526,10 @@ export function renderCombatOutro(game, wrapup, opts = {}) {
   const paragraphs = [];
   const enemies = wrapup.enemies ?? [];
   const scene = opts.scene ?? new Set();
+
+  if (victoryType === 'win' && wrapup.finisherResolved) {
+    return '';
+  }
 
   enemies.forEach((enemy, idx) => {
     const subject = {
@@ -544,7 +552,7 @@ export function renderCombatOutro(game, wrapup, opts = {}) {
     const line = render(`{${pool}}`, ctx, opts).trim();
     if (line) paragraphs.push(line);
 
-    if (idx === enemies.length - 1) {
+    if (idx === enemies.length - 1 && victoryType === 'converted') {
       const finisher = render('{dm.combat.finisher}', ctx, opts).trim();
       if (finisher) paragraphs.push(finisher);
     }
@@ -562,7 +570,7 @@ export function renderCombatOutro(game, wrapup, opts = {}) {
     seed: opts.seed != null ? `${opts.seed}_coda` : undefined,
   });
   const coda = render('{dm.combat.outro.victory_coda}', codaCtx, opts).trim();
-  if (coda) paragraphs.push(coda);
+  if (coda && !(victoryType === 'win' && wrapup.finisherResolved)) paragraphs.push(coda);
 
   const primaryType = enemies[0]?.type;
   if (primaryType && isCosmicThreat(primaryType) && victoryType !== 'defeat') {
@@ -610,9 +618,11 @@ export function buildCombatWrapup(game, combat) {
     region: combat.regionId ?? game.region,
     enemies,
     allies,
+    finisherResolved: combat.finisherResolved ?? false,
+    finisherProse: combat.finisherProse ?? null,
   };
   return {
     ...wrapup,
-    prose: renderCombatOutro(game, wrapup),
+    prose: wrapup.finisherProse || renderCombatOutro(game, wrapup),
   };
 }

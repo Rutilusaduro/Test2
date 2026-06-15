@@ -8,6 +8,7 @@ import { getStage } from './stages.js';
 import {
   getLearningModel,
   getCurriculumForLevel,
+  getUnlockedSpellPool,
   getSubclassGrantsAtLevel,
   CLASS_CANTRIP_POOL,
   STARTING_SPELLS,
@@ -215,8 +216,12 @@ export function resolveSpellLearning(character, newLevel) {
     };
   }
 
-  const curriculum = filterLearnable(getCurriculumForLevel(classId, newLevel), character, maxSpellLevel);
-  const pickCount = model.spellsPerLevel ?? 1;
+  const curriculum = filterLearnable(
+    getUnlockedSpellPool(classId, newLevel),
+    character,
+    maxSpellLevel,
+  );
+  const pickCount = model.spellsPerLevel ?? 2;
 
   if (model.type === 'spellbook' && newLevel > 1) {
   } else if (model.type === 'known' && newLevel === 1) {
@@ -247,7 +252,7 @@ export function resolveSpellLearning(character, newLevel) {
     };
   }
 
-  const options = optionPool.slice(0, Math.max(totalPick + 3, 6));
+  const options = optionPool;
   if (options.length <= totalPick) {
     for (const id of options) {
       if (learnSpell(character, id)) autoGranted.push(id);
@@ -268,7 +273,7 @@ export function resolveSpellLearning(character, newLevel) {
       label: model.label,
       description: magicalSecrets
         ? 'Magical Secrets — choose growth spells from any class list.'
-        : model.description,
+        : (model.description || 'Choose from your unlocked spell curriculum.'),
     },
     growthHighlights: growthHighlights.map((id) => spellSummary(id)),
     model: model.type,
