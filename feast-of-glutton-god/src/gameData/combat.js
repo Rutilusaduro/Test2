@@ -44,9 +44,10 @@ const TRIVIALIZE_MIN_PLAYER_STAGE = 6;
 const TRIVIALIZE_SIZE_GAP = 3;
 
 function prepareCombatUnit(unit, team, index) {
+  const combatId = `${team}_${index}`;
   return {
     ...unit,
-    combatId: getCombatUnitId(unit, team, index),
+    combatId,
     x: unit.x ?? 0,
     y: unit.y ?? 0,
   };
@@ -179,7 +180,8 @@ export function canMoveTo(combat, unit, nx, ny) {
 
 export function getReachableTiles(combat, unit) {
   const entry = getActiveEntry(combat.turnState);
-  const eco = entry ? getEconomy(combat.turnState, entry.id) : { movementRemaining: getMovement(getStage(unit.lbs).id) };
+  if (!entry || entry.unit !== unit) return [];
+  const eco = getEconomy(combat.turnState, entry.id);
   const move = eco.movementRemaining ?? getMovement(getStage(unit.lbs).id);
   const size = getTileSize(getStage(unit.lbs).id);
   const tiles = [];
@@ -196,8 +198,12 @@ export function getReachableTiles(combat, unit) {
 
 export function moveUnit(combat, unit, x, y) {
   const entry = getActiveEntry(combat.turnState);
+  if (!entry || entry.unit !== unit) {
+    combat.log.push(`${unit.name} cannot move right now!`);
+    return combat;
+  }
   const dist = Math.abs(x - unit.x) + Math.abs(y - unit.y);
-  if (entry && !canSpendMovement(combat.turnState, entry.id, dist)) {
+  if (!canSpendMovement(combat.turnState, entry.id, dist)) {
     combat.log.push("Not enough movement remaining!");
     return combat;
   }
@@ -691,7 +697,7 @@ function resolveLegendaryActions(combat) {
     const def = getEnemyTypeDef(enemy);
     if (!def?.legendaryActions?.length) continue;
 
-    const eid = enemy.combatId || enemy.id || enemy.typeId;
+    const eid = enemy.combatId || enemy.typeId || enemy.id;
     const used = combat.legendaryUsed[eid] ?? 0;
     const max = def.legendaryActionCount ?? 1;
     if (used >= max) continue;

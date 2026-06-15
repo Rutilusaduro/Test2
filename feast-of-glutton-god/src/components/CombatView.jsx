@@ -101,15 +101,14 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onVict
   const [pendingSpell, setPendingSpell] = useState(null);
   const [spellTargetIds, setSpellTargetIds] = useState([]);
 
-  const selectedUnit = getActiveUnit(combat) || combat.allies[0];
-  const turnSummary = getTurnSummary(combat);
+  const activeUnit = getActiveUnit(combat);
   const playerTurn = isPlayerTurn(combat);
-  const reachable = mode === "move" && playerTurn && selectedUnit
-    ? getReachableTiles(combat, selectedUnit)
+  const reachable = mode === "move" && playerTurn && activeUnit?.isPlayer
+    ? getReachableTiles(combat, activeUnit)
     : [];
+  const turnSummary = getTurnSummary(combat);
   const spells = getPreparedSpells(player);
-  const activeUnit = getActiveUnit(combat) || combat.allies.find((a) => a.isPlayer);
-  const bonusActions = activeUnit ? getAvailableBonusActions(activeUnit) : [];
+  const bonusActions = activeUnit?.isPlayer ? getAvailableBonusActions(activeUnit) : [];
   const selectedEnemy = combat.enemies.find((e) => (e.combatId || e.id) === selectedEnemyId)
     ?? combat.enemies.find((e) => e.id === selectedEnemyId);
   const latestLog = combat.log.slice(-1)[0] || "";
@@ -193,7 +192,11 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onVict
   const resetSpellMode = () => {
     setPendingSpell(null);
     setSpellTargetIds([]);
-    setMode("action");
+  };
+
+  const resumeMovementMode = (c) => {
+    const summary = getTurnSummary(c);
+    setMode(summary?.movement > 0 ? "move" : "action");
   };
 
   const finishSpellCast = (c, spell, targets) => {
@@ -211,6 +214,7 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onVict
     flashSpend(spell.actionType === "bonus" ? "bonus" : "action");
     checkVictory(c);
     resetSpellMode();
+    resumeMovementMode(c);
     update(c, `Cast ${spell.name}.`);
   };
 
@@ -245,6 +249,7 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onVict
 
   const cancelSpellCast = () => {
     resetSpellMode();
+    resumeMovementMode(combat);
     setActionConfirm("");
   };
 
@@ -264,6 +269,7 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onVict
     flashSpend("action");
     checkVictory(c);
     setSelectedEnemyId(null);
+    resumeMovementMode(c);
     update(c, "Attack spent.");
   };
 
@@ -285,6 +291,7 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onVict
     }
     flashSpend("action");
     setSelectedEnemyId(null);
+    resumeMovementMode(result.combat);
     update(result.combat, "Trivialized — the dread foe is dessert now.");
   };
 
@@ -365,6 +372,7 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onVict
       flashSpend("action");
       checkVictory(c);
       setSelectedEnemyId(target.combatId || target.id);
+      resumeMovementMode(c);
       update(c, `Fed ${target.name}.`);
     }
   };
@@ -385,6 +393,7 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onVict
     }
     flashSpend("bonus");
     checkVictory(c);
+    resumeMovementMode(c);
     update(c, "Bonus action spent.");
   };
 
@@ -449,7 +458,7 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onVict
       <div className="header">
         <h1>Round {turnSummary?.round ?? combat.turn} — {turnSummary?.active ?? "…"}</h1>
         <p className="subtitle">
-          {isPlayerTurn(combat) ? "Your turn" : "Enemy turn"}
+          {playerTurn ? "Your turn" : turnSummary?.team === "ally" ? "Ally turn" : "Enemy turn"}
         </p>
       </div>
 

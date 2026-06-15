@@ -40,8 +40,9 @@ export function createTurnEconomy(unit) {
   };
 }
 
+/** Stable per-combat instance id — never reuse type ids (duplicate goblins share type id). */
 export function getCombatUnitId(unit, team, index) {
-  return unit.combatId || unit.id || `${team}_${index}`;
+  return unit.combatId ?? `${team}_${index}`;
 }
 
 /** Roll initiative for all units; returns sorted order */
@@ -148,7 +149,10 @@ export function spendAction(turnState, unitId, type = ACTION_TYPES.ACTION) {
 
 /** Growth mid-turn — update footprint, grant temp HP, flag economy */
 export function onUnitGrew(turnState, unit, growthResult) {
-  const id = unit.combatId || unit.id;
+  const entry = turnState.order.find((e) => e.unit === unit)
+    ?? turnState.order[turnState.turnIndex];
+  const id = entry?.id ?? unit.combatId;
+  if (!id) return turnState;
   const eco = getEconomy(turnState, id);
   eco.growthThisTurn = true;
   const newStage = growthResult.endStage;

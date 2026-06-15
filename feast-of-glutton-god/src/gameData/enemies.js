@@ -656,11 +656,25 @@ export function isConversionImmune(enemyOrTypeId) {
   return Boolean(def?.conversionImmune);
 }
 
+/** Short prose name for species/title enemies — not the leading adjective. */
+export function deriveEnemyShortName(name = '') {
+  const trimmed = name.trim();
+  if (!trimmed) return 'foe';
+  if (trimmed.includes(',')) return trimmed.split(',')[0].trim().split(/\s+/)[0];
+  if (/\s+in\s+/i.test(trimmed)) return trimmed.split(/\s+in\s+/i)[0].trim();
+  if (/\s+of\s+/i.test(trimmed)) return trimmed.split(/\s+of\s+/i)[0].trim();
+  if (trimmed.toLowerCase().startsWith('the ')) return trimmed.slice(4).trim();
+  const parts = trimmed.split(/\s+/);
+  if (parts.length <= 2) return parts[parts.length - 1];
+  return parts[parts.length - 1];
+}
+
 export function createEnemy(typeId) {
   const t = ENEMY_TYPES[typeId] || ENEMY_TYPES.harvest_harpy;
   return {
     ...t,
     typeId: t.id,
+    shortName: t.shortName ?? deriveEnemyShortName(t.name),
     growthKind: t.growthKind || getEnemyGrowthKind(t.id),
     lbs: t.startLbs,
     corruption: 0,

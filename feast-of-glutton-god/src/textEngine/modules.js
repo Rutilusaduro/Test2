@@ -18,7 +18,12 @@ registerModule('subject.name', [
 ]);
 
 registerModule('subject.first', [
-  { when: {}, text: [(ctx) => (ctx.subject?.name || 'Someone').split(' ')[0]] },
+  { when: {}, text: [(ctx) => {
+    const s = ctx.subject;
+    if (s?.shortName) return s.shortName;
+    if (s?.firstName) return s.firstName;
+    return (s?.name || 'Someone').split(' ')[0];
+  }] },
 ]);
 
 registerModule('subject.lbs', [
