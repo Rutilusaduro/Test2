@@ -19,7 +19,7 @@ import { ensureInfluenceState } from "./gameData/influence.js";
 import { ensureTransformationState } from "./gameData/worldTransformation.js";
 import { ensureReactivityState } from "./gameData/worldReactivity.js";
 import { ensurePartyUniversalSize } from "./gameData/universalSize.js";
-import { recordCombatEndForQuests } from "./hooks/questHooks.js";
+import { recordCombatEndForQuests, flushCompanionMilestoneBeats } from "./hooks/questHooks.js";
 import { recordPuzzleSolvedForQuests } from "./hooks/puzzleHooks.js";
 import { applySolutionImmediate } from "./gameData/puzzleEngine.js";
 import { recordCombatVictory } from "./gameData/obstacleUnlocks.js";
@@ -56,6 +56,7 @@ function applyLevelUpResults(game, levelUps) {
   const message = levelUps.map((lu) => lu.narrative || `Level ${lu.level}! ${lu.flavor}`).join("\n\n---\n\n");
   game.lastLevelUpMessage = message;
   narrateEvent(game, message, 'levelup');
+  flushCompanionMilestoneBeats(game);
   return game;
 }
 
@@ -83,6 +84,9 @@ function applyCombatEndState(prev, combat) {
     for (const portent of spread.divineAttention?.portents ?? []) {
       if (portent.message) narrateEvent(next, portent.message, 'quest');
     }
+    if (spread.divineAttention?.genreBeat) {
+      narrateEvent(next, spread.divineAttention.genreBeat, 'event');
+    }
     if (spread.divineAttention?.antagonistBeat) {
       narrateEvent(next, spread.divineAttention.antagonistBeat, 'quest');
     }
@@ -96,6 +100,9 @@ function applyCombatEndState(prev, combat) {
       const trivialDivine = raiseDivineAttention(next, 'trivialize');
       for (const portent of trivialDivine.portents ?? []) {
         if (portent.message) narrateEvent(next, portent.message, 'quest');
+      }
+      if (trivialDivine.genreBeat) {
+        narrateEvent(next, trivialDivine.genreBeat, 'event');
       }
       if (trivialDivine.antagonistBeat) {
         narrateEvent(next, trivialDivine.antagonistBeat, 'quest');

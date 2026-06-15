@@ -3,6 +3,18 @@ import { registerPool, createContext, render } from '../../engine.js';
 // ── dm.genre.frame — arrival genre-clash framing (FULL SENTENCE) ──
 // The ONLY voice that perceives the mismatch between earnest fantasy and off-genre power.
 registerPool('dm.genre.frame', [
+  { when: { escalationTierMin: 3, region: 'barrow_deeps' }, text: [
+    'The barrow plays straight gothic — oath-stone, cold, honest dread. You bring a hunger older than its god.',
+    'Veshanne\'s deeps measure you in carvings. The narrator whispers: wrong genre, right tomb.',
+  ]},
+  { when: { escalationTierMin: 3, region: 'gilded_citadel_inner' }, text: [
+    'Divine geometry was not drafted for curves like yours. The inner sanctum recalculates and fails charmingly.',
+    'High altar, high stakes — the Wheel\'s law made marble. Your patron made appetite. Marble is losing.',
+  ]},
+  { when: { escalationTierMin: 4, region: 'divine_plane_vestibule' }, text: [
+    'The gods\' own hallway — illegal presence, cosmic draft, theology as architecture. You belong here impossibly.',
+    'Planar law visible as lines on the floor. You walk off-script. The DM stops joking for one beat.',
+  ]},
   { when: { escalationTierMin: 3, region: 'gilded_citadel' }, text: [
     'The temple-capital kneels to gods who do not know what you are. Even here, your patron\'s hunger reads wrong to the Wheel.',
     'Incense and hymn — and beneath them, the wrongness you carry. The pantheon\'s heart beats faster because you walked in.',
@@ -71,6 +83,16 @@ registerPool('dm.genre.power', [
 
 // ── dm.genre.escalation — tier register (FULL SENTENCE) ─────────
 registerPool('dm.genre.escalation', [
+  { when: { escalationTier: 5 }, text: [
+    'Apotheosis register — theological awe. The DM speaks like weather reporting the end of a genre.',
+    'Tier five: you are no longer the wrong note. You are the new key the Wheel must learn or break.',
+    'The Fat Goddess is almost here. Even irony kneels — briefly, beautifully.',
+  ]},
+  { when: { escalationTier: 4 }, text: [
+    'Cosmic dread register — horrified and fascinated. Avatars deploy; the pantheon runs out of euphemisms.',
+    'Tier four: extinction protocols considered, then postponed. You are too interesting to erase quickly.',
+    'The narrator\'s smirk dies. Something like respect replaces it. The feast deepens.',
+  ]},
   { when: { escalationTier: 3 }, text: [
     'Act III air — awed, terrified, divine. The Wheel knows your name now, and wishes it didn\'t.',
     'Apotheosis weather. Even the narrator speaks softer; the sky does not.',

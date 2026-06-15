@@ -3,7 +3,9 @@
  * Drives escalationTier for the DM narrator and gates Act II→III opposition (Prompt 3).
  */
 import { renderPortentBeat } from '../textEngine/scenes/dm/portent.js';
+import { renderGenreBeat } from '../textEngine/scenes/dm/genre.js';
 import { renderVerityConfrontation, renderHeraldUltimatum } from '../textEngine/scenes/npc/antagonist.js';
+import { addExperience, XP_SOURCES } from './leveling.js';
 import { getRegionHostility, getHostilityTier } from './regionHostility.js';
 
 export const DIVINE_ATTENTION_TIERS = [
@@ -142,6 +144,21 @@ function checkPortentEvents(game, oldPoints, newPoints) {
     game.worldFlags.lastPortent = def.id;
     triggered.push({ def, entry, message });
 
+    if (game.player) {
+      const { levelUps, amount } = addExperience(
+        game.player,
+        XP_SOURCES.divine_attention_milestone,
+        'divine_attention_milestone',
+      );
+      if (amount > 0) {
+        entry.message = `${message}\n\n+${amount} XP — the Wheel marks another threshold.`;
+        if (levelUps?.length) {
+          game.lastLevelUpMessage = levelUps.map((lu) => lu.narrative || `Level ${lu.level}!`).join('\n\n---\n\n');
+          game.lastLevelUpResult = levelUps[levelUps.length - 1];
+        }
+      }
+    }
+
     if (def.id === 'inquisition_whispers' && !game.worldFlags.verity_act2_seen) {
       game.worldFlags.verity_act2_seen = true;
       const verityBeat = renderVerityConfrontation(game, { act: 2 });
@@ -173,8 +190,12 @@ export function raiseDivineAttention(game, source, amountOverride) {
   const portents = checkPortentEvents(game, oldPoints, total);
 
   let antagonistBeat = null;
+  let genreBeat = null;
   if (newTier > oldTier) {
     antagonistBeat = renderVerityConfrontation(game);
+    genreBeat = renderGenreBeat(game, 'escalation', {
+      escalationTier: getDivineAttentionTier(total).current.escalationTier,
+    });
   }
 
   return {
@@ -186,6 +207,7 @@ export function raiseDivineAttention(game, source, amountOverride) {
     portents,
     portent: portents[0] ?? null,
     antagonistBeat,
+    genreBeat,
   };
 }
 

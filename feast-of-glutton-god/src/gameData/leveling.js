@@ -14,6 +14,7 @@ import {
   getCharacterSpells,
 } from "./spellLearning.js";
 import { buildLevelUpMessage } from "../textEngine/scenes/leveling/index.js";
+import { isCosmicThreat } from "./enemies.js";
 import {
   ASI_LEVELS,
   buildAsiOptions,
@@ -30,7 +31,7 @@ export const MAX_LEVEL = 20;
 /** XP required to reach each level (cumulative) */
 export const XP_THRESHOLDS = [
   0, 0, 300, 900, 2700, 6500, 14000, 23000, 34000, 48000, 64000,
-  85000, 100000, 120000, 140000, 165000, 195000, 225000, 265000, 305000, 355000,
+  85000, 100000, 115000, 132000, 150000, 170000, 192000, 215000, 240000, 265000,
 ];
 
 export const XP_SOURCES = {
@@ -44,6 +45,8 @@ export const XP_SOURCES = {
   npc_growth_milestone: 25,
   fatten_stage: 20,
   quest_complete: 100,
+  cosmic_conversion: 200,
+  divine_attention_milestone: 150,
 };
 
 /** Size stage caps unlocked by level milestones (tier ids on new ladder) */
@@ -54,8 +57,9 @@ export const SIZE_CAP_BY_LEVEL = {
   7: 9,
   9: 11,
   12: 12,
-  16: 13,
-  20: 14,
+  13: 12,
+  15: 13,
+  16: 14,
 };
 
 const LEVEL_UP_FLAVOR = [
@@ -260,7 +264,10 @@ export function awardFatteningXp(player, stagesGained = 1, source = 'fatten_othe
 export function awardCombatXp(player, combat) {
   if (!combat?.victory || combat.victory === "lose") return { xp: 0, levelUps: [] };
   let xp = XP_SOURCES.combat_win;
-  if (combat.victory === "converted") xp = XP_SOURCES.combat_convert;
+  if (combat.victory === "converted") {
+    const hasCosmic = (combat.enemies ?? []).some((e) => isCosmicThreat(e));
+    xp = hasCosmic ? XP_SOURCES.cosmic_conversion : XP_SOURCES.combat_convert;
+  }
   xp += combat.enemies.length * 10;
   const growthLevelUp = combat.allies?.some((a) => a.isPlayer && a.grewThisCombat);
   return addExperience(player, xp, "combat", { growthLevelUp });

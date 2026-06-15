@@ -11,11 +11,22 @@ import { narrateEvent } from '../gameData/narrator.js';
 import { renderRegionHostilityBeat } from '../textEngine/scenes/dm/region.js';
 import { clearCrackdown } from '../gameData/regionHostility.js';
 import { awardCompanionDevotion } from '../gameData/companionDevotion.js';
+import {
+  checkCompanionMilestones,
+  formatCompanionMilestoneMessages,
+} from '../gameData/companionMilestones.js';
 
 /**
  * Record an NPC interaction for quest objective progress.
  * @returns {{ lines: string[], growthSnippets: string[], questMessages: string }}
  */
+export function flushCompanionMilestoneBeats(game) {
+  const fired = checkCompanionMilestones(game);
+  const message = formatCompanionMilestoneMessages(fired);
+  if (message) narrateEvent(game, message, 'devotion');
+  return fired;
+}
+
 export function recordNpcInteractionForQuests(game, { npcId, interaction, npc, meta }) {
   ensureQuestState(game);
   const { lines, growthSnippets } = notifyQuestEvent(game, {
@@ -27,6 +38,7 @@ export function recordNpcInteractionForQuests(game, { npcId, interaction, npc, m
     regionId: game.region,
   });
   const questMessages = formatQuestMessages(lines, growthSnippets);
+  flushCompanionMilestoneBeats(game);
   return { lines, growthSnippets, questMessages };
 }
 
@@ -52,6 +64,7 @@ export function recordRegionVisitForQuests(game, regionId) {
     type: 'visit_region',
     regionId,
   });
+  flushCompanionMilestoneBeats(game);
   return { questMessages: formatQuestMessages(lines, growthSnippets) };
 }
 
@@ -83,6 +96,7 @@ export function recordCombatEndForQuests(game, combat) {
     defeatedEnemyIds,
     trivialized: Boolean(combat.trivialized),
   });
+  flushCompanionMilestoneBeats(game);
   return { questMessages: formatQuestMessages(lines, growthSnippets) };
 }
 

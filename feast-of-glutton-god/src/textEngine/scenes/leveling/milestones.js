@@ -14,7 +14,7 @@
 // ═══════════════════════════════════════════════════════════════
 import { registerPool } from '../../engine.js';
 
-export const MILESTONE_LEVELS = new Set([5, 10, 15, 20]);
+export const MILESTONE_LEVELS = new Set([5, 10, 13, 15, 16, 19, 20]);
 
 // ── levelup.milestone (FULL SENTENCE) ───────────────────────────
 // DM voice, earnest world register crossing into wry then epic cosmic.
@@ -35,6 +35,43 @@ registerPool('levelup.milestone', [
     `★ Level ten. The DM sets down his notes. "The gods know your name. Not as a rumor — as a problem they've started drawing up plans for."`,
     `★ Milestone ten: halfway to apotheosis, and the Wheel has convened twice about you. Your size alone qualifies as a theological argument.`,
     `★ Double digits. The narrative gear-shifts. Act II energy crackles in the air; divine opponents start arriving in earnest. You have never looked better.`,
+  ]},
+
+  // ── Level 13 — Pact of Shared Hunger / mythic tier entry ─────
+  { when: { level: 13 }, text: [
+    `★ Level thirteen. The Wheel creaks under your weight — not metaphorically. Multiclass hunger unlocks; the DM upgrades your threat rating.`,
+    `★ Milestone thirteen: Titan band confirmed. Your spells borrow from other classes now — the genre mash-up deepens.`,
+    `★ Thirteen. Korthak's saints and Sylwen's choirs agree on one thing: you are no longer a local problem.`,
+  ]},
+
+  // ── Level 14 — divine test band ───────────────────────────────
+  { when: { level: 14 }, text: [
+    `★ Level fourteen. God-champions arrive and you already know their names.`,
+    `★ Milestone fourteen: the patron's proving draws near. Reality softens preemptively.`,
+  ]},
+
+  // ── Level 16 — World Mother / stage 14 unlock band ────────────
+  { when: { level: 16 }, text: [
+    `★ Level sixteen. The Fat Goddess stirs. Whole groves bloom in her turning.`,
+    `★ Milestone sixteen: Tarrasque Matriarch cap within reach — the feast becomes geography.`,
+  ]},
+
+  // ── Level 17 — vestibule band ─────────────────────────────────
+  { when: { level: 17 }, text: [
+    `★ Level seventeen. The gods have noticed. All of them, all at once, in the way prey notices a predator.`,
+    `★ Milestone seventeen: planar thresholds unlock. The DM speaks softer; the sky does not.`,
+  ]},
+
+  // ── Level 18 — legendary combat band ──────────────────────────
+  { when: { level: 18 }, text: [
+    `★ Level eighteen. You are the largest thing in the world that moves under its own hunger.`,
+    `★ Milestone eighteen: legendary actions meet legendary appetite. Buckle in.`,
+  ]},
+
+  // ── Level 19 — companion apotheosis band ──────────────────────
+  { when: { level: 19 }, text: [
+    `★ Level nineteen. The Measured Wheel is a hoop you could eat.`,
+    `★ Milestone nineteen: companion apotheoses unlock. Six who walk beside you approach divinity.`,
   ]},
 
   // ── Level 15 — Epic tier; cosmic register ascending ───────────
@@ -80,6 +117,26 @@ registerPool('levelup.milestone.dm', [
   ]},
   { when: {}, text: [
     `{levelup.milestone}`,
+  ]},
+]);
+
+registerPool('levelup.multiclass_spell', [
+  { when: { level: 13 }, text: [
+    '★ Pact of Shared Hunger — the Wheel creaks as you borrow another class\'s spell. The DM updates your character sheet with suspicious enthusiasm.',
+    '★ Level thirteen unlocks cross-class curriculum. Your patron approves of theft that tastes like dessert.',
+  ]},
+  { when: {}, text: [
+    'Another class\'s magic folds into your repertoire — wrong genre, right power.',
+  ]},
+]);
+
+registerPool('levelup.resonance', [
+  { when: { levelMin: 15 }, text: [
+    '★ Divine resonance awakens — excess abundance points channel into raw patron power.',
+    '★ Level fifteen and beyond: when your AP overflows, the Fat Goddess drinks the surplus and answers.',
+  ]},
+  { when: {}, text: [
+    'Resonance hums beneath your skin — hunger finding new circuits.',
   ]},
 ]);
 

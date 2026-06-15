@@ -83,6 +83,26 @@ registerPool('dm.idle', [
     'Merchants hawk sweets you haven\'t tasted yet. The square bustles with possibility.',
     'Coin changes hands, hips sway between stalls — abundance wears a merchant\'s smile today.',
   ]},
+  { when: { region: 'barrow_deeps' }, text: [
+    'Oath-carvings watch you idle. The cold here is older than fear and warmer than it should be.',
+    'Pact-smoke curls in still air. Even waiting feels like a rite in Veshanne\'s deeps.',
+  ]},
+  { when: { region: 'gilded_citadel_inner' }, text: [
+    'Divine geometry hums. The sanctum reconsiders its floor plan while you catch your breath.',
+    'Marble altar, measured silence — broken by the distant smell of someone cooking destiny.',
+  ]},
+  { when: { region: 'divine_plane_vestibule' }, text: [
+    'Cosmic draft through impossible windows. The gods\' hallway waits, offended and curious.',
+    'Planar quiet — law made visible, your presence still technically illegal. Delicious.',
+  ]},
+  { when: { region: 'gorgara_cradle' }, text: [
+    'The thin veil purrs. Golden water remembers your footsteps.',
+    'Shrine-quiet — patron-close, hunger-holy, inevitable.',
+  ]},
+  { when: { region: 'ancient_temple' }, text: [
+    'Ruins exhale feast-smoke. Every fallen arch seems to lean toward your next idea.',
+    'Temple hush — old gods, new appetite, excellent acoustics for plotting.',
+  ]},
   { when: {}, text: [
     'A quiet beat — the continent exhales. No rush. Appetite is patient.',
     'The world waits, amused. You have time to choose your next delicious move.',

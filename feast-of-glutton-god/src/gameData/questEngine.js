@@ -8,7 +8,8 @@ import { awardAbundanceSpreadWithEvents } from './worldEvents.js';
 import { getCorruptionTier } from './corruption.js';
 import { getStage, advanceStage } from './stages.js';
 import { applyGrowthWithPresentation } from './growthPresentation.js';
-import { awardPartyDevotion } from './companionDevotion.js';
+import { awardPartyDevotion, awardCompanionDevotion } from './companionDevotion.js';
+import { renderCompanionMilestone } from '../textEngine/scenes/companion/index.js';
 import { addAbundancePoints } from './player.js';
 import { addExperience, XP_SOURCES } from './leveling.js';
 import { getNpcState, applyNpcState } from './player.js';
@@ -378,9 +379,11 @@ function applyRewardBundle(game, bundle = {}) {
   }
   if (bundle.xp) {
     const source = bundle.xpSource && XP_SOURCES[bundle.xpSource] ? bundle.xpSource : 'general';
-    const amount = bundle.xpSource && XP_SOURCES[bundle.xpSource]
-      ? XP_SOURCES[bundle.xpSource]
-      : bundle.xp;
+    const amount = bundle.xp != null
+      ? bundle.xp
+      : (bundle.xpSource && XP_SOURCES[bundle.xpSource]
+        ? XP_SOURCES[bundle.xpSource]
+        : 0);
     const { levelUps } = addExperience(game.player, amount, source);
     messages.push(`+${amount} XP`);
     if (levelUps.length) {
@@ -584,9 +587,18 @@ export function notifyQuestEvent(game, event = {}) {
         }
       } else if (obj.type === OBJECTIVE_TYPE.COMPANION_MILESTONE) {
         if (event.type === 'visit_region' && objectiveTargetMet(game, obj, instance)) {
+          const companion = getCompanionInParty(game, obj.companionId);
           const apotheosisFlag = `${obj.companionId}_apotheosis_complete`;
           if (!getPlayerFlag(game, apotheosisFlag)) {
             game.player.storyFlags[apotheosisFlag] = true;
+            game.player.storyFlags[`${obj.companionId}_t4_complete`] = true;
+          }
+          if (companion) {
+            awardCompanionDevotion(companion, 20, 'milestone');
+            const scene = renderCompanionMilestone(game, obj.companionId, 4, companion, {
+              milestoneTitle: 'Apotheosis Beside You',
+            });
+            if (scene) growthSnippets.push(scene);
           }
           instance.objectives[obj.id].progress = obj.count ?? 1;
           instance.objectives[obj.id].completed = true;
@@ -638,9 +650,14 @@ export function notifyQuestEvent(game, event = {}) {
         const rec = instance.objectives[obj.id];
         if (!rec.completed) {
           if (obj.type === OBJECTIVE_TYPE.COMPANION_MILESTONE) {
+            const companion = getCompanionInParty(game, obj.companionId);
             const apotheosisFlag = `${obj.companionId}_apotheosis_complete`;
             if (!getPlayerFlag(game, apotheosisFlag)) {
               game.player.storyFlags[apotheosisFlag] = true;
+              game.player.storyFlags[`${obj.companionId}_t4_complete`] = true;
+            }
+            if (companion) {
+              awardCompanionDevotion(companion, 20, 'milestone');
             }
           }
           rec.progress = obj.count ?? 1;

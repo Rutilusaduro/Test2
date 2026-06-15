@@ -23,6 +23,7 @@ import './growthEvent/index.js';
 import './growth/index.js';
 import './quests/index.js';
 import './leveling/index.js';
+import './companion/milestones.js';
 import './leveling/tiers.js';
 import './leveling/milestones.js';
 import './spells/namedSpellFlavor.js';
@@ -41,6 +42,7 @@ import './npc/companionPersonas.js';
 import './npc/antagonist.js';
 import './player/indulge.js';
 
+export { renderCompanionMilestone } from './companion/index.js';
 export { renderUnmetDescriptor } from './npc/unmet.js';
 export { renderObserve, POSES } from './npc/observe.js';
 export { renderFeed, FEED_TEMPLATE } from './npc/feed.js';

@@ -76,5 +76,15 @@ export function buildLevelUpMessage(player, levelUpResult) {
     parts.push(levelUpResult.features.map((f) => `• ${f.name}: ${f.desc}`).join('\n'));
   }
 
+  if (levelUpResult.level === 13) {
+    const mcLine = renderLevelUpText('levelup.multiclass_spell', player, { level: 13 });
+    if (mcLine) parts.push(mcLine);
+  }
+
+  if (levelUpResult.level >= 15) {
+    const resonance = renderLevelUpText('levelup.resonance', player, { level: levelUpResult.level });
+    if (resonance) parts.push(resonance);
+  }
+
   return parts.filter(Boolean).join('\n\n');
 }
