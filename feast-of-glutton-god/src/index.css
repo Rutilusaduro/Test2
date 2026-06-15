@@ -162,6 +162,7 @@ button.primary:hover:not(:disabled) {
 }
 .combat-cell.spell-target { outline: 2px solid var(--gold-bright); }
 .combat-cell.selected { outline: 2px solid var(--rose); }
+.combat-cell.combat-cell--active { box-shadow: inset 0 0 0 2px var(--gold-bright); }
 
 .combat-intro-overlay,
 .combat-scene-overlay {

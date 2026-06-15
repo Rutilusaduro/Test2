@@ -69,7 +69,12 @@ export function createCombatState(player, party, enemyTypeId, regionId, game = n
 
   const allies = [
     prepareCombatUnit({ ...player, x: 1, y: 4, isPlayer: true }, "ally", 0),
-    ...((party ?? []).map((c, i) => prepareCombatUnit({ ...c, x: 1, y: 6 + i * 2, isPlayer: false }, "ally", i + 1))),
+    ...((party ?? []).map((c, i) => prepareCombatUnit({
+      ...c,
+      x: 2 + (i % 2),
+      y: 2 + i * 3,
+      isPlayer: false,
+    }, "ally", i + 1))),
   ];
   const preparedEnemies = enemies.map((e, i) => {
     const unit = prepareCombatUnit(e, "enemy", i);
@@ -818,26 +823,41 @@ function runAllyAction(combat, ally) {
   const target = combat.enemies.find((e) => e.hp > 0 && !e.converted);
   if (!target) return;
 
-  const dist = Math.abs(ally.x - target.x) + Math.abs(ally.y - target.y);
+  const entry = getActiveEntry(combat.turnState);
+  if (!entry || entry.unit !== ally) return;
+
   const allySize = getTileSize(getStage(ally.lbs).id);
   const reach = getAttackReach(ally, ATTACK_TYPES.MELEE);
-  if (dist <= reach + allySize + 1) {
-    attackUnit(combat, ally, target);
-    return;
-  }
+  let safety = 16;
 
-  const dx = target.x > ally.x ? 1 : target.x < ally.x ? -1 : 0;
-  const dy = target.y > ally.y ? 1 : target.y < ally.y ? -1 : 0;
-  const candidates = [
-    { x: ally.x + dx, y: ally.y + dy },
-    { x: ally.x + dx, y: ally.y },
-    { x: ally.x, y: ally.y + dy },
-  ];
-  for (const { x, y } of candidates) {
-    if (canMoveTo(combat, ally, x, y)) {
-      moveUnit(combat, ally, x, y);
+  while (safety-- > 0) {
+    const dist = Math.abs(ally.x - target.x) + Math.abs(ally.y - target.y);
+    if (dist <= reach + allySize + 1) {
+      attackUnit(combat, ally, target);
       return;
     }
+
+    const eco = getEconomy(combat.turnState, entry.id);
+    if (eco.movementRemaining <= 0) return;
+
+    const dx = target.x > ally.x ? 1 : target.x < ally.x ? -1 : 0;
+    const dy = target.y > ally.y ? 1 : target.y < ally.y ? -1 : 0;
+    const candidates = [
+      { x: ally.x + dx, y: ally.y + dy },
+      { x: ally.x + dx, y: ally.y },
+      { x: ally.x, y: ally.y + dy },
+      { x: ally.x - dx, y: ally.y },
+      { x: ally.x, y: ally.y - dy },
+    ];
+    let moved = false;
+    for (const { x, y } of candidates) {
+      if (canMoveTo(combat, ally, x, y)) {
+        moveUnit(combat, ally, x, y);
+        moved = true;
+        break;
+      }
+    }
+    if (!moved) return;
   }
 }
 

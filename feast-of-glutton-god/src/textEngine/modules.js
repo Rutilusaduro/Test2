@@ -26,6 +26,20 @@ registerModule('subject.first', [
   }] },
 ]);
 
+registerModule('ref.first', [
+  { when: {}, text: [(ctx) => {
+    const r = ctx.ref;
+    if (!r) return 'traveler';
+    if (r.shortName) return r.shortName;
+    if (r.firstName) return r.firstName;
+    return (r.name || 'traveler').split(' ')[0];
+  }] },
+]);
+
+registerModule('ref.name', [
+  { when: {}, text: [(ctx) => ctx.ref?.name || 'the traveler'] },
+]);
+
 registerModule('subject.lbs', [
   { when: {}, text: [(ctx) => String(Math.round(ctx.subject?.lbs || 0))] },
 ]);

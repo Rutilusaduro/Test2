@@ -425,7 +425,10 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onVict
       const s = getTileSize(getStage(a.lbs).id);
       if (x >= a.x && x < a.x + s && y >= a.y && y < a.y + s) {
         cls += " ally";
-        label = a.isPlayer ? "★" : "A";
+        if (activeUnit && (a.combatId || a.id) === (activeUnit.combatId || activeUnit.id)) {
+          cls += " combat-cell--active";
+        }
+        label = a.isPlayer ? "★" : (a.name?.split(" ")[0]?.[0] || "A");
       }
     }
     for (const e of combat.enemies) {

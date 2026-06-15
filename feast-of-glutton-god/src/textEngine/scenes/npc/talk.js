@@ -1,37 +1,43 @@
 import { registerPool, createContext, render } from '../../engine.js';
 import '../../modules.js';
+import '../../dimensions/weightGain.js';
 
 registerPool('npc.talk.greeting', [
   { when: { hasMet: true, relationship: 0 }, text: [
-    '"Oh — it\'s you again." She remembers you, even if the bond is still thin.',
-    '"Back so soon?" She eyes you with wary recognition — not strangers, not friends yet.',
-    '"I remember you," she says quietly. "What do you want this time?"',
+    '"Oh — {ref.first}, it\'s you again." She remembers you, even if the bond is still thin.',
+    '"Back so soon, {ref.first}?" She eyes you with wary recognition — not strangers, not friends yet.',
+    '"I remember you," she says quietly. "What do you want this time, {ref.first}?"',
   ]},
   { when: { hasMet: false, relationship: 0 }, text: [
     '"Oh — hello. I don\'t think we\'ve met."',
     '"Can I help you with something?"',
   ]},
+  { when: { role: 'rival', hasMet: true }, text: [
+    '"{ref.first}." Her jaw tightens. "Come to gloat?"',
+    '"Still at it, {ref.first}?" She won\'t quite meet your eyes.',
+    '"You again," she says. "What do you want?"',
+  ]},
   { when: { relationship: 1 }, text: [
-    '"{subject.first:ref}! Good to see a friendly face."',
-    '"You again — I\'m glad you stopped by."',
+    '"{ref.first}! Good to see a friendly face."',
+    '"You again — I\'m glad you stopped by, {ref.first}."',
   ]},
   { when: { relationship: 2 }, text: [
-    '"There you are. I was hoping you\'d come by."',
-    '"{subject.first:ref}! Come sit — I saved you something sweet."',
+    '"There you are, {ref.first}. I was hoping you\'d come by."',
+    '"{ref.first}! Come sit — I saved you something sweet."',
   ]},
   { when: { relationship: 3 }, text: [
-    '"There you are, my dear. I\'ve been thinking about you."',
-    '"Come closer — I always feel warmer when you\'re near."',
+    '"There you are, my dear. I\'ve been thinking about you, {ref.first}."',
+    '"Come closer, {ref.first} — I always feel warmer when you\'re near."',
   ]},
   { when: { relationship: 4 }, text: [
-    '"I was craving you," she admits, voice husky. "Don\'t make me wait."',
-    '"Finally. I\'ve been aching for your touch all day."',
+    '"I was craving you," she admits, voice husky. "Don\'t make me wait, {ref.first}."',
+    '"Finally, {ref.first}. I\'ve been aching for your touch all day."',
   ]},
   { when: { relationship: 5 }, text: [
-    '"My love," she breathes, opening her arms wide. "Come home to me."',
-    '"You\'re here — my heart, my feast, my everything."',
+    '"My love," she breathes, opening her arms wide. "Come home to me, {ref.first}."',
+    '"You\'re here — my heart, my feast, my everything, {ref.first}."',
   ]},
-  { when: {}, text: ['"Hello."'] },
+  { when: {}, text: ['"Hello, {ref.first}."'] },
 ]);
 
 registerPool('npc.talk.topic', [
@@ -90,14 +96,15 @@ export function renderTalk(npc, player, opts = {}) {
   const wf = opts.game?.worldFlags ?? {};
   const act = wf.main_act3_complete || wf.act3_gates_unlocked ? 3
     : wf.main_act2_complete || wf.act2_gates_unlocked ? 2 : 1;
+  const ref = player ?? opts.game?.player ?? null;
   const ctx = createContext({
     subject: npc,
-    ref: player,
+    ref,
     globals: {
       location: opts.location,
       interaction: 'talk',
       role: npc.role,
-      level: player?.level ?? 1,
+      level: ref?.level ?? 1,
       escalationTier: wf.escalationTier ?? 0,
       act,
       hasMet: Boolean(opts.hasMet ?? npc.met),
