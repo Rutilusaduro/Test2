@@ -24,6 +24,7 @@ import './growth/index.js';
 import './quests/index.js';
 import './leveling/index.js';
 import './companion/milestones.js';
+import './endings/echo.js';
 import './leveling/tiers.js';
 import './leveling/milestones.js';
 import './spells/namedSpellFlavor.js';

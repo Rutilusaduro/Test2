@@ -23,6 +23,7 @@ import { getCombinedPuzzleBonuses } from './worldAuras.js';
 import { CONNECTION_GATES, syncGateUnlocks } from './regionObstacles.js';
 import { tryClearObstacle } from './obstacleUnlocks.js';
 import { recordGorgaraManifestCast } from './worldTransformation.js';
+import { getEffectiveSpellApCost } from './endingEcho.js';
 import {
   getSpellGrowthFavorCost,
   canSpendFavor,
@@ -59,7 +60,7 @@ function resolveOverworldCost(player, spell, overflow, opts = {}) {
   const castData = getSpellForCast(spell, overflow);
   const ritual = opts.ritual && isRitualSpell(castData);
   if (ritual) {
-    const ap = getRitualApCost(castData);
+    const ap = getEffectiveSpellApCost(opts.game, castData.id, getRitualApCost(castData));
     if ((player.ap || 0) >= ap) {
       return { ok: true, method: 'ritual', spell: castData, ap };
     }
@@ -69,7 +70,11 @@ function resolveOverworldCost(player, spell, overflow, opts = {}) {
   if (hasSpellSlot(player, castData.slotLevel)) {
     return { ok: true, method: 'slot', spell: castData, slotLevel: castData.slotLevel };
   }
-  const ap = castData.apCost ?? castData.slotLevel * 5;
+  const ap = getEffectiveSpellApCost(
+    opts.game,
+    castData.id,
+    castData.apCost ?? castData.slotLevel * 5,
+  );
   if ((player.ap || 0) >= ap) {
     return { ok: true, method: 'ap', spell: castData, ap };
   }
@@ -135,7 +140,7 @@ export function castSpellOnNpc(game, npc, spellId, opts = {}) {
     return { ok: false, text: `You must reach size stage ${spell.minSizeStage} to wield ${spell.name}.` };
   }
 
-  const cost = resolveOverworldCost(player, spell, opts.overflow, opts);
+  const cost = resolveOverworldCost(player, spell, opts.overflow, { ...opts, game });
   if (!cost.ok) return { ok: false, text: cost.reason };
 
   if (player.classId === 'wizard' && !isSpellPrepared(player, spellId)) {
@@ -218,7 +223,7 @@ export function castSpellOnFeature(game, featureId, spellId, opts = {}) {
     return { ok: false, text: `You must reach size stage ${spell.minSizeStage} to wield ${spell.name}.` };
   }
 
-  const cost = resolveOverworldCost(player, spell, opts.overflow, opts);
+  const cost = resolveOverworldCost(player, spell, opts.overflow, { ...opts, game });
   if (!cost.ok) return { ok: false, text: cost.reason };
 
   if (player.classId === 'wizard' && !isSpellPrepared(player, spellId)) {

@@ -28,7 +28,7 @@ Phases 9–10 ask: **what happens after the feast crowns you?** and **how do we 
 
 **Goal:** Level 20 is not a hard stop. The world reacts to *which* ending path you walked and offers **denouement + prestige** without invalidating the main arc.
 
-### 9a. Ending Echo System (`endingEcho.js`)
+### 9a. Ending Echo System (`endingEcho.js`) — ✅ SHIPPED (`Expedimental`)
 
 When `main_act3_complete` fires, stamp an **ending archetype** from existing flags:
 

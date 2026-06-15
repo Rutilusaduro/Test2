@@ -9,6 +9,7 @@ import { getNpcsInRegion } from './npcs.js';
 import { getNpcState, applyNpcState } from './player.js';
 import { renderWorldText } from '../textEngine/scenes/world/transformation.js';
 import { raiseDivineAttention } from './divineAttention.js';
+import { getEndingTransformBonus } from './endingEcho.js';
 
 export const TRANSFORMATION_LEVELS = [
   { level: 0, label: 'Untouched', minPoints: 0, desc: 'Restrictive norms still hold — abundance is a rumor.' },
@@ -123,6 +124,8 @@ export function getEffectiveTransformLevel(game, regionId) {
   const { current } = getTransformationLevel(points);
   const narrative = getNarrativeDepth(game, regionId);
   let effective = Math.max(current.level, narrative);
+  effective += getEndingTransformBonus(game);
+  effective = Math.min(5 + getEndingTransformBonus(game), effective);
 
   if (game?.worldFlags?.goddess_present && game?.dm?.visitedRegions?.[regionId]) {
     effective = Math.max(effective, 5);
@@ -135,7 +138,8 @@ export function getRegionTransformation(game, regionId) {
   const points = getRegionTransformationPoints(game, regionId);
   const { current, next } = getTransformationLevel(points);
   const narrativeDepth = getNarrativeDepth(game, regionId);
-  const effectiveLevel = Math.max(current.level, narrativeDepth);
+  const echoBonus = getEndingTransformBonus(game);
+  const effectiveLevel = Math.min(5 + echoBonus, Math.max(current.level, narrativeDepth) + echoBonus);
   const pct = next
     ? Math.min(100, Math.round(((points - current.minPoints) / (next.minPoints - current.minPoints)) * 100))
     : 100;

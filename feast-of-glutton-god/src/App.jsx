@@ -217,7 +217,7 @@ export default function App() {
   const startCombat = useCallback((enemyTypeId) => {
     setGame((prev) => {
       clearTransient(prev);
-      const combat = createCombatState(prev.player, prev.party, enemyTypeId, prev.region);
+      const combat = createCombatState(prev.player, prev.party, enemyTypeId, prev.region, prev);
       const skip = prev.settings?.skipCombatScenes;
       const next = {
         ...prev,
@@ -234,7 +234,7 @@ export default function App() {
   const startPuzzleCombat = useCallback((pending) => {
     setGame((prev) => {
       clearTransient(prev);
-      const combat = createCombatState(prev.player, prev.party, pending.enemyId, prev.region);
+      const combat = createCombatState(prev.player, prev.party, pending.enemyId, prev.region, prev);
       const skip = prev.settings?.skipCombatScenes;
       const next = {
         ...prev,

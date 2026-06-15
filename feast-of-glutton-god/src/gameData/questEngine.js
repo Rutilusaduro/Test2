@@ -19,6 +19,7 @@ import { renderGrowthProse } from '../textEngine/scenes/growth/index.js';
 import { renderQuestText } from '../textEngine/scenes/quests/index.js';
 import { onRedemptionQuestComplete } from '../hooks/questHooks.js';
 import { getDivineAttention } from './divineAttention.js';
+import { stampEndingEchoIfNeeded } from './endingEcho.js';
 import { COMPANIONS } from './companions.js';
 import { ensureCompanionDevotion } from './companionDevotion.js';
 import { getPuzzleDefinition } from './puzzles/registry.js';
@@ -723,10 +724,14 @@ export function completeQuest(game, questId, opts = {}) {
     onRedemptionQuestComplete(game);
   }
 
+  const echoResult = stampEndingEchoIfNeeded(game);
   const textKey = ending?.textKey ?? rewardBundle.textKey ?? 'quest.complete';
-  const completionMessage = opts.stageMessage
+  let completionMessage = opts.stageMessage
     ? `${opts.stageMessage}\n\n${renderQuestText(textKey, game, { questId, endingId: ending?.id })}`
     : renderQuestText(textKey, game, { questId, endingId: ending?.id });
+  if (echoResult?.newlyStamped && echoResult.message) {
+    completionMessage = `${completionMessage}\n\n${echoResult.message}`;
+  }
 
   return {
     ok: true,
@@ -735,6 +740,7 @@ export function completeQuest(game, questId, opts = {}) {
     ending,
     completionMessage,
     rewardMsgs,
+    endingEcho: echoResult,
   };
 }
 

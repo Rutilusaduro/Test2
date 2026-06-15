@@ -6,6 +6,7 @@ import { renderPortentBeat } from '../textEngine/scenes/dm/portent.js';
 import { renderGenreBeat } from '../textEngine/scenes/dm/genre.js';
 import { renderVerityConfrontation, renderHeraldUltimatum } from '../textEngine/scenes/npc/antagonist.js';
 import { addExperience, XP_SOURCES } from './leveling.js';
+import { getEndingAttentionMultiplier } from './endingEcho.js';
 import { getRegionHostility, getHostilityTier } from './regionHostility.js';
 
 export const DIVINE_ATTENTION_TIERS = [
@@ -175,7 +176,8 @@ function checkPortentEvents(game, oldPoints, newPoints) {
 
 export function raiseDivineAttention(game, source, amountOverride) {
   ensureDivineAttentionState(game);
-  const base = amountOverride ?? DIVINE_ATTENTION_AWARDS[source] ?? 0;
+  const raw = amountOverride ?? DIVINE_ATTENTION_AWARDS[source] ?? 0;
+  const base = Math.max(0, Math.round(raw * getEndingAttentionMultiplier(game)));
   if (base <= 0) {
     return { gained: 0, total: getDivineAttention(game), portents: [], tierUp: false };
   }

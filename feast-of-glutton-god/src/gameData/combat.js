@@ -36,6 +36,7 @@ import { getSpellForCast } from "./spells.js";
 import { renderCastFeedback } from "../textEngine/scenes/dm/cast.js";
 import { awardFatteningXp } from "./leveling.js";
 import { summarizePartyDevotion, tickDevotionCorruptionAura } from "./companionDevotion.js";
+import { applyEndingEchoCombatStart } from "./endingEcho.js";
 
 const GRID_SIZE = 10;
 const TRIVIALIZE_MIN_PLAYER_STAGE = 6;
@@ -50,7 +51,7 @@ function prepareCombatUnit(unit, team, index) {
   };
 }
 
-export function createCombatState(player, party, enemyTypeId, regionId) {
+export function createCombatState(player, party, enemyTypeId, regionId, game = null) {
   const enemies = [];
   const def = enemyTypeId ? getEnemyTypeDef(enemyTypeId) : null;
   const eliteSolo = def && (isCosmicThreat(enemyTypeId) || isMythicThreat(enemyTypeId))
@@ -103,6 +104,10 @@ export function createCombatState(player, party, enemyTypeId, regionId) {
 
   if (combat.devotionBonuses.apotheosis) {
     log.push('★ Companion apotheosis bond thrums — devotion made battle-ready.');
+  }
+
+  if (game) {
+    applyEndingEchoCombatStart(game, combat);
   }
 
   return skipToPlayerTurn(combat);

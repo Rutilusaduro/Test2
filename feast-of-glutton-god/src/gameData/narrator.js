@@ -7,6 +7,7 @@ import { getQuestOffersForNpc } from './questOffers.js';
 import { renderDmLine } from '../textEngine/scenes/dm/index.js';
 import { renderGenreBeat } from '../textEngine/scenes/dm/genre.js';
 import { syncEscalationTier } from '../gameData/divineAttention.js';
+import { stampEndingEchoIfNeeded, getEndingEchoArrivalLine } from '../gameData/endingEcho.js';
 
 const IDLE_ACTION_THRESHOLD = 5;
 
@@ -46,7 +47,9 @@ export function narrate(game, kind, params = {}) {
       regionId,
       escalationTier: game.worldFlags?.escalationTier ?? 0,
     });
-    const line = genreLine ? `${arrivalLine} ${genreLine}` : arrivalLine;
+    stampEndingEchoIfNeeded(game);
+    const echoLine = getEndingEchoArrivalLine(game, regionId);
+    const line = [arrivalLine, genreLine, echoLine].filter(Boolean).join(' ');
     dm.sceneLine = line;
     dm.eventLine = null;
     dm.lastKind = 'arrival';

@@ -23,6 +23,7 @@ registerSelectors(
   'spellId', 'spellSlotLevel', 'spellSlotLevelMin', 'spellSlotLevelMax',
   // companion tier band — mirrors level bands for companion-arc keying
   'companionTier',
+  'endingArchetype',
   // growth quantity for level-up context
   'isMilestone',
 );
