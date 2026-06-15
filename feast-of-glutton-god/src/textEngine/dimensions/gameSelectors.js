@@ -24,6 +24,8 @@ registerSelectors(
   // companion tier band — mirrors level bands for companion-arc keying
   'companionTier',
   'endingArchetype',
+  'digestTopic', 'digestWeek', 'seasonalEvent',
+  'achievementId', 'achievementTitle', 'directorsCutFork',
   // growth quantity for level-up context
   'isMilestone',
 );

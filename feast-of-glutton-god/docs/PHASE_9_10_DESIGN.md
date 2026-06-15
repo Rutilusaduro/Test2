@@ -73,7 +73,7 @@ Side quest chain: `side_lyra_last_duel` — 3 stages, romance OR dominance endin
 
 **Why one-up:** Turns a level 1 gag into endgame emotional payoff.
 
-### 9d. Living World Digest (`worldDigest.js`)
+### 9d. Living World Digest (`worldDigest.js`) — ✅ SHIPPED (`Expedimental`)
 
 Weekly (in-game day counter) **continent digest** — 3 bullet events generated from flags:
 
@@ -94,7 +94,7 @@ Weekly (in-game day counter) **continent digest** — 3 bullet events generated 
 
 ---
 
-## Phase 10 — Eternal Feast (Replay & Legacy)
+## Phase 10 — Eternal Feast (Replay & Legacy) — ✅ SHIPPED (`Expedimental`)
 
 **Goal:** Second run feels **different**, not repetitive. The Fat Goddess remembers.
 

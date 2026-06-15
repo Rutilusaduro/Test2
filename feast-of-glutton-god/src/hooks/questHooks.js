@@ -16,6 +16,8 @@ import {
   formatCompanionMilestoneMessages,
 } from '../gameData/companionMilestones.js';
 import { syncPrestigeRank } from '../gameData/prestige.js';
+import { checkAchievements, recordCosmicConversion } from '../gameData/achievements.js';
+import { isCosmicThreat } from '../gameData/enemies.js';
 
 /**
  * Record an NPC interaction for quest objective progress.
@@ -67,11 +69,20 @@ export function recordNpcGrowthForQuests(game, { npcId, startStage, endStage, st
 
 export function recordRegionVisitForQuests(game, regionId) {
   ensureQuestState(game);
+  if (regionId === 'eternal_feast_hall') {
+    game.worldFlags = game.worldFlags ?? {};
+    game.worldFlags.eternal_hall_visited = true;
+  }
+  if (regionId === 'divine_plane_vestibule') {
+    game.worldFlags = game.worldFlags ?? {};
+    game.worldFlags.vestibule_crossed = true;
+  }
   const { lines, growthSnippets } = notifyQuestEvent(game, {
     type: 'visit_region',
     regionId,
   });
   flushCompanionMilestoneBeats(game);
+  checkAchievements(game);
   return { questMessages: formatQuestMessages(lines, growthSnippets) };
 }
 
@@ -100,6 +111,14 @@ export function recordCombatEndForQuests(game, combat) {
     game.player.storyFlags = game.player.storyFlags || {};
     game.player.storyFlags.lyra_ascended_defeated = true;
   }
+  if (defeatedEnemyIds.includes('wheel_incarnate')) {
+    game.worldFlags = game.worldFlags || {};
+    game.worldFlags.defeated_wheel_incarnate = true;
+  }
+  if (combat.victory === 'converted') {
+    const hasCosmic = (combat.enemies ?? []).some((e) => isCosmicThreat(e));
+    if (hasCosmic) recordCosmicConversion(game);
+  }
   const { lines, growthSnippets } = notifyQuestEvent(game, {
     type: 'combat_end',
     victoryType,
@@ -108,7 +127,10 @@ export function recordCombatEndForQuests(game, combat) {
     trivialized: Boolean(combat.trivialized),
   });
   flushCompanionMilestoneBeats(game);
-  return { questMessages: formatQuestMessages(lines, growthSnippets) };
+  const achievements = checkAchievements(game);
+  const achMsg = achievements.map((a) => a.message).filter(Boolean).join('\n\n');
+  const base = formatQuestMessages(lines, growthSnippets);
+  return { questMessages: [base, achMsg].filter(Boolean).join('\n\n') };
 }
 
 export function tryStartQuest(game, questId) {
@@ -159,6 +181,7 @@ export function flushHostilityPending(game) {
 export function onRedemptionQuestComplete(game) {
   const regionId = game.worldFlags?.redemptionRegion ?? game.region;
   clearCrackdown(game, regionId);
+  game.worldFlags.hostility_redemption_complete = true;
   game.worldFlags.pending_hostility_narration = {
     regionId,
     hostilityTier: 1,

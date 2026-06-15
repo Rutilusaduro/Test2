@@ -1,6 +1,8 @@
-import { hasSave } from "../gameData/save.js";
+import { hasSave, canStartNewPilgrimage, loadGame } from "../gameData/save.js";
 
-export default function TitleScreen({ onNew, onContinue }) {
+export default function TitleScreen({ onNew, onContinue, onPilgrimage }) {
+  const showPilgrimage = canStartNewPilgrimage();
+  const priorGame = showPilgrimage ? loadGame() : null;
   return (
     <div className="app">
       <div className="header" style={{ marginTop: "4rem" }}>
@@ -16,6 +18,9 @@ export default function TitleScreen({ onNew, onContinue }) {
         <div className="btn-grid" style={{ justifyContent: "center" }}>
           <button className="primary" onClick={onNew}>New Game</button>
           {hasSave() && <button onClick={onContinue}>Continue</button>}
+          {showPilgrimage && onPilgrimage && (
+            <button onClick={() => onPilgrimage(priorGame)}>New Pilgrimage</button>
+          )}
         </div>
       </div>
     </div>

@@ -1,6 +1,7 @@
 import { MAX_STAGE_ID } from "./stages.js";
 import { getEnemyGrowthKind } from "./enemyGrowthKinds.js";
 import { getNarrativeDepth } from "./worldTransformation.js";
+import { applySeasonalEncounterSwap } from "./seasonalEvents.js";
 
 const MUNDANE = { threatTier: "mundane" };
 const MYTHIC = {
@@ -757,6 +758,7 @@ export function pickEncounter(regionId, game = null) {
   };
   let pool = pools[regionId] || ["harvest_harpy"];
   if (game) pool = swapLyraInPool(pool, game);
+  if (game) pool = applySeasonalEncounterSwap(pool, regionId, game);
   const id = pool[Math.floor(Math.random() * pool.length)];
   return createEnemy(id);
 }

@@ -32,6 +32,10 @@ import { getDivineAttentionProgress, getLastPortent } from "../gameData/divineAt
 import { recordRegionVisitForQuests } from "../hooks/questHooks.js";
 import { advanceWorldSettling, getRegionReactivitySummary } from "../gameData/worldReactivity.js";
 import { syncGateUnlocks } from "../gameData/regionObstacles.js";
+import { tickWeeklyDigest, formatDigest } from "../gameData/worldDigest.js";
+import { syncSeasonalEvent } from "../gameData/seasonalEvents.js";
+import { performEndlessBanquet } from "../gameData/legacyAbundance.js";
+import { checkAchievements } from "../gameData/achievements.js";
 import NpcModal from "./NpcModal.jsx";
 import FeatureModal from "./FeatureModal.jsx";
 import QuestLog from "./QuestLog.jsx";
@@ -423,9 +427,28 @@ export default function WorldView({ game, onUpdate, onEncounter, onHostilityEnco
           <button onClick={() => setShowRegionDash((v) => !v)}>Region Chronicle</button>
           <button onClick={() => setShowInfluence((v) => !v)}>{INFLUENCE_META.label}</button>
           <button onClick={onEncounter}>Seek Encounter</button>
+          {game.region === 'eternal_feast_hall' && (
+            <button className="primary" onClick={() => onUpdate((g) => {
+              const result = performEndlessBanquet(g);
+              if (result.message) narrateEvent(g, result.message, 'growth');
+              checkAchievements(g);
+              return g;
+            })}>
+              Endless Banquet (+1 Legacy, 20 AP)
+            </button>
+          )}
           <button onClick={() => onUpdate((g) => {
             longRest(g.player, g);
             decaySatiationForGame(g, { longRest: true });
+            const seasonal = syncSeasonalEvent(g);
+            if (seasonal.changed && seasonal.message) {
+              narrateEvent(g, seasonal.message, 'event');
+            }
+            const digest = tickWeeklyDigest(g);
+            if (digest) {
+              narrateEvent(g, formatDigest(digest), 'quest');
+            }
+            checkAchievements(g);
             const next = applySettling({ ...g, day: g.day + 1, lastLevelUpMessage: null });
             tickRegionHostility(next, { dayAdvance: true, longRest: true });
             return next;

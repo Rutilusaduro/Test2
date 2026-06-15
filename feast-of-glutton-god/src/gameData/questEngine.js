@@ -21,6 +21,8 @@ import { onRedemptionQuestComplete } from '../hooks/questHooks.js';
 import { getDivineAttention } from './divineAttention.js';
 import { stampEndingEchoIfNeeded } from './endingEcho.js';
 import { syncPrestigeRank } from './prestige.js';
+import { checkAchievements } from './achievements.js';
+import { maybeRenderDirectorsCut } from './directorsCut.js';
 import { COMPANIONS } from './companions.js';
 import { ensureCompanionDevotion } from './companionDevotion.js';
 import { getPuzzleDefinition } from './puzzles/registry.js';
@@ -739,6 +741,15 @@ export function completeQuest(game, questId, opts = {}) {
   }
   if (prestigeResult.rankUp && prestigeResult.message) {
     completionMessage = `${completionMessage}\n\n${prestigeResult.message}`;
+  }
+
+  const achievements = checkAchievements(game);
+  if (achievements.length) {
+    completionMessage = `${completionMessage}\n\n${achievements.map((a) => a.message).filter(Boolean).join('\n\n')}`;
+  }
+  const directorsLine = maybeRenderDirectorsCut(game, 0.5);
+  if (directorsLine) {
+    completionMessage = `${completionMessage}\n\n${directorsLine}`;
   }
 
   return {

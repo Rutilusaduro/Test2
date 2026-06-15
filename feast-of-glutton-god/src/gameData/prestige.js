@@ -102,7 +102,7 @@ export function getPrestigeProgress(game) {
   };
 }
 
-/** Rank 1 on Act III crown; +2 from scaling, +2 from milestones, +1 from archive depth. */
+/** Rank 1 on Act III crown; +2 from scaling, +2 from milestones, +1 from archive; +2 from achievements. */
 export function calculatePrestigeRank(game) {
   if (!isPrestigeUnlocked(game)) return 0;
 
@@ -117,7 +117,8 @@ export function calculatePrestigeRank(game) {
   if (milestones >= 24) rank += 1;
   if (archive >= 3) rank += 1;
 
-  return Math.min(5, rank);
+  const achievementBonus = Math.min(2, Math.floor((game.worldFlags?.prestige_achievement_points ?? 0) / 10));
+  return Math.min(5, rank + achievementBonus);
 }
 
 export function getPrestigeRank(game) {

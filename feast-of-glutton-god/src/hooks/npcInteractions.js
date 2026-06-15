@@ -37,6 +37,7 @@ import { appendPuzzleHintToTalk } from '../gameData/puzzleHints.js';
 import { getReactivityGlobals } from '../gameData/worldReactivity.js';
 import { syncGateUnlocks } from '../gameData/regionObstacles.js';
 import { applyFeastMomentum } from '../gameData/prestige.js';
+import { recordFeastForAchievements } from '../gameData/achievements.js';
 import { getQuestOffersForNpc, buildQuestOfferNarrative, acceptQuestFromNpc } from '../gameData/questOffers.js';
 import { renderSpecial } from '../textEngine/scenes/npc/special.js';
 import {
@@ -406,6 +407,7 @@ export function doFeast(npc, player, game) {
   game.worldFlags.communal_feast_done = true;
   const gateMsgs = syncGateUnlocks(game, { regionId: game.region });
   const momentumMsg = applyFeastMomentum(game);
+  const feastAchievements = recordFeastForAchievements(game);
   let result = appendTierUp({
     text: text + '\n\n' + (growth.text || ''), npc, growth, ok: true,
   }, npc, relResult);
@@ -414,6 +416,9 @@ export function doFeast(npc, player, game) {
   }
   if (momentumMsg) {
     result.text = `${result.text}\n\n${momentumMsg}`;
+  }
+  if (feastAchievements.length) {
+    result.text = `${result.text}\n\n${feastAchievements.map((a) => a.message).filter(Boolean).join('\n\n')}`;
   }
   return withQuestProgress(game, npc, 'feast', null, result);
 }

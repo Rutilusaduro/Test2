@@ -16,6 +16,8 @@ import { ensureSatiation } from "./satiation.js";
 import { ensureFavor } from "./favor.js";
 import { drainForcedGrowthLog, tickRegionHostility } from "./regionHostility.js";
 import { flushHostilityPending } from "../hooks/questHooks.js";
+import { loadPilgrimageMeta } from "./save.js";
+import { applyLegacyToNewGame, syncEternalHallUnlock } from "./legacyAbundance.js";
 
 /**
  * @param {string} name
@@ -88,6 +90,7 @@ export function createPlayer(name, classId, options = {}) {
 export function createNewGame(name, classId, options = {}) {
   const player = createPlayer(name, classId, options);
   const elara = createCompanionData(COMPANIONS.find((c) => c.id === "elara"));
+  const pilgrimageMeta = loadPilgrimageMeta();
   const game = {
     player,
     party: [elara],
@@ -96,7 +99,8 @@ export function createNewGame(name, classId, options = {}) {
     npcStates: {},
     history: null,
     endingsSeen: [],
-    newGamePlus: false,
+    newGamePlus: (pilgrimageMeta.pilgrimageCount ?? 0) > 0,
+    pilgrimageMeta,
     combat: null,
     lastLevelUpMessage: null,
     quests: { active: {}, completed: [], failed: [] },
@@ -108,6 +112,8 @@ export function createNewGame(name, classId, options = {}) {
       divineAttentionTier: 0,
       portentLog: [],
       regionTransformation: {},
+      pilgrimage_count: pilgrimageMeta.pilgrimageCount ?? 0,
+      legacy_abundance: pilgrimageMeta.legacyAbundance ?? 0,
     },
     influence: {
       political: 0,
@@ -129,8 +135,11 @@ export function createNewGame(name, classId, options = {}) {
     },
     settings: {
       skipCombatScenes: false,
+      directorsCutEnabled: pilgrimageMeta.directorsCutUnlocked ?? false,
     },
   };
+  applyLegacyToNewGame(game);
+  syncEternalHallUnlock(game);
   return ensurePartyUniversalSize(game);
 }
 

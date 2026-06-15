@@ -6,10 +6,11 @@ import CombatView from "./components/CombatView.jsx";
 import CombatScenePopup from "./components/CombatScenePopup.jsx";
 import LevelUpModal from "./components/LevelUpModal.jsx";
 import PrestigeModal from "./components/PrestigeModal.jsx";
+import PilgrimageModal from "./components/PilgrimageModal.jsx";
 import GameDebugShell from "./components/GameDebugShell.jsx";
 import { createNewGame, addAbundancePoints, syncPlayerFromCombat, ensureDmState, ensureScarcityState } from "./gameData/player.js";
 import { clearTransient, narrateEvent } from "./gameData/narrator.js";
-import { saveGame, loadGame } from "./gameData/save.js";
+import { saveGame, loadGame, beginPilgrimageMeta } from "./gameData/save.js";
 import { createCombatState, getCombatRewards } from "./gameData/combat.js";
 import { buildCombatIntro, buildCombatWrapup } from "./textEngine/scenes/dm/combat.js";
 import { pickEncounter } from "./gameData/enemies.js";
@@ -32,6 +33,11 @@ import { ensureSpellState, getCharacterSpells, ensureDamageCantrip } from "./gam
 import { autoPrepareSpells } from "./gameData/spellPreparation.js";
 import { completePendingLevelUp as completeLevelUpChoice } from "./gameData/levelUpChoices.js";
 import { applyCosmicSatiety, getPrestigeProgress } from "./gameData/prestige.js";
+import { applyPilgrimageSeeds, buildSeedChoicesFromPayload } from "./gameData/pilgrimageSeeds.js";
+import { recordTrivializeAchievement, checkAchievements } from "./gameData/achievements.js";
+import { syncEternalHallUnlock } from "./gameData/legacyAbundance.js";
+import { syncSeasonalEvent } from "./gameData/seasonalEvents.js";
+import { maybeRenderDirectorsCut } from "./gameData/directorsCut.js";
 import "./textEngine/scenes/index.js";
 
 function migratePlayerSpells(player) {
@@ -67,7 +73,7 @@ function applyCombatEndState(prev, combat) {
   ensureDivineAttentionState(next);
   const rewards = getCombatRewards(combat);
   next = addAbundancePoints(next, rewards.ap);
-  const { levelUps } = awardCombatXp(next.player, combat);
+  const { levelUps } = awardCombatXp(next.player, combat, next);
   applyLevelUpResults(next, levelUps);
   if (combat.fattenLevelUps?.length) {
     applyLevelUpResults(next, combat.fattenLevelUps);
@@ -104,6 +110,10 @@ function applyCombatEndState(prev, combat) {
           (e.typeId || e.type) === combat.trivializedEnemyId
         ) || combat.enemies[0]);
       if (gag) narrateEvent(next, gag, 'event');
+      const trivialAchievements = recordTrivializeAchievement(next);
+      for (const ach of trivialAchievements) {
+        if (ach.message) narrateEvent(next, ach.message, 'levelup');
+      }
       const trivialDivine = raiseDivineAttention(next, 'trivialize');
       for (const portent of trivialDivine.portents ?? []) {
         if (portent.message) narrateEvent(next, portent.message, 'quest');
@@ -151,9 +161,16 @@ export default function App() {
   const [screen, setScreen] = useState("title");
   const [game, setGame] = useState(null);
   const [debugContext, setDebugContext] = useState({});
+  const [pilgrimageSeeds, setPilgrimageSeeds] = useState(null);
+  const [showPilgrimageModal, setShowPilgrimageModal] = useState(false);
+  const [priorGameForPilgrimage, setPriorGameForPilgrimage] = useState(null);
 
   const startNewGame = useCallback((name, classId, options = {}) => {
     const g = createNewGame(name, classId, options);
+    if (pilgrimageSeeds?.length) {
+      applyPilgrimageSeeds(g, buildSeedChoicesFromPayload({ seeds: pilgrimageSeeds }));
+      setPilgrimageSeeds(null);
+    }
     ensurePartyUniversalSize(g);
     ensureQuestState(g);
     ensureInfluenceState(g);
@@ -164,6 +181,19 @@ export default function App() {
     ensureDivineAttentionState(g);
     setGame(g);
     setScreen("world");
+  }, [pilgrimageSeeds]);
+
+  const handlePilgrimageOpen = useCallback((prior) => {
+    setPriorGameForPilgrimage(prior);
+    setShowPilgrimageModal(true);
+  }, []);
+
+  const handlePilgrimageBegin = useCallback((seedPicks) => {
+    beginPilgrimageMeta(seedPicks);
+    setPilgrimageSeeds(seedPicks);
+    setShowPilgrimageModal(false);
+    setPriorGameForPilgrimage(null);
+    setScreen("create");
   }, []);
 
   const continueGame = useCallback(() => {
@@ -183,7 +213,10 @@ export default function App() {
       ensurePartyUniversalSize(g);
       ensureDmState(g);
       ensureScarcityState(g);
-      if (!g.settings) g.settings = { skipCombatScenes: false };
+      syncEternalHallUnlock(g);
+      syncSeasonalEvent(g);
+      checkAchievements(g);
+      if (!g.settings) g.settings = { skipCombatScenes: false, directorsCutEnabled: g.pilgrimageMeta?.directorsCutUnlocked ?? false };
       setGame(g);
       setScreen("world");
     }
@@ -398,12 +431,38 @@ export default function App() {
   }
 
   if (screen === "title") {
-    return <TitleScreen onNew={() => setScreen("create")} onContinue={continueGame} />;
+    return (
+      <>
+        <TitleScreen
+          onNew={() => setScreen("create")}
+          onContinue={continueGame}
+          onPilgrimage={handlePilgrimageOpen}
+        />
+        {showPilgrimageModal && (
+          <PilgrimageModal
+            priorGame={priorGameForPilgrimage}
+            onBegin={handlePilgrimageBegin}
+            onCancel={() => setShowPilgrimageModal(false)}
+          />
+        )}
+      </>
+    );
   }
 
   if (screen === "create") {
     return <CharacterCreation onBack={() => setScreen("title")} onStart={startNewGame} />;
   }
 
-  return <TitleScreen onNew={() => setScreen("create")} onContinue={continueGame} />;
+  return (
+    <>
+      <TitleScreen onNew={() => setScreen("create")} onContinue={continueGame} onPilgrimage={handlePilgrimageOpen} />
+      {showPilgrimageModal && (
+        <PilgrimageModal
+          priorGame={priorGameForPilgrimage}
+          onBegin={handlePilgrimageBegin}
+          onCancel={() => setShowPilgrimageModal(false)}
+        />
+      )}
+    </>
+  );
 }

@@ -15,6 +15,7 @@ import {
 } from "./spellLearning.js";
 import { buildLevelUpMessage } from "../textEngine/scenes/leveling/index.js";
 import { isCosmicThreat } from "./enemies.js";
+import { getSeasonalXpMultiplier } from "./seasonalEvents.js";
 import {
   ASI_LEVELS,
   buildAsiOptions,
@@ -262,7 +263,7 @@ export function awardFatteningXp(player, stagesGained = 1, source = 'fatten_othe
 }
 
 /** Award XP from combat results */
-export function awardCombatXp(player, combat) {
+export function awardCombatXp(player, combat, game = null) {
   if (!combat?.victory || combat.victory === "lose") return { xp: 0, levelUps: [] };
   let xp = XP_SOURCES.combat_win;
   if (combat.victory === "converted") {
@@ -270,6 +271,8 @@ export function awardCombatXp(player, combat) {
     xp = hasCosmic ? XP_SOURCES.cosmic_conversion : XP_SOURCES.combat_convert;
   }
   xp += combat.enemies.length * 10;
+  const seasonalMult = game ? getSeasonalXpMultiplier(game) : 1;
+  if (seasonalMult !== 1) xp = Math.round(xp * seasonalMult);
   const growthLevelUp = combat.allies?.some((a) => a.isPlayer && a.grewThisCombat);
   return addExperience(player, xp, "combat", { growthLevelUp });
 }

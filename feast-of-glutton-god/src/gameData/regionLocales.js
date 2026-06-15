@@ -80,6 +80,12 @@ export const REGION_LOCALES = {
     structure: 'marble',
     density: 'vast',
   },
+  eternal_feast_hall: {
+    primary: 'endless_banquet',
+    tags: ['planar', 'feast_hall', 'endless_tables', 'demiplane'],
+    structure: 'marble',
+    density: 'vast',
+  },
 };
 
 export function getLocaleForRegion(regionId) {

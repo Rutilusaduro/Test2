@@ -190,6 +190,39 @@ export const WORLD_NPCS = [
     location: "fertile_heartlands",
     desc: "Sylwen's harvest-herald — tragic foil in green vestments, voice gentle, verdict terrible.",
   },
+  {
+    id: "sylwen_converted_guest",
+    name: "Sylwen, Converted",
+    role: "divine_guest",
+    bodyType: "pear",
+    archetype: "softened",
+    startLbs: 165,
+    location: "eternal_feast_hall",
+    desc: "Harvest-goddess of measured plenty — converted, dining, finally allowing seconds.",
+    guestFlag: "sylwen_converted",
+  },
+  {
+    id: "tarn_converted_guest",
+    name: "Tarn, Converted",
+    role: "divine_guest",
+    bodyType: "hourglass",
+    archetype: "merchant",
+    startLbs: 158,
+    location: "eternal_feast_hall",
+    desc: "Guild-god of contracts — converted, auditing dessert instead of souls.",
+    guestFlag: "tarn_converted",
+  },
+  {
+    id: "lumen_converted_guest",
+    name: "Lumen, Converted",
+    role: "divine_guest",
+    bodyType: "slim",
+    archetype: "scholar",
+    startLbs: 142,
+    location: "eternal_feast_hall",
+    desc: "Star-god of the Index — converted, charting caloric constellations between bites.",
+    guestFlag: "lumen_converted",
+  },
 ];
 
 export function createNpc(template) {
@@ -210,7 +243,8 @@ export function getNpcsInRegion(regionId, gameState) {
   const recruitedCompanionIds = new Set((gameState.party || []).map((c) => c.id));
   let worldNpcs = WORLD_NPCS
     .filter((n) => n.location === regionId)
-    .filter((n) => !n.companionId || !recruitedCompanionIds.has(n.companionId));
+    .filter((n) => !n.companionId || !recruitedCompanionIds.has(n.companionId))
+    .filter((n) => !n.guestFlag || gameState?.worldFlags?.[n.guestFlag]);
 
   if (
     regionId === 'divine_plane_vestibule'

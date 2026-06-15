@@ -23,6 +23,10 @@ registerPool('dm.arrival', [
     'You step onto the Threshold — a grand hall that keeps reconsidering its floor plan. Technically illegal. Deliciously inevitable.',
     'The outer edge of the gods\' plane. Cosmic draft, impossible windows, and law made visible as geometry.',
   ]},
+  { when: { firstVisit: true, region: 'eternal_feast_hall' }, text: [
+    'You enter the Eternal Feast Hall — tables without end, converted gods gossiping over pastry, combat banned as bad manners.',
+    'A demiplane of endless banquet. Legacy abundance hums in the air; your past pilgrimages left crumbs in the architecture.',
+  ]},
   { when: { transformDepthMin: 5, region: 'gorgara_cradle' }, text: [
     'You return to the cradle — a divine locale now. Even the air gains weight; pilgrims kneel before your shadow.',
     'The Thin Veil no longer hides your patron — she breathes here openly, and the grotto swells with answered hunger.',
