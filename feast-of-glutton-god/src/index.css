@@ -738,6 +738,143 @@ button.primary:hover:not(:disabled) {
   margin-bottom: 0;
 }
 
+.combat-spell-row {
+  display: flex;
+  gap: 0.35rem;
+  align-items: stretch;
+}
+
+.spell-info-btn {
+  flex: 0 0 2rem;
+  padding: 0.25rem 0;
+  font-size: 0.85rem;
+  line-height: 1.2;
+  opacity: 0.75;
+}
+
+.spell-info-btn--active,
+.spell-info-btn:hover {
+  opacity: 1;
+  border-color: var(--gold);
+  color: var(--gold);
+}
+
+.combat-spell-cast {
+  flex: 1 1 auto;
+  text-align: left;
+  font-size: 0.8rem;
+}
+
+.spell-detail-card {
+  margin-bottom: 0.75rem;
+  padding: 0.75rem;
+  border: 1px solid rgba(201, 162, 39, 0.35);
+  border-radius: 6px;
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.spell-detail-card--compact {
+  margin-top: 0;
+}
+
+.spell-detail-card__header {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  align-items: flex-start;
+}
+
+.spell-detail-card__title {
+  margin: 0;
+  color: var(--gold);
+  font-size: 1rem;
+}
+
+.spell-detail-card__meta {
+  margin: 0.15rem 0 0;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.spell-detail-card__close {
+  flex-shrink: 0;
+  width: 1.75rem;
+  height: 1.75rem;
+  padding: 0;
+  line-height: 1;
+  font-size: 1.1rem;
+}
+
+.spell-detail-card__desc {
+  margin: 0.5rem 0 0;
+  font-size: 0.85rem;
+  color: var(--text);
+  line-height: 1.45;
+}
+
+.spell-detail-card__mechanics {
+  margin: 0.5rem 0 0;
+  padding-left: 1.1rem;
+  font-size: 0.8rem;
+  color: var(--rose);
+}
+
+.spell-detail-card__mechanics li {
+  margin-bottom: 0.2rem;
+}
+
+.spell-detail-card__facts {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  margin-top: 0.5rem;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.spell-detail-card__overflow {
+  margin: 0.5rem 0 0;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
+.spell-detail-card__cast {
+  margin-top: 0.65rem;
+  width: 100%;
+}
+
+.spell-sheet-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  max-height: 160px;
+  overflow-y: auto;
+  margin-bottom: 0.5rem;
+}
+
+.spell-sheet-list__item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  text-align: left;
+  padding: 0.4rem 0.55rem;
+  font-size: 0.85rem;
+  background: rgba(0, 0, 0, 0.15);
+}
+
+.spell-sheet-list__item--active {
+  border-color: var(--gold);
+  background: rgba(201, 162, 39, 0.12);
+}
+
+.spell-sheet-list__level {
+  flex-shrink: 0;
+  font-size: 0.75rem;
+  color: var(--text-dim);
+}
+
 /* ─── Mobile ────────────────────────────────────────────────────────────── */
 
 @media (max-width: 768px) {

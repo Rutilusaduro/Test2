@@ -1,15 +1,18 @@
+import { useState } from 'react';
 import { getStage, isAtSizeCap, getStageProgress } from '../gameData/stages.js';
 import { getStagePerk } from '../gameData/stagePerks.js';
 import { getStageMechanics, getMobilityLabel } from '../gameData/stageMechanics.js';
-import { getCharacterSpells } from '../gameData/spellLearning.js';
+import { getCharacterSpells, isGrowthThemedSpell } from '../gameData/spellLearning.js';
 import { getAbundanceProgress } from '../gameData/abundanceSpread.js';
 import { getInfluenceProgress } from '../gameData/influence.js';
 import { getTier } from '../gameData/relationships.js';
 import { getCorruptionTier } from '../gameData/corruption.js';
 import { STAT_LABELS } from '../gameData/stats.js';
+import SpellDetailCard from './SpellDetailCard.jsx';
 
 export default function CharacterSheet({ game, onClose }) {
   const player = game.player;
+  const [selectedSpellId, setSelectedSpellId] = useState(null);
   const stage = getStage(player.lbs);
   const stageProg = getStageProgress(player.lbs);
   const perk = getStagePerk(player);
@@ -17,6 +20,7 @@ export default function CharacterSheet({ game, onClose }) {
   const abundance = getAbundanceProgress(game);
   const influence = getInfluenceProgress(game);
   const spells = getCharacterSpells(player);
+  const selectedSpell = spells.find((s) => s.id === selectedSpellId) ?? null;
   const atCap = isAtSizeCap(player);
 
   return (
@@ -94,13 +98,26 @@ export default function CharacterSheet({ game, onClose }) {
 
         <div className="panel" style={{ marginTop: '0.75rem' }}>
           <h3 style={{ fontSize: '1rem' }}>Spells Known ({spells.length})</h3>
-          <div style={{ fontSize: '0.8rem', maxHeight: 120, overflow: 'auto' }}>
+          <div className="spell-sheet-list">
             {spells.map((s) => (
-              <div key={s.id} style={{ marginBottom: '0.25rem' }}>
-                {s.growth ? '✦ ' : ''}{s.name} <span style={{ color: 'var(--text-dim)' }}>Lv{s.slotLevel}</span>
-              </div>
+              <button
+                key={s.id}
+                type="button"
+                className={`spell-sheet-list__item${selectedSpellId === s.id ? ' spell-sheet-list__item--active' : ''}`}
+                onClick={() => setSelectedSpellId((id) => (id === s.id ? null : s.id))}
+              >
+                <span>
+                  {isGrowthThemedSpell(s) ? '✦ ' : ''}{s.name}
+                </span>
+                <span className="spell-sheet-list__level">
+                  {s.slotLevel === 0 ? 'Cantrip' : `Lv ${s.slotLevel}`}
+                </span>
+              </button>
             ))}
           </div>
+          {selectedSpell && (
+            <SpellDetailCard spell={selectedSpell} player={player} />
+          )}
         </div>
 
         {game.party?.length > 0 && (

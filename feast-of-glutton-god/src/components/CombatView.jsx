@@ -13,6 +13,7 @@ import { getPreparedSpells } from "../gameData/spellPreparation.js";
 import { previewCastCost } from "../gameData/spellSlots.js";
 import { getSpellForCast } from "../gameData/spells.js";
 import { renderCombatNarration } from "../hooks/npcInteractions.js";
+import SpellDetailCard from "./SpellDetailCard.jsx";
 import { renderCombatGrowthBeat } from "../textEngine/scenes/growth/combatGrowth.js";
 import { addBugNote, captureGameContext } from "../hooks/bugLog.js";
 import SpellSlotPips from "./SpellSlotPips.jsx";
@@ -99,7 +100,7 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onVict
   const [logOpen, setLogOpen] = useState(false);
   const [flashAction, setFlashAction] = useState(null);
   const [pendingSpell, setPendingSpell] = useState(null);
-  const [spellTargetIds, setSpellTargetIds] = useState([]);
+  const [inspectSpell, setInspectSpell] = useState(null);
 
   const activeUnit = getActiveUnit(combat);
   const playerTurn = isPlayerTurn(combat);
@@ -114,6 +115,7 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onVict
   const latestLog = combat.log.slice(-1)[0] || "";
   const caster = activeUnit?.isPlayer ? activeUnit : player;
   const spellTargeting = pendingSpell ? deriveSpellTargeting(pendingSpell) : null;
+  const detailSpell = pendingSpell || inspectSpell;
   const spellRangeTiles = (mode === "spell" && pendingSpell && caster)
     ? getSpellRangeTiles(combat, caster, spellTargeting)
     : [];
@@ -214,12 +216,14 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onVict
     flashSpend(spell.actionType === "bonus" ? "bonus" : "action");
     checkVictory(c);
     resetSpellMode();
+    setInspectSpell(null);
     resumeMovementMode(c);
     update(c, `Cast ${spell.name}.`);
   };
 
   const beginSpellCast = (spell) => {
     if (!isPlayerTurn(combat) || sceneBlocked) return;
+    setInspectSpell(spell);
     if (!spellActionReady(spell, turnSummary)) return;
     if (!canAffordSpell(spell, player, overflowCast)) return;
     const targeting = deriveSpellTargeting(spell);
@@ -537,6 +541,23 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onVict
 
       <div className="panel combat-spells-panel">
         <h2>Spells</h2>
+        {detailSpell && (
+          <SpellDetailCard
+            spell={detailSpell}
+            player={player}
+            overflowCast={overflowCast}
+            compact
+            onClose={pendingSpell ? null : () => setInspectSpell(null)}
+            onCast={!pendingSpell && inspectSpell ? () => cast(inspectSpell) : null}
+            castDisabled={
+              !isPlayerTurn(combat)
+              || !canAffordSpell(detailSpell, player, overflowCast)
+              || !spellActionReady(detailSpell, turnSummary)
+              || sceneBlocked
+            }
+            castLabel={pendingSpell ? undefined : `Cast ${detailSpell.name}`}
+          />
+        )}
         <label style={{ fontSize: "0.85rem", display: "block", marginBottom: "0.5rem" }}>
           <input type="checkbox" checked={overflowCast} onChange={(e) => setOverflowCast(e.target.checked)} />
           {" "}Overflow cast (extra slot/AP, more growth)
@@ -552,15 +573,25 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onVict
                   const canCastResource = canAffordSpell(s, player, overflowCast);
                   const actionReady = spellActionReady(s, turnSummary);
                   return (
-                    <button
-                      key={s.id}
-                      className={pendingSpell?.id === s.id ? "primary" : ""}
-                      onClick={() => cast(s)}
-                      disabled={!isPlayerTurn(combat) || !canCastResource || !actionReady || sceneBlocked}
-                      title={spellCostLabel(s, player, overflowCast)}
-                    >
-                      {spellCostLabel(s, player, overflowCast)}
-                    </button>
+                    <div key={s.id} className="combat-spell-row">
+                      <button
+                        type="button"
+                        className={`spell-info-btn${inspectSpell?.id === s.id ? ' spell-info-btn--active' : ''}`}
+                        onClick={() => setInspectSpell((prev) => (prev?.id === s.id ? null : s))}
+                        aria-label={`Details for ${s.name}`}
+                        title={`View ${s.name} details`}
+                      >
+                        ⓘ
+                      </button>
+                      <button
+                        className={`combat-spell-cast${pendingSpell?.id === s.id ? " primary" : ""}`}
+                        onClick={() => cast(s)}
+                        disabled={!isPlayerTurn(combat) || !canCastResource || !actionReady || sceneBlocked}
+                        title={spellCostLabel(s, player, overflowCast)}
+                      >
+                        {spellCostLabel(s, player, overflowCast)}
+                      </button>
+                    </div>
                   );
                 })}
               </div>
