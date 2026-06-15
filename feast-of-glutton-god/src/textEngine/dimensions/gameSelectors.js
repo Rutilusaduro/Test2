@@ -28,4 +28,6 @@ registerSelectors(
   'achievementId', 'achievementTitle', 'directorsCutFork',
   // growth quantity for level-up context
   'isMilestone',
+  // combat growth hindrance — movement/tile deltas from buildCombatGrowthGlobals
+  'movementDropped', 'tileExpanded', 'prevMovement', 'nextMovement', 'prevTileSize', 'nextTileSize',
 );

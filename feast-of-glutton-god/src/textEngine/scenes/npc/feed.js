@@ -3,13 +3,25 @@ import '../../modules.js';
 import '../../lexicon.js';
 
 registerPool('npc.feed.opening', [
+  { when: { feedType: 'hand', relationship: 0, attitudeMax: 0 }, text: [
+    'You lift food toward {subject.name}. She jerks back — "Don\'t touch me with that."',
+    'A pastry hovers at {subject.first}\'s lips; she turns her face away, jaw set.',
+  ]},
+  { when: { feedType: 'hand', relationship: [0, 1], attitudeMax: 0 }, text: [
+    'You offer a bite. {subject.first} hesitates, arms tight — hunger and pride warring in her eyes.',
+    'Hand-feeding {subject.name} feels like trespass; she has not invited your hand near her mouth.',
+  ]},
+  { when: { feedType: 'magical', relationship: 0, attitudeMax: 0 }, text: [
+    'Golden aromas coil around {subject.first} — she clamps her lips shut, eyes hard.',
+    'You conjure delicacies; {subject.name} recoils from the shimmer like it burns.',
+  ]},
   { when: { feedType: 'magical' }, text: [
     'You conjure a shimmering platter of golden delicacies. {subject.first}\'s eyes widen with hunger.',
     'Magical aromas swirl around {subject.name}, and her lips part eagerly.',
   ]},
   { when: { feedType: 'hand' }, text: [
-    'You lift a honeyed pastry to {subject.name}\'s lips. She leans in without hesitation.',
-    'Hand-feeding {subject.first}, you watch her cheeks flush with pleasure.',
+    'You lift a honeyed pastry to {subject.name}\'s lips. She watches you warily before accepting.',
+    'Hand-feeding {subject.first}, you feel her weigh each bite before she swallows.',
   ]},
   { when: { feedType: 'feast' }, text: [
     'The feast table groans under impossible bounty. {subject.name} moans at the sight.',
@@ -21,6 +33,16 @@ registerPool('npc.feed.opening', [
 ]);
 
 registerPool('npc.feed.reaction', [
+  { when: { relationship: 0, attitudeMax: 0, consentState: 'forced' }, text: [
+    '{subject.first} twists away — food and magic follow anyway, shame hot on her cheeks.',
+    'She eats because the spell leaves no graceful exit; resistance thins with each swallow.',
+    'Her eyes flash anger; she swallows because her body insists, not because she agrees.',
+  ]},
+  { when: { relationship: [0, 1], attitudeMax: 0, corruption: 0 }, text: [
+    'She takes the minimum to be polite and stops — fingers trembling when her body wants more.',
+    '{subject.first} chews like each swallow is surrender she did not authorize.',
+    'Appetite betrays her; she hates that it tastes good while hating that it happens.',
+  ]},
   { when: { consentState: 'forced', severityMin: 2 }, text: [
     '{subject.first} tries to twist away — food and magic follow anyway.',
     '"Don\'t," she chokes out, mouth still wet with your offering.',
@@ -43,8 +65,8 @@ registerPool('npc.feed.reaction', [
     '{subject.first} purrs around your fingers, already asking with her eyes.',
   ]},
   { when: { relationship: [0, 1], corruption: 0 }, text: [
-    '"I… shouldn\'t," she murmurs, but her mouth is already full.',
-    'She eats with guilty pleasure, unable to stop.',
+    'She eats with guilty hesitation — each bite a concession she did not mean to give.',
+    'Warmth spreads through {subject.first}; she looks away, ashamed that it feels good.',
   ]},
   { when: { relationship: 2, corruption: 0 }, text: [
     'She trusts you enough to savor without shame — cheeks flushing as she chews.',

@@ -15,26 +15,26 @@ export const GAIN_DESIRE_TIERS = [
 
 /** Innate starting desire by archetype / bodyType (seeded once per NPC). */
 const ARCHETYPE_SEED = {
-  nurturing: 55,
-  performer: 50,
-  fertility_goddess: 70,
-  devout: 40,
-  scholar: 35,
-  shy: 28,
-  competitive: 32,
-  dominant: 38,
-  haughty: 22,
-  proud: 25,
-  greedy: 48,
-  ancient: 30,
+  nurturing: 38,
+  performer: 34,
+  fertility_goddess: 48,
+  devout: 26,
+  scholar: 22,
+  shy: 16,
+  competitive: 20,
+  dominant: 24,
+  haughty: 14,
+  proud: 16,
+  greedy: 32,
+  ancient: 20,
 };
 
 const BODYTYPE_SEED = {
-  hourglass: 45,
-  pear: 50,
-  rotund: 55,
-  athletic: 30,
-  straight: 25,
+  hourglass: 28,
+  pear: 32,
+  rotund: 36,
+  athletic: 18,
+  straight: 16,
 };
 
 export function getGainDesireTier(points = 0) {
@@ -43,8 +43,8 @@ export function getGainDesireTier(points = 0) {
 
 export function seedGainDesire(npc) {
   if (npc.gainDesire != null) return npc.gainDesire;
-  const archetype = ARCHETYPE_SEED[npc.archetype] ?? 35;
-  const body = BODYTYPE_SEED[npc.bodyType] ?? 35;
+  const archetype = ARCHETYPE_SEED[npc.archetype] ?? 22;
+  const body = BODYTYPE_SEED[npc.bodyType] ?? 22;
   return Math.min(GAIN_DESIRE_MAX, Math.round((archetype + body) / 2));
 }
 

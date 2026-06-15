@@ -18,7 +18,7 @@ function comfortableStageLimit(budget) {
   if (budget >= 80) return 4;
   if (budget >= 60) return 3;
   if (budget >= 40) return 2;
-  if (budget >= 15) return 1;
+  if (budget >= 25) return 1;
   return 0;
 }
 

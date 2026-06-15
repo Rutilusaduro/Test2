@@ -82,20 +82,22 @@ function magnitudeTier({ stagesJumped = 0, malfunctionTier = null } = {}) {
 }
 
 // environment joins once the body is large (endStage ≥ 4); more beats at mythic scale.
-function beatsForMagnitude(tier, { stagesJumped = 0, endStage = 0 } = {}) {
+function beatsForMagnitude(tier, { stagesJumped = 0, endStage = 0, growthMethod = null } = {}) {
+  const isCombat = growthMethod === 'combat';
+  const tail = isCombat ? [] : ['ge.reaction', 'ge.settle'];
   const crossed = stagesJumped >= 1;
   if (tier === 'dramatic') {
     return ['ge.onset', 'ge.surge', 'ge.strain', 'ge.environmentBeat',
-      ...(crossed ? ['ge.crossingBeat'] : []), 'ge.reaction', 'ge.settle'];
+      ...(crossed ? ['ge.crossingBeat'] : []), ...tail];
   }
   if (tier === 'significant') {
     return ['ge.onset', 'ge.surge', 'ge.strain',
       ...(endStage >= 4 ? ['ge.environmentBeat'] : []),
-      ...(crossed ? ['ge.crossingBeat'] : []), 'ge.reaction', 'ge.settle'];
+      ...(crossed ? ['ge.crossingBeat'] : []), ...tail];
   }
   return ['ge.onset', 'ge.surge',
     ...(endStage >= 7 ? ['ge.environmentBeat'] : []),
-    ...(crossed ? ['ge.reaction'] : [])];
+    ...(crossed && !isCombat ? ['ge.reaction'] : [])];
 }
 
 // ── context globals ────────────────────────────────────────────

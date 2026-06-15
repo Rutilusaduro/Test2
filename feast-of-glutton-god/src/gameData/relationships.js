@@ -73,7 +73,7 @@ export const RELATIONSHIP_AWARDS = {
 export const INTERACTION_UNLOCKS = {
   talk: 0,
   observe: 0,
-  feed: 0,
+  feed: 1,
   flirt: 1,
   bless: 1,
   special: 2,

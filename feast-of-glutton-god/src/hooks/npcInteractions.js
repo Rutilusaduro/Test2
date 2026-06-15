@@ -296,6 +296,13 @@ export function doFlirt(npc, player, game) {
 }
 
 export function doFeed(npc, player, game, feedType = 'hand') {
+  if (!canUnlockInteraction(npc, 'feed')) {
+    return { text: getInteractionLockReason(npc, 'feed'), npc, ok: false };
+  }
+  if (isNpcDecliningHostility(npc, game)) {
+    const beat = renderRegionHostilityBeat(game, game.region, { hostilityTier: 1 });
+    return { text: beat, npc, ok: false, declined: true };
+  }
   if (isServiceLocked(game, game.region)) {
     return {
       text: renderRegionHostilityBeat(game, game.region, { hostilityTier: 3, crackdown: true }),
@@ -332,6 +339,10 @@ export function doFeed(npc, player, game, feedType = 'hand') {
 export function doBless(npc, player, game, blessType = 'minor') {
   if (!canUnlockInteraction(npc, 'bless')) {
     return { text: getInteractionLockReason(npc, 'bless'), npc, ok: false };
+  }
+  if (isNpcDecliningHostility(npc, game)) {
+    const beat = renderRegionHostilityBeat(game, game.region, { hostilityTier: 1 });
+    return { text: beat, npc, ok: false, declined: true };
   }
   if (isServiceLocked(game, game.region)) {
     return {

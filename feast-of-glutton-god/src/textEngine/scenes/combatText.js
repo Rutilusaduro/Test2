@@ -11,8 +11,8 @@ registerPool('combat.action', [
     'Caloric energy pours into {subject.first} until resistance melts into shameless pleasure.',
   ]},
   { when: { interaction: 'growth' }, text: [
-    '{subject.name} surges larger mid-fight, golden light rippling across new softness like a blessing.',
-    'Combat growth — {subject.first}\'s body balloons with divine abundance, glorious and gasping.',
+    '{subject.name} surges larger mid-fight — belly and hip spreading, balance shifting under fresh weight.',
+    'Combat growth ripples across {subject.first}; seams strain, footing wobbles, reach shortened.',
   ]},
   { when: { interaction: 'convert' }, text: [
     '{subject.name} drops her weapon, hands on her swollen belly. "I… I surrender to the feast."',

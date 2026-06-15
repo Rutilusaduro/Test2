@@ -1,5 +1,6 @@
 import { getStage, getTileSize, getMovement, getHpBonus } from "./stages.js";
 import { advanceStageUniversal } from "./growthPresentation.js";
+import { renderCombatGrowthBeat } from "../textEngine/scenes/growth/combatGrowth.js";
 import { addCorruption } from "./corruption.js";
 import { getCombatModifiers } from "./stagePerks.js";
 import {
@@ -244,7 +245,8 @@ export function attackUnit(combat, attacker, target) {
       combat.log.push(`★ Critical hit — ${target.name} swells under the voluptuous impact!`);
     }
     if (applied.growthStages > 0) {
-      combat.log.push(`${target.name}'s body blooms with pleasurable abundance.`);
+      const beat = renderCombatGrowthBeat(target, combat.lastGrowth, { attacker });
+      combat.log.push(beat || `${target.name} swells under the strike — footing compromised.`);
       addCorruption(target, 3 * applied.growthStages);
     }
     if (getStage(attacker.lbs).id >= 6) {

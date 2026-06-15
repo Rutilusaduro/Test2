@@ -10,6 +10,7 @@ import './helpers.js';
 import './corePools.js';
 import './contextPools.js';
 import './speciesCombatGrowth.js';
+import './combatGrowth.js';
 
 import { createContext, render } from '../../engine.js';
 import { getStage } from '../../../gameData/stages.js';
@@ -109,3 +110,5 @@ export {
   registerStageCrossingPool,
   registerSelfTargetPair,
 } from './helpers.js';
+
+export { renderCombatGrowthBeat, buildCombatGrowthGlobals } from './combatGrowth.js';

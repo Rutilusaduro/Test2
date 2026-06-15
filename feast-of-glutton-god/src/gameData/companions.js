@@ -101,9 +101,9 @@ export function createCompanionData(template) {
   return {
     ...template,
     lbs: template.startLbs,
-    corruption: template.recruited ? 20 : 0,
-    relationship: template.recruited ? 40 : 0,
-    devotion: template.recruited ? 15 : 0,
+    corruption: template.recruited ? 10 : 0,
+    relationship: template.recruited ? 25 : 0,
+    devotion: template.recruited ? 8 : 0,
     hp: 30,
     maxHp: 30,
     mp: 15,

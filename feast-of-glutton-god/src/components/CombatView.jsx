@@ -13,7 +13,7 @@ import { getPreparedSpells } from "../gameData/spellPreparation.js";
 import { previewCastCost } from "../gameData/spellSlots.js";
 import { getSpellForCast } from "../gameData/spells.js";
 import { renderCombatNarration } from "../hooks/npcInteractions.js";
-import { renderGrowthScene } from "../textEngine/scenes/growthEvent/index.js";
+import { renderCombatGrowthBeat } from "../textEngine/scenes/growth/combatGrowth.js";
 import { addBugNote, captureGameContext } from "../hooks/bugLog.js";
 import SpellSlotPips from "./SpellSlotPips.jsx";
 import DmBanner from "./DmBanner.jsx";
@@ -81,6 +81,11 @@ function groupSpellsByLevel(spellList) {
 
 function spellActionReady(spell, turnSummary) {
   return spell.actionType === "bonus" ? turnSummary?.bonus : turnSummary?.action;
+}
+
+function combatGrowthPanel(unit, growth, attacker) {
+  if (!growth?.stagesJumped) return "";
+  return renderCombatGrowthBeat(unit, growth, { attacker });
 }
 
 export default function CombatView({ game, combat, onUpdateCombat, onEnd, onVictory, introBlocking, onDebugContext }) {
@@ -199,12 +204,7 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onVict
       targets,
     });
     if (c.lastGrowth) {
-      const gt = renderGrowthScene(c.lastGrowth.unit, {
-        growthMethod: "blessing",
-        startStage: c.lastGrowth.startStage,
-        endStage: c.lastGrowth.endStage,
-        week: game.day,
-      });
+      const gt = combatGrowthPanel(c.lastGrowth.unit, c.lastGrowth, active);
       setGrowthText(gt);
       c.log.push(renderCombatNarration(c.lastGrowth.unit, "growth"));
     }
@@ -256,6 +256,10 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onVict
     if (!target || !active) return;
     attackUnit(c, active, target);
     c.log.push(renderCombatNarration(active, "attack"));
+    if (c.lastGrowth?.stagesJumped) {
+      const gt = combatGrowthPanel(c.lastGrowth.unit, c.lastGrowth, active);
+      setGrowthText(gt);
+    }
     if (target.hp <= 0) c.log.push(`${target.name} falls!`);
     flashSpend("action");
     checkVictory(c);
@@ -276,12 +280,7 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onVict
     }
     result.combat.trivializeGag = renderTrivializeGag(game, result.combat, target);
     if (result.combat.lastGrowth) {
-      const gt = renderGrowthScene(target, {
-        growthMethod: "feed",
-        startStage: result.combat.lastGrowth.startStage,
-        endStage: result.combat.lastGrowth.endStage,
-        week: game.day,
-      });
+      const gt = combatGrowthPanel(target, result.combat.lastGrowth, active);
       setGrowthText(gt);
     }
     flashSpend("action");
@@ -357,11 +356,10 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onVict
 
     if (mode === "feed" && active) {
       feedTarget(c, active, target, 1);
-      const gt = renderGrowthScene(target, {
-        growthMethod: "feed", startStage: getStage(target.lbs).id - 1,
-        endStage: getStage(target.lbs).id, week: game.day,
-      });
-      setGrowthText(gt);
+      if (c.lastGrowth?.stagesJumped) {
+        const gt = combatGrowthPanel(target, c.lastGrowth, active);
+        setGrowthText(gt);
+      }
       c.log.push(renderCombatNarration(target, "feed"));
       if (checkConversion(target)) convertEnemy(c, target);
       flashSpend("action");
@@ -382,12 +380,7 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onVict
       : c.enemies.find((e) => e.hp > 0 && !e.converted);
     useBonusAction(c, active, actionId, target);
     if (c.lastGrowth) {
-      const gt = renderGrowthScene(c.lastGrowth.unit, {
-        growthMethod: actionId === 'self_feed' ? 'feed' : 'blessing',
-        startStage: c.lastGrowth.startStage,
-        endStage: c.lastGrowth.endStage,
-        week: game.day,
-      });
+      const gt = combatGrowthPanel(c.lastGrowth.unit, c.lastGrowth, active);
       setGrowthText(gt);
     }
     flashSpend("bonus");
