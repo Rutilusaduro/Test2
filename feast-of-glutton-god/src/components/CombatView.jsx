@@ -477,7 +477,13 @@ export default function CombatView({ game, combat, onUpdateCombat, onEnd, onVict
 
       {combat.victory && (
         <div className="panel" style={{ borderColor: "var(--gold)", textAlign: "center" }}>
-          <h2>{combat.victory === "lose" ? "Defeat…" : "Victory!"}</h2>
+          <h2>
+            {combat.victory === "lose"
+              ? "Defeat…"
+              : combat.victory === "immobilized"
+                ? "Victory — too huge to fight!"
+                : "Victory!"}
+          </h2>
         </div>
       )}
 

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { getOverworldCastableSpells, castSpellOnNpc, castSpellOnFeature, getRitualCastableSpells } from '../gameData/overworldSpells.js';
-import { hasSpellSlot } from '../gameData/spellSlots.js';
+import { previewCastCost } from '../gameData/spellSlots.js';
+import { canUseCreationGift } from '../gameData/creationGift.js';
 import { getStage } from '../gameData/stages.js';
 import { recordNpcGrowthForQuests, recordNpcInteractionForQuests } from '../hooks/questHooks.js';
 import {
@@ -34,12 +35,10 @@ export default function SpellbookPanel({ game, npcs, features = [], onCastResult
 
   const canCast = (spell) => {
     if (mode === 'ritual' && isRitualSpell(spell)) {
+      if (canUseCreationGift(player, spell.id)) return true;
       return (player.ap || 0) >= getRitualApCost(spell);
     }
-    if (spell.slotLevel === 0) return true;
-    if (hasSpellSlot(player, spell.slotLevel)) return true;
-    const ap = spell.apCost ?? spell.slotLevel * 5;
-    return (player.ap || 0) >= ap;
+    return previewCastCost(player, spell, { overflow }).ok;
   };
 
   const handleCastOnNpc = () => {

@@ -18,6 +18,7 @@ import {
 import { syncPrestigeRank } from '../gameData/prestige.js';
 import { checkAchievements, recordCosmicConversion } from '../gameData/achievements.js';
 import { isCosmicThreat } from '../gameData/enemies.js';
+import { isCombatImmobilized, isCombatVictory } from '../gameData/combat.js';
 
 /**
  * Record an NPC interaction for quest objective progress.
@@ -88,12 +89,12 @@ export function recordRegionVisitForQuests(game, regionId) {
 
 export function recordCombatEndForQuests(game, combat) {
   ensureQuestState(game);
-  if (!combat?.victory || combat.victory === 'lose') {
+  if (!isCombatVictory(combat?.victory)) {
     return { questMessages: '' };
   }
   const victoryType = combat.victory === 'converted' ? 'converted' : 'win';
   const defeatedEnemyIds = (combat.enemies ?? [])
-    .filter((e) => e.hp <= 0 || e.converted)
+    .filter((e) => e.hp <= 0 || e.converted || isCombatImmobilized(e))
     .map((e) => e.typeId || e.type || e.id)
     .filter(Boolean);
   const foughtEnemyIds = (combat.enemies ?? [])

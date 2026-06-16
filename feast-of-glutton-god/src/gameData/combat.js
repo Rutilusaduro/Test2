@@ -1,4 +1,6 @@
 import { getStage, getTileSize, getMovement, getHpBonus } from "./stages.js";
+import { isImmobile } from "./stageMechanics.js";
+import { FINISHER_IMMOBILE_STAGE } from "./combatFinisher.js";
 import { advanceStageUniversal } from "./growthPresentation.js";
 import { renderCombatGrowthBeat } from "../textEngine/scenes/growth/combatGrowth.js";
 import { addCorruption } from "./corruption.js";
@@ -579,6 +581,17 @@ export function castSpell(combat, caster, spell, target, opts = {}) {
   return combat;
 }
 
+export function isCombatImmobilized(unit) {
+  if (!unit || unit.hp <= 0 || unit.converted) return false;
+  return isImmobile(getStage(unit.lbs).id);
+}
+
+export function isCombatVictory(victory) {
+  return victory === "win" || victory === "converted" || victory === "immobilized";
+}
+
+export { FINISHER_IMMOBILE_STAGE as COMBAT_IMMOBILE_VICTORY_STAGE };
+
 export function checkConversion(enemy) {
   if (!enemy || enemy.converted) return false;
   if (isConversionImmune(enemy)) return false;
@@ -598,13 +611,29 @@ export function convertEnemy(combat, enemy) {
 export function checkVictory(combat) {
   const aliveEnemies = combat.enemies.filter((e) => e.hp > 0 && !e.converted);
   const aliveAllies = combat.allies.filter((a) => a.hp > 0);
+
+  if (aliveAllies.length === 0) {
+    combat.victory = "lose";
+    combat.log.push("Your party has been overwhelmed...");
+    return combat;
+  }
+
   if (aliveEnemies.length === 0) {
     combat.victory = "win";
     combat.log.push("Victory through abundance!");
-  } else if (aliveAllies.length === 0) {
-    combat.victory = "lose";
-    combat.log.push("Your party has been overwhelmed...");
-  } else if (combat.enemies.every((e) => e.converted || e.hp <= 0)) {
+    return combat;
+  }
+
+  const fightingEnemies = aliveEnemies.filter((e) => !isCombatImmobilized(e));
+  if (fightingEnemies.length === 0) {
+    combat.victory = "immobilized";
+    combat.log.push(
+      "Your foes swell past fighting weight — Monolith-scale curves pin them in place. Too plush to stand, too huge to threaten.",
+    );
+    return combat;
+  }
+
+  if (combat.enemies.every((e) => e.converted || e.hp <= 0)) {
     combat.victory = "converted";
     combat.log.push("All enemies converted to the Fat Goddess's gospel!");
   }
@@ -862,6 +891,11 @@ function runAllyAction(combat, ally) {
 }
 
 function runEnemyAction(combat, enemy) {
+  if (isCombatImmobilized(enemy)) {
+    combat.log.push(`${enemy.name} can barely shift — pinned under glorious weight, no longer a threat.`);
+    return;
+  }
+
   const target = combat.allies.find((a) => a.hp > 0);
   if (!target) return;
 
@@ -889,7 +923,7 @@ export function enemyAiTurn(combat) {
 }
 
 export function getCombatRewards(combat) {
-  if (!combat.victory || combat.victory === "lose") return { ap: 0, xp: 0 };
+  if (!isCombatVictory(combat.victory)) return { ap: 0, xp: 0 };
   const base = combat.victory === "converted" ? 25 : 15;
   return { ap: base + combat.turn * 2, xp: 10 + combat.enemies.length * 5 };
 }

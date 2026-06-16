@@ -17,7 +17,7 @@ import GameDebugShell from "./components/GameDebugShell.jsx";
 import { createNewGame, addAbundancePoints, syncPlayerFromCombat, ensureDmState, ensureScarcityState } from "./gameData/player.js";
 import { clearTransient, narrateEvent } from "./gameData/narrator.js";
 import { saveGame, loadGame, beginPilgrimageMeta } from "./gameData/save.js";
-import { createCombatState, getCombatRewards } from "./gameData/combat.js";
+import { createCombatState, getCombatRewards, isCombatVictory } from "./gameData/combat.js";
 import { buildCombatIntro, buildCombatWrapup } from "./textEngine/scenes/dm/combat.js";
 import { pickEncounter } from "./gameData/enemies.js";
 import { awardCombatXp, getSizeCapForLevel, initializeStartingSpells } from "./gameData/leveling.js";
@@ -96,7 +96,7 @@ function applyCombatEndState(prev, combat) {
     narrateEvent(next, satietyMsg, 'growth');
   }
 
-  if (combat.victory === 'win' || combat.victory === 'converted') {
+  if (isCombatVictory(combat.victory)) {
     const spreadSource = combat.victory === 'converted' ? 'combat_convert' : 'combat_win';
     const spread = awardAbundanceSpreadWithEvents(next, spreadSource);
     if (spread.worldEvent?.message) {
@@ -145,7 +145,7 @@ function applyCombatEndState(prev, combat) {
   }
 
   const pending = prev.pendingPuzzleCombat;
-  if (pending && (combat.victory === 'win' || combat.victory === 'converted')) {
+  if (pending && isCombatVictory(combat.victory)) {
     const solveResult = applySolutionImmediate(next, pending.puzzleId, pending.solutionId);
     const puzzleQuest = recordPuzzleSolvedForQuests(next, {
       puzzleId: pending.puzzleId,

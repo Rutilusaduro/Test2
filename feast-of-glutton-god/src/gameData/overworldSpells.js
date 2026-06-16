@@ -59,6 +59,10 @@ export function getRitualCastableSpells(player) {
 
 function resolveOverworldCost(player, spell, overflow, opts = {}) {
   const castData = getSpellForCast(spell, overflow);
+  if (castData.slotLevel === 0) return { ok: true, method: 'cantrip', spell: castData };
+  if (!overflow && canUseCreationGift(player, castData.id, { overflow })) {
+    return { ok: true, method: 'gift', spell: castData };
+  }
   const ritual = opts.ritual && isRitualSpell(castData);
   if (ritual) {
     const ap = getEffectiveSpellApCost(opts.game, castData.id, getRitualApCost(castData));
@@ -66,10 +70,6 @@ function resolveOverworldCost(player, spell, overflow, opts = {}) {
       return { ok: true, method: 'ritual', spell: castData, ap };
     }
     return { ok: false, reason: 'Not enough AP for ritual cast.' };
-  }
-  if (castData.slotLevel === 0) return { ok: true, method: 'cantrip', spell: castData };
-  if (!overflow && canUseCreationGift(player, castData.id, { overflow })) {
-    return { ok: true, method: 'gift', spell: castData };
   }
   if (hasSpellSlot(player, castData.slotLevel)) {
     return { ok: true, method: 'slot', spell: castData, slotLevel: castData.slotLevel };

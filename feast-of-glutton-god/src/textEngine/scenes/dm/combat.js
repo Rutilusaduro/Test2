@@ -55,6 +55,7 @@ function buildOutroGlobals(game, wrapup, enemy, outcomeKind) {
   const victoryType = wrapup.victory === 'lose' ? 'defeat'
     : wrapup.victory === 'converted' ? 'converted'
     : wrapup.victory === 'flee' ? 'flee'
+    : wrapup.victory === 'immobilized' ? 'immobilized'
     : 'win';
   return {
     region,
@@ -375,6 +376,23 @@ registerPool('dm.combat.outro.converted', [
   ]},
 ]);
 
+// ── OUTRO: immobilized (FULL SENTENCE) ─────────────────────────
+
+registerPool('dm.combat.outro.immobilized', [
+  { when: { stagesJumpedMin: 3 }, text: [
+    '{subject.name} swells past Monolith scale — pinned under {their} own glorious mass, wheezing, unable to lift a hand against you.',
+    '{subject.first} grows until the battlefield shrinks around {them}; movement dies, menace dies, only plush helplessness remains.',
+    'You fatten {subject.first} beyond fighting weight — {they} quiver, immobile, a mountain of defeated curves.',
+    '{subject.first} can only pant and jiggle now, too huge to stand, too stuffed to swing — victory without a killing blow.',
+  ]},
+  { when: {}, text: [
+    '{subject.name} reaches immobility mid-fight — too plush to stand, too vast to threaten, the DM calling it before {they} can beg.',
+    '{subject.first} is pinned by {their} own abundance, heaving, helpless, a living monument to your gospel.',
+    'The enemy stops being an enemy when {subject.first} cannot move — only swell, only sigh, only surrender to gravity.',
+    '{subject.first} lies trapped in new flesh, Monolith-heavy and harmless — you win because {they} grew too magnificent to fight.',
+  ]},
+]);
+
 // ── OUTRO: ko (FULL SENTENCE) ──────────────────────────────────
 
 registerPool('dm.combat.outro.ko', [
@@ -408,6 +426,17 @@ registerPool('dm.combat.outro.victory_coda', [
     'You stand alone amid surrendered curves, the gospel written on flesh instead of stone.',
     'The last convert sighs; the camera of the tale slows, reverent, hungry for what you do next.',
     'Victory through conversion — the prettiest kind, bodies blooming like offerings.',
+  ]},
+  { when: { victoryType: 'immobilized', enemyCountMin: 2 }, text: [
+    'Every foe left standing is too huge to fight — the field groans under Monolith-scale curves, and you breathe easy.',
+    'They swelled past violence together; now they sprawl, pinned, plush, and utterly beaten by their own abundance.',
+    'Several enemies, one lesson: grow them past movement and the battle ends without blood.',
+  ]},
+  { when: { victoryType: 'immobilized' }, text: [
+    'Victory by immensity — your foes grew too magnificent to stand, let alone strike.',
+    'The fight ends not with a fall but with a shuddering stillness — bodies too plush to move, too huge to threaten.',
+    'You win because abundance won first — flesh piled until steel meant nothing.',
+    'Monolith weight settles over the field; the enemy cannot fight what they have become.',
   ]},
   { when: { victoryType: 'win', enemyCountMin: 2 }, text: [
     'The last enemy falls and the field exhales — a mess of swollen silhouettes and satisfied breath.',
@@ -502,6 +531,7 @@ export function renderCombatOutro(game, wrapup, opts = {}) {
   const victoryType = wrapup.victory === 'lose' ? 'defeat'
     : wrapup.victory === 'converted' ? 'converted'
     : wrapup.victory === 'flee' ? 'flee'
+    : wrapup.victory === 'immobilized' ? 'immobilized'
     : 'win';
 
   if (wrapup.finisherProse) {
@@ -538,7 +568,7 @@ export function renderCombatOutro(game, wrapup, opts = {}) {
       pronouns: enemy.pronouns || 'they',
       role: ENEMY_TYPES[enemy.type]?.role,
     };
-    const outcomeKind = enemy.converted ? 'converted' : 'ko';
+    const outcomeKind = enemy.converted ? 'converted' : enemy.immobilized ? 'immobilized' : 'ko';
     const globals = buildOutroGlobals(game, wrapup, enemy, outcomeKind);
     const ctx = createContext({
       subject,
@@ -548,7 +578,11 @@ export function renderCombatOutro(game, wrapup, opts = {}) {
       scene,
       seed: opts.seed != null ? `${opts.seed}_${idx}` : undefined,
     });
-    const pool = enemy.converted ? 'dm.combat.outro.converted' : 'dm.combat.outro.ko';
+    const pool = enemy.converted
+      ? 'dm.combat.outro.converted'
+      : enemy.immobilized
+        ? 'dm.combat.outro.immobilized'
+        : 'dm.combat.outro.ko';
     const line = render(`{${pool}}`, ctx, opts).trim();
     if (line) paragraphs.push(line);
 
@@ -563,7 +597,11 @@ export function renderCombatOutro(game, wrapup, opts = {}) {
     ref: game.player,
     globals: {
       ...buildOutroGlobals(game, wrapup, enemies[0], 'win'),
-      victoryType: wrapup.victory === 'converted' ? 'converted' : 'win',
+      victoryType: wrapup.victory === 'converted'
+        ? 'converted'
+        : wrapup.victory === 'immobilized'
+          ? 'immobilized'
+          : 'win',
     },
     history: game.history,
     scene,
@@ -599,16 +637,21 @@ export function buildCombatIntro(game, combat) {
 }
 
 export function buildCombatWrapup(game, combat) {
-  const enemies = (combat.enemies ?? []).map((e) => ({
-    name: e.name,
-    type: e.type ?? e.typeId ?? e.id,
-    startStage: e.startStage ?? getStage(e.startLbs ?? e.lbs).id,
-    endStage: getStage(e.lbs).id,
-    lbs: Math.round(e.lbs),
-    pronouns: e.pronouns || 'they',
-    converted: !!e.converted,
-    killed: e.hp <= 0 && !e.converted,
-  }));
+  const immobileStage = 11;
+  const enemies = (combat.enemies ?? []).map((e) => {
+    const endStage = getStage(e.lbs).id;
+    return {
+      name: e.name,
+      type: e.type ?? e.typeId ?? e.id,
+      startStage: e.startStage ?? getStage(e.startLbs ?? e.lbs).id,
+      endStage,
+      lbs: Math.round(e.lbs),
+      pronouns: e.pronouns || 'they',
+      converted: !!e.converted,
+      killed: e.hp <= 0 && !e.converted,
+      immobilized: e.hp > 0 && !e.converted && endStage >= immobileStage,
+    };
+  });
   const allies = (combat.allies ?? [])
     .filter((a) => a.hp > 0)
     .map((a) => ({ name: a.name, lbs: Math.round(a.lbs), isPlayer: !!a.isPlayer }));
