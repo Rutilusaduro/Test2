@@ -2,6 +2,7 @@
  * Wizard spell preparation — daily prepared subset from spellbook.
  * Cantrips are always castable; leveled spells must be prepared after rest.
  */
+import { getCreationGiftSpellIds } from './creationGift.js';
 import { getSpell } from './spells.js';
 import { getPreparedCap } from './spellLearning.js';
 import { isGrowthThemedSpell, ensureSpellState, getKnownSpellIds } from './spellLearning.js';
@@ -22,17 +23,17 @@ export function getPreparedSpellIds(character) {
   ensureSpellState(character);
   if (!usesSpellPreparation(character.classId)) {
     const ids = getKnownSpellIds(character);
-    const giftId = character.creationGift?.spellId;
-    if (giftId && !ids.includes(giftId)) return [...ids, giftId];
-    return ids;
+    const giftIds = getCreationGiftSpellIds(character).filter((id) => !ids.includes(id));
+    return giftIds.length ? [...ids, ...giftIds] : ids;
   }
   if (!character.spellsPrepared?.length) {
     autoPrepareSpells(character);
   }
   const cantrips = getKnownSpellIds(character).filter((id) => (getSpell(id)?.slotLevel ?? 0) === 0);
   const prepared = (character.spellsPrepared || []).filter((id) => knowsInSpellbook(character, id));
-  const giftId = character.creationGift?.spellId;
-  const giftExtra = giftId && !cantrips.includes(giftId) && !prepared.includes(giftId) ? [giftId] : [];
+  const giftExtra = getCreationGiftSpellIds(character).filter(
+    (id) => !cantrips.includes(id) && !prepared.includes(id),
+  );
   return [...new Set([...cantrips, ...prepared, ...giftExtra])];
 }
 
@@ -48,7 +49,7 @@ export function getPreparedSpells(character) {
 export function isSpellPrepared(character, spellId) {
   const spell = getSpell(spellId);
   if (!spell) return false;
-  if (character.creationGift?.spellId === spellId) return true;
+  if (getCreationGiftSpellIds(character).includes(spellId)) return true;
   if (!usesSpellPreparation(character.classId)) return true;
   if ((spell.slotLevel ?? 0) === 0) return true;
   return (character.spellsPrepared || []).includes(spellId);

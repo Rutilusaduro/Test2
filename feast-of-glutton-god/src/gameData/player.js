@@ -86,6 +86,9 @@ export function createPlayer(name, classId, options = {}) {
   if (options.creationGiftSpellId) {
     applyCreationGift(player, options.creationGiftSpellId);
   }
+  if (options.creationGiftSpellId4) {
+    applyCreationGift(player, options.creationGiftSpellId4);
+  }
   ensureCreationGiftState(player);
   ensureFavor(player);
   player.ap = Math.min(player.ap, getMaxAbundancePoints(player));

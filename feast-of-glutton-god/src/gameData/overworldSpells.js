@@ -167,7 +167,7 @@ export function castSpellOnNpc(game, npc, spellId, opts = {}) {
   const effects = applyOverworldSpellEffects(game, target, player, cost.spell);
 
   if (cost.method === 'slot') spendSpellSlot(player, cost.slotLevel);
-  else if (cost.method === 'gift') spendCreationGiftUse(player);
+  else if (cost.method === 'gift') spendCreationGiftUse(player, cost.spell.id);
   else if (cost.method === 'ap' || cost.method === 'ritual') spendAP(game, cost.ap);
 
   if (effects.growth && !effects.growth.favorRefused) {
@@ -238,7 +238,7 @@ export function castSpellOnFeature(game, featureId, spellId, opts = {}) {
   }
 
   if (cost.method === 'slot') spendSpellSlot(player, cost.slotLevel);
-  else if (cost.method === 'gift') spendCreationGiftUse(player);
+  else if (cost.method === 'gift') spendCreationGiftUse(player, cost.spell.id);
   else if (cost.method === 'ap' || cost.method === 'ritual') spendAP(game, cost.ap);
 
   const auraBonus = getCombinedPuzzleBonuses(game, game.region);

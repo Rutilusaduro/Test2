@@ -5,6 +5,7 @@ import { getSpell, getSpellForCast, getSpellEnvironmentTags, isRitualSpell, getR
 import { isGrowthThemedSpell } from './spellLearning.js';
 import { deriveSpellTargeting, getTargetingHint } from './spellTargeting.js';
 import { previewCastCost } from './spellSlots.js';
+import { getCreationGiftUses } from './creationGift.js';
 
 const SCHOOL_LABELS = {
   abundance: 'Abundance',
@@ -116,8 +117,9 @@ function formatCostLabel(player, spell, overflow = false) {
     }
     if (preview.method === 'resonance') return 'Divine resonance (no slot spent)';
     if (preview.method === 'gift') {
-      const left = preview.giftUsesLeft ?? player?.creationGift?.usesRemaining ?? 0;
-      return `Divine gift (free · ${left} left this rest)`;
+      const left = preview.giftUsesLeft ?? getCreationGiftUses(player, spell.id)?.usesRemaining ?? 0;
+      const max = preview.giftUsesMax ?? getCreationGiftUses(player, spell.id)?.maxUses ?? 3;
+      return `Divine gift (free · ${left}/${max} this rest)`;
     }
     if (preview.method === 'ap') {
       return `${preview.apSpent ?? spell.apCost ?? '?'} AP`;
