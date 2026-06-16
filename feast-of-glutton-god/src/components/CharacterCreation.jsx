@@ -5,9 +5,10 @@ import { getSubclassesForClass } from "../gameData/subclasses.js";
 import { applyRaceStatBonuses } from "../gameData/races.js";
 import { buildStartingSpells } from "../gameData/spellLearning.js";
 import { getCharacterSpells } from "../gameData/spellLearning.js";
+import { getThirdLevelSpellOptions, CREATION_GIFT_MAX_USES } from "../gameData/creationGift.js";
 import { STAT_LABELS } from "../gameData/stats.js";
 
-const STEPS = ['race', 'class', 'subclass', 'details'];
+const STEPS = ['race', 'class', 'subclass', 'gift', 'details'];
 
 export default function CharacterCreation({ onBack, onStart }) {
   const [step, setStep] = useState(0);
@@ -16,6 +17,10 @@ export default function CharacterCreation({ onBack, onStart }) {
   const [classId, setClassId] = useState("bard");
   const [subclassId, setSubclassId] = useState("feast_singer");
   const [humanPicks, setHumanPicks] = useState(["con", "cha"]);
+  const [creationGiftSpellId, setCreationGiftSpellId] = useState(null);
+
+  const giftSpells = useMemo(() => getThirdLevelSpellOptions(), []);
+  const selectedGift = giftSpells.find((s) => s.id === creationGiftSpellId);
 
   const selectedClass = PLAYER_CLASSES.find((c) => c.id === classId);
   const subclasses = useMemo(() => getSubclassesForClass(classId), [classId]);
@@ -43,6 +48,9 @@ export default function CharacterCreation({ onBack, onStart }) {
         setSubclassId(defaultSub?.id || "");
       }
     }
+    if (step === 2 && !creationGiftSpellId && giftSpells.length) {
+      setCreationGiftSpellId(giftSpells[0].id);
+    }
     setStep((s) => Math.min(s + 1, STEPS.length - 1));
   };
 
@@ -60,14 +68,17 @@ export default function CharacterCreation({ onBack, onStart }) {
   };
 
   const finish = () => {
+    if (!creationGiftSpellId) return;
     onStart(name || "Chosen of the Fat Goddess", classId, {
       raceId,
       subclassId,
       humanStatPicks: raceId === "human" ? humanPicks : undefined,
+      creationGiftSpellId,
     });
   };
 
   const stepLabel = STEPS[step];
+  const canAdvance = step !== 3 || Boolean(creationGiftSpellId);
 
   return (
     <div className="app">
@@ -149,6 +160,39 @@ export default function CharacterCreation({ onBack, onStart }) {
       )}
 
       {step === 3 && (
+        <div className="panel">
+          <h2>Divine Gift — 3rd-Level Spell</h2>
+          <p className="prose" style={{ marginBottom: "1rem", fontSize: "0.9rem" }}>
+            The Fat Goddess offers one forbidden miracle from beyond your level — cast it{" "}
+            <strong>{CREATION_GIFT_MAX_USES} times</strong> per long rest, with no slot or AP cost.
+            Growth-themed spells are marked with ✦.
+          </p>
+          <div className="spell-levelup-pool creation-gift-pool">
+            {giftSpells.map((spell) => (
+              <button
+                key={spell.id}
+                type="button"
+                className={`class-card ${creationGiftSpellId === spell.id ? "primary" : ""}`}
+                onClick={() => setCreationGiftSpellId(spell.id)}
+                style={{ textAlign: "left", borderColor: spell.growth ? "var(--rose)" : undefined }}
+              >
+                <h3>
+                  {spell.growth ? "✦ " : ""}{spell.name}
+                  <span style={{ fontWeight: "normal", color: "var(--text-dim)" }}> — Level 3</span>
+                </h3>
+                <p>{spell.desc}</p>
+              </button>
+            ))}
+          </div>
+          {selectedGift && (
+            <p className="prose" style={{ marginTop: "0.75rem", fontSize: "0.9rem", color: "var(--gold)" }}>
+              Selected: <strong>{selectedGift.name}</strong> — {CREATION_GIFT_MAX_USES} free casts after each long rest.
+            </p>
+          )}
+        </div>
+      )}
+
+      {step === 4 && (
         <>
           <div className="panel">
             <h2>Your Name</h2>
@@ -192,6 +236,11 @@ export default function CharacterCreation({ onBack, onStart }) {
               <p style={{ color: "var(--text-dim)", marginTop: "0.5rem" }}>
                 {spellCount} spells known · Stage {selectedRace?.startStageBonus ? "bonus" : "standard"} start
               </p>
+              {selectedGift && (
+                <p style={{ color: "var(--rose)", marginTop: "0.5rem" }}>
+                  <strong>Divine gift:</strong> {selectedGift.name} ({CREATION_GIFT_MAX_USES}/long rest, free)
+                </p>
+              )}
               <div style={{ display: "flex", flexWrap: "wrap", gap: "0.5rem", marginTop: "0.75rem" }}>
                 {Object.entries(previewStats).map(([k, v]) => (
                   <span key={k} className="stat" style={{ fontSize: "0.85rem" }}>
@@ -212,9 +261,9 @@ export default function CharacterCreation({ onBack, onStart }) {
       <div style={{ display: "flex", gap: "0.5rem", marginTop: "0.5rem" }}>
         <button onClick={goBack}>{step === 0 ? "Back" : "Previous"}</button>
         {step < STEPS.length - 1 ? (
-          <button className="primary" onClick={goNext}>Next</button>
+          <button className="primary" onClick={goNext} disabled={!canAdvance}>Next</button>
         ) : (
-          <button className="primary" onClick={finish}>Begin the Feast</button>
+          <button className="primary" onClick={finish} disabled={!creationGiftSpellId}>Begin the Feast</button>
         )}
       </div>
     </div>

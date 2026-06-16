@@ -217,7 +217,7 @@ function sweepCombatOutro(iterations = 200) {
 
 const SPELL_SCHOOLS = ['abundance', 'enchantment', 'transmutation', 'evocation', 'conjuration'];
 const CAST_TYPES = ['action', 'bonus'];
-const PAID_BY = ['slot', 'ap', 'cantrip'];
+const PAID_BY = ['slot', 'ap', 'cantrip', 'gift'];
 const FAIL_CAUSES = ['no_resource', 'no_action', 'no_bonus'];
 const CAST_KINDS = ['invoke', 'fizzle', 'noaction', 'nobonus'];
 

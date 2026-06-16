@@ -115,6 +115,10 @@ function formatCostLabel(player, spell, overflow = false) {
       return `Spell slot (level ${lvl})`;
     }
     if (preview.method === 'resonance') return 'Divine resonance (no slot spent)';
+    if (preview.method === 'gift') {
+      const left = preview.giftUsesLeft ?? player?.creationGift?.usesRemaining ?? 0;
+      return `Divine gift (free · ${left} left this rest)`;
+    }
     if (preview.method === 'ap') {
       return `${preview.apSpent ?? spell.apCost ?? '?'} AP`;
     }

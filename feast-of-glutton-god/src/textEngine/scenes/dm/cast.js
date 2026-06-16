@@ -84,6 +84,16 @@ registerPool('dm.cast.invoke.payment', [
     'internal abundance poured straight into the verse',
     'the cost taken from your curves, not your book',
   ]},
+  { when: { paidBy: 'gift' }, text: [
+    'paid from the divine gift — no slot, no cost, only grace',
+    'a creation blessing spent, warm and weightless',
+    'the Fat Goddess\'s gift opens the verse for free',
+    'miracle-casting — one of your sacred free casts',
+    'no purse touched; the gift remembers your name',
+    'forbidden power lent at character\'s dawn, still yours',
+    'a third-level miracle, freely given and freely spent',
+    'the gift burns once more — sumptuous and unpriced',
+  ]},
   { when: { paidBy: 'slot' }, text: [
     'a prepared slot snapping open, clean and sure',
     'ritual structure catching the power perfectly',
@@ -213,6 +223,7 @@ function paidByFromCost(cost) {
   if (!cost?.ok) return null;
   if (cost.method === 'ap') return 'ap';
   if (cost.method === 'slot') return 'slot';
+  if (cost.method === 'gift') return 'gift';
   return 'cantrip';
 }
 

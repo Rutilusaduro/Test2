@@ -7,6 +7,7 @@ import { getMaxAbundancePoints, getArmorClass } from "./stats.js";
 import { getRegionApMultiplier } from "./worldTransformation.js";
 import { channelExcessApToResonance } from "./divineResonance.js";
 import { getSizeCapForLevel, initializeStartingSpells } from "./leveling.js";
+import { resetCreationGiftUses, applyCreationGift, ensureCreationGiftState } from "./creationGift.js";
 import { CLASS_SKILL_PROFICIENCIES } from "./skills.js";
 import { applyRaceStatBonuses, getRace } from "./races.js";
 import { getSubclass, getDefaultSubclassId } from "./subclasses.js";
@@ -82,6 +83,10 @@ export function createPlayer(name, classId, options = {}) {
 
   initSpellSlots(player);
   initializeStartingSpells(player);
+  if (options.creationGiftSpellId) {
+    applyCreationGift(player, options.creationGiftSpellId);
+  }
+  ensureCreationGiftState(player);
   ensureFavor(player);
   player.ap = Math.min(player.ap, getMaxAbundancePoints(player));
   return player;

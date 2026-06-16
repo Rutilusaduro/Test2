@@ -572,6 +572,23 @@ button.primary:hover:not(:disabled) {
   color: #b07aff;
 }
 
+.spell-pips__row--gift .pip--gift {
+  color: var(--rose);
+}
+
+.spell-pips__gift-name {
+  color: var(--text-dim);
+  font-size: 0.75rem;
+  max-width: 9rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.creation-gift-pool {
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+}
+
 .spell-pips__label {
   color: var(--text-dim);
   min-width: 1.5rem;

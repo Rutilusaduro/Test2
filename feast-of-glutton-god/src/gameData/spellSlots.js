@@ -14,6 +14,7 @@ import {
   canResonanceUpcast,
   spendResonanceForUpcast,
 } from "./divineResonance.js";
+import { canUseCreationGift, spendCreationGiftUse } from "./creationGift.js";
 
 export const MAX_SPELL_LEVEL = 9;
 
@@ -246,6 +247,11 @@ export function resolveCastCost(character, spell, opts = {}) {
   if (slotLevel === 0) return { ok: true, method: "cantrip" };
 
   const overflow = opts.overflow && spell.overflow;
+  if (!overflow && canUseCreationGift(character, spell.id, opts)) {
+    spendCreationGiftUse(character);
+    return { ok: true, method: "gift", slotLevelUsed: slotLevel };
+  }
+
   const effectiveLevel = overflow ? slotLevel + (spell.overflow.slotBonus || 1) : slotLevel;
   const apCost = overflow ? (spell.overflow.apCost ?? spell.apCost ?? 0) : (spell.apCost ?? 0);
 
@@ -284,6 +290,14 @@ export function previewCastCost(character, spell, opts = {}) {
   if (slotLevel === 0) return { ok: true, method: "cantrip" };
 
   const overflow = opts.overflow && spell.overflow;
+  if (!overflow && canUseCreationGift(character, spell.id, opts)) {
+    return {
+      ok: true,
+      method: "gift",
+      giftUsesLeft: character.creationGift?.usesRemaining ?? 0,
+    };
+  }
+
   const effectiveLevel = overflow ? slotLevel + (spell.overflow.slotBonus || 1) : slotLevel;
   const apCost = overflow ? (spell.overflow.apCost ?? spell.apCost ?? 0) : (spell.apCost ?? 0);
 

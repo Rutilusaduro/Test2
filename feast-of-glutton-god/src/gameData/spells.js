@@ -386,6 +386,11 @@ export function getSpell(id) {
   return SPELL_INDEX.get(id) ?? null;
 }
 
+/** All spells in the catalog at a given slot level (cantrips = 0). */
+export function getSpellsBySlotLevel(slotLevel) {
+  return [...SPELL_INDEX.values()].filter((s) => (s.slotLevel ?? 0) === slotLevel);
+}
+
 export function getSpellsForClass(classId) {
   return getSpellsForBuild(classId, null);
 }

@@ -21,14 +21,19 @@ export function getSpellbookLeveledIds(character) {
 export function getPreparedSpellIds(character) {
   ensureSpellState(character);
   if (!usesSpellPreparation(character.classId)) {
-    return getKnownSpellIds(character);
+    const ids = getKnownSpellIds(character);
+    const giftId = character.creationGift?.spellId;
+    if (giftId && !ids.includes(giftId)) return [...ids, giftId];
+    return ids;
   }
   if (!character.spellsPrepared?.length) {
     autoPrepareSpells(character);
   }
   const cantrips = getKnownSpellIds(character).filter((id) => (getSpell(id)?.slotLevel ?? 0) === 0);
   const prepared = (character.spellsPrepared || []).filter((id) => knowsInSpellbook(character, id));
-  return [...new Set([...cantrips, ...prepared])];
+  const giftId = character.creationGift?.spellId;
+  const giftExtra = giftId && !cantrips.includes(giftId) && !prepared.includes(giftId) ? [giftId] : [];
+  return [...new Set([...cantrips, ...prepared, ...giftExtra])];
 }
 
 function knowsInSpellbook(character, spellId) {
@@ -43,6 +48,7 @@ export function getPreparedSpells(character) {
 export function isSpellPrepared(character, spellId) {
   const spell = getSpell(spellId);
   if (!spell) return false;
+  if (character.creationGift?.spellId === spellId) return true;
   if (!usesSpellPreparation(character.classId)) return true;
   if ((spell.slotLevel ?? 0) === 0) return true;
   return (character.spellsPrepared || []).includes(spellId);

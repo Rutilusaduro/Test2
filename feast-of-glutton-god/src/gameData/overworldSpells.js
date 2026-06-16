@@ -7,6 +7,7 @@ import { spendAP } from './player.js';
 import { addCorruption } from './corruption.js';
 import { awardRelationship } from './relationships.js';
 import { getPreparedSpells, isSpellPrepared } from './spellPreparation.js';
+import { canUseCreationGift, spendCreationGiftUse } from './creationGift.js';
 import { awardAbundanceSpreadWithEvents } from './worldEvents.js';
 import { renderOverworldSpellCast } from '../textEngine/scenes/overworld/spellCast.js';
 import { applyNpcGrowth } from './npcGrowth.js';
@@ -67,6 +68,9 @@ function resolveOverworldCost(player, spell, overflow, opts = {}) {
     return { ok: false, reason: 'Not enough AP for ritual cast.' };
   }
   if (castData.slotLevel === 0) return { ok: true, method: 'cantrip', spell: castData };
+  if (!overflow && canUseCreationGift(player, castData.id, { overflow })) {
+    return { ok: true, method: 'gift', spell: castData };
+  }
   if (hasSpellSlot(player, castData.slotLevel)) {
     return { ok: true, method: 'slot', spell: castData, slotLevel: castData.slotLevel };
   }
@@ -163,6 +167,7 @@ export function castSpellOnNpc(game, npc, spellId, opts = {}) {
   const effects = applyOverworldSpellEffects(game, target, player, cost.spell);
 
   if (cost.method === 'slot') spendSpellSlot(player, cost.slotLevel);
+  else if (cost.method === 'gift') spendCreationGiftUse(player);
   else if (cost.method === 'ap' || cost.method === 'ritual') spendAP(game, cost.ap);
 
   if (effects.growth && !effects.growth.favorRefused) {
@@ -193,7 +198,9 @@ export function castSpellOnNpc(game, npc, spellId, opts = {}) {
     : '';
   const ritualNote = cost.method === 'ritual'
     ? '\n\n✦ Ritual complete — abundance lingers without spending a spell slot.'
-    : '';
+    : cost.method === 'gift'
+      ? '\n\n✦ Divine gift — no slot or AP spent.'
+      : '';
 
   return {
     ok: true,
@@ -231,6 +238,7 @@ export function castSpellOnFeature(game, featureId, spellId, opts = {}) {
   }
 
   if (cost.method === 'slot') spendSpellSlot(player, cost.slotLevel);
+  else if (cost.method === 'gift') spendCreationGiftUse(player);
   else if (cost.method === 'ap' || cost.method === 'ritual') spendAP(game, cost.ap);
 
   const auraBonus = getCombinedPuzzleBonuses(game, game.region);

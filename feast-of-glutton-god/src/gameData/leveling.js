@@ -4,6 +4,7 @@
 import { hpPerLevel } from "./stats.js";
 import { getClass } from "./classes.js";
 import { initSpellSlots, recoverAllSpellSlots } from "./spellSlots.js";
+import { resetCreationGiftUses } from "./creationGift.js";
 import { getMaxAbundancePoints } from "./stats.js";
 import { getStage } from "./stages.js";
 import { getFeaturesForLevel } from "./levelFeatures.js";
@@ -281,6 +282,7 @@ export function awardCombatXp(player, combat, game = null) {
 export function longRest(character, game = null) {
   character.hp = character.maxHp;
   recoverAllSpellSlots(character);
+  resetCreationGiftUses(character);
   autoPrepareSpells(character);
   const maxAp = getMaxAbundancePoints(character);
   character.ap = Math.min(maxAp, (character.ap || 0) + 15);

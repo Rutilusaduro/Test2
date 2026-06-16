@@ -22,6 +22,7 @@ import { buildCombatIntro, buildCombatWrapup } from "./textEngine/scenes/dm/comb
 import { pickEncounter } from "./gameData/enemies.js";
 import { awardCombatXp, getSizeCapForLevel, initializeStartingSpells } from "./gameData/leveling.js";
 import { initSpellSlots, syncSpellSlots } from "./gameData/spellSlots.js";
+import { ensureCreationGiftState } from "./gameData/creationGift.js";
 import { ensureQuestState } from "./gameData/questEngine.js";
 import { ensureInfluenceState } from "./gameData/influence.js";
 import { ensureTransformationState } from "./gameData/worldTransformation.js";
@@ -61,6 +62,7 @@ function migratePlayerSpells(player) {
     autoPrepareSpells(player);
   }
   ensureDamageCantrip(player);
+  ensureCreationGiftState(player);
 }
 
 function applyLevelUpResults(game, levelUps) {

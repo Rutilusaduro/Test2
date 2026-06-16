@@ -54,7 +54,10 @@ function spellCostLabel(spell, player, overflowCast) {
   const level = spell.slotLevel ? `L${spell.slotLevel}` : "cantrip";
   let pay = "Cantrip";
   if (preview.ok) {
-    if (preview.method === "ap") pay = `AP ${preview.apSpent ?? data.apCost ?? "?"}`;
+    if (preview.method === "gift") {
+      const left = preview.giftUsesLeft ?? player?.creationGift?.usesRemaining ?? 0;
+      pay = `Gift ${left}/${player?.creationGift?.maxUses ?? 3}`;
+    } else if (preview.method === "ap") pay = `AP ${preview.apSpent ?? data.apCost ?? "?"}`;
     else if (preview.method === "slot") pay = "Slot";
   } else {
     pay = "—";
