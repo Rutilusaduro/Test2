@@ -139,6 +139,17 @@ export const UTILITY_SPELLS = {
     persistentUntil: 'until_long_rest',
     environment: { slick: true, soften: true },
   },
+  conjure_vines: {
+    id: 'conjure_vines', name: 'Conjure Vines', slotLevel: 2, school: 'conjuration',
+    apCost: 15,
+    desc: 'Summon thick magical vines to bind or suspend a target. Bound: vines coil around wrists, ankles, and waist — restrained in place, belly exposed, feeding trivial. Suspended: target hoisted face-down off the ground, hanging helplessly — gravity-assisted feeding, weight permitting.',
+    effect: {},
+    targetTypes: ['creature'],
+    mechanicalTags: ['control', 'restraint', 'setup', 'suspend'],
+    createsStates: ['vine_bound', 'vine_suspended'],
+    interactsWith: ['suggestion_active', 'bound_calorie_transfer'],
+    persistentUntil: 'until_triggered',
+  },
 };
 
 /** Spells granted by specific subclasses or shared across classes. */

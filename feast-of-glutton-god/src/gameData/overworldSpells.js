@@ -477,6 +477,45 @@ function resolveUtilitySpellOnNpc(game, npc, spell, player, opts = {}) {
       };
     }
 
+    case 'conjure_vines': {
+      const vineMode = opts.vineMode ?? 'bind';
+      const maxSuspendLbs = 300 + Math.min(player.level || 1, 10) * 15;
+
+      let actualMode = vineMode;
+      let overweightNote = '';
+
+      if (vineMode === 'suspend' && npc.lbs > maxSuspendLbs) {
+        actualMode = 'bind';
+        overweightNote = `\n\n⚠ ${npc.name} exceeds your suspension limit (${maxSuspendLbs} lbs at your level). The vines bind instead — raise your level for heavier suspension.`;
+      }
+
+      const stateId = actualMode === 'suspend' ? 'vine_suspended' : 'vine_bound';
+      applyIndulgenceState(npc, stateId, {
+        appliedBy: 'player',
+        appliedAt: game.day ?? null,
+      });
+
+      const alreadySuggested = hasIndulgenceState(npc, 'suggestion_active');
+      const comboHint = alreadySuggested
+        ? `\n\n✦ Suggestion ignites immediately — bound and already compelled, ${npc.name}'s resistance collapses entirely.`
+        : `\n\n✦ ${npc.name} is ${actualMode === 'suspend' ? 'suspended and ' : ''}restrained. Suggestion and feeding magic gain a significant bonus.`;
+
+      let actionText;
+      if (actualMode === 'suspend') {
+        actionText = `Green shoots erupt from the floor and race up ${npc.name}'s legs — coiling once around each ankle, cinching tight. Another pair snaps around the wrists. A final broad band wraps the waist. With a smooth, inexorable pull they are lifted clear of the ground, tipped horizontal, and held there face-down: arms behind, ankles level, belly hanging free beneath them. They are entirely airborne. Entirely yours.`;
+      } else {
+        actionText = `Vines burst from the ground and wind themselves around ${npc.name}'s ankles first, then the wrists, pulling each limb taut in its own direction before a last thick coil cinches snug around the waist. They cannot fall. They cannot step. Their belly is exposed and the vines have no intention of loosening.`;
+      }
+
+      return {
+        ok: true,
+        npc,
+        text: `${actionText}${comboHint}${overweightNote}`,
+        effects: {},
+        stateApplied: stateId,
+      };
+    }
+
     default:
       return null;
   }

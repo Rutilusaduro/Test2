@@ -141,6 +141,45 @@ export const ARCANE_STATE_DEFS = {
     },
   },
 
+  vine_bound: {
+    id: 'vine_bound',
+    name: 'Vine-Bound',
+    desc: 'Magical vines coil tight around wrists, ankles, and waist — restrained in place, belly exposed.',
+    targetTypes: ['creature'],
+    durationType: 'until_triggered',
+    properties: {
+      restrained: true,
+      movementPenalty: 'full',
+      attackDisadvantage: true,
+      saveDexDisadvantage: true,
+      suggestionBonus: true,
+      exposedBelly: true,
+      feedingBonus: true,
+      vineMode: 'bind',
+    },
+  },
+
+  vine_suspended: {
+    id: 'vine_suspended',
+    name: 'Vine-Suspended',
+    desc: 'Hoisted off the ground face-down — vines around wrists, ankles, and waist. Gravity assists every bite.',
+    targetTypes: ['creature'],
+    durationType: 'until_triggered',
+    properties: {
+      restrained: true,
+      suspended: true,
+      faceDown: true,
+      movementPenalty: 'full',
+      attackDisadvantage: true,
+      saveDexDisadvantage: true,
+      suggestionBonus: true,
+      exposedBelly: true,
+      feedingBonus: true,
+      feedingMultiplier: 1.2,
+      vineMode: 'suspend',
+    },
+  },
+
 };
 
 // ─── State Manager ───────────────────────────────────────────────────────────
@@ -327,7 +366,9 @@ export function resolveStateInteractions(game, caster, spellOrAction, targets) {
     // Any new spell cast in range of a restrained + suggested target
     // triggers the suggestion early with a bonus growth bump.
     const isRestrained = hasIndulgenceState(target, 'quicksand_restrained')
-      || hasIndulgenceState(target, 'restrained');
+      || hasIndulgenceState(target, 'restrained')
+      || hasIndulgenceState(target, 'vine_bound')
+      || hasIndulgenceState(target, 'vine_suspended');
 
     if (isRestrained && spellOrAction.id !== 'suggestion') {
       const sug = getIndulgenceState(target, 'suggestion_active');
@@ -402,9 +443,14 @@ export function hasAreaState(game, regionId, stateId) {
 export function getStateContextGlobals(target) {
   if (!target?.indulgenceStates?.length) return {};
   const ids = target.indulgenceStates.map((s) => s.id);
+  const isVineBound = ids.includes('vine_bound');
+  const isVineSuspended = ids.includes('vine_suspended');
   return {
-    isRestrained: ids.includes('restrained') || ids.includes('quicksand_restrained'),
+    isRestrained: ids.includes('restrained') || ids.includes('quicksand_restrained') || isVineBound || isVineSuspended,
     isQuicksandTrapped: ids.includes('quicksand_restrained'),
+    isVineBound,
+    isVineSuspended,
+    isVineRestrained: isVineBound || isVineSuspended,
     hasSuggestion: ids.includes('suggestion_active'),
     hasCalorieBond: ids.includes('bound_calorie_transfer'),
     hasShapedStone: ids.includes('shaped_stone'),

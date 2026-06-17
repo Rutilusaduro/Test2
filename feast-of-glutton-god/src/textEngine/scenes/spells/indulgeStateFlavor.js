@@ -177,8 +177,95 @@ registerPool('spell.state.quicksand_pull_deeper', [
   ]},
 ]);
 
+// ─────────────────────────────────────────────────────────────────────────────
+// dm.cast.invoke.school extension — Conjure Vines participial clause
+// ─────────────────────────────────────────────────────────────────────────────
+registerModuleVariants('dm.cast.invoke.school', [
+  { when: { spellName: 'Conjure Vines', vineMode: 'bind' }, weight: 4, text: [
+    'green shoots answering the call with predatory patience, coiling low before they strike upward',
+    'vines rising from the floor with the single-minded purpose of something that has been waiting to be useful',
+    'the conjuration arriving in stages — ankles, then wrists, then waist — each stage final',
+  ]},
+  { when: { spellName: 'Conjure Vines', vineMode: 'suspend' }, weight: 4, text: [
+    'living vines erupting from the earth with an architect\'s precision, wrapping and lifting in one fluid motion',
+    'the air filling briefly with the smell of green things, then the target leaving the ground without ceremony',
+    'a suspension rig growing from nothing — ankles, wrists, waist — tightening until the floor is a distant memory',
+  ]},
+]);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// spell.cast.conjure_vines — full sentence pools
+// Context keys: vineMode ('bind'|'suspend'), isQuicksandTrapped, hasSuggestion,
+//               isOverweightForSuspend
+// ─────────────────────────────────────────────────────────────────────────────
+registerPool('spell.cast.conjure_vines', [
+  { when: { vineMode: 'suspend', hasSuggestion: true }, weight: 5, text: [
+    'The vines lift them off the ground and the planted suggestion detonates immediately — weightless, face-down, and helplessly compelled, they are a perfect study in total accessibility.',
+    'Suspended and suggested: the two states meet and the result is something beyond restraint. They do not merely comply. They want to.',
+  ]},
+  { when: { vineMode: 'suspend', isQuicksandTrapped: true }, weight: 3, text: [
+    'The vines find purchase even through the quicksand and haul them free of it entirely — going directly from trapped-below to trapped-above, with no comfortable middle ground.',
+    'Pulled clean from the muck and held aloft: out of the quicksand and into the air, face-down and no less yours for the transition.',
+  ]},
+  { when: { vineMode: 'suspend' }, weight: 2, text: [
+    'The vines arrange them in the air with the confidence of something that has done this before — ankles up, wrists back, waist secured, belly down. An ideal configuration.',
+    'Off the ground, face-down, suspended. There is a geometry to this position that makes feeding almost thoughtless.',
+    'They leave the floor behind and arrive in a posture that serves every purpose: restrained, exposed, gravity working for you instead of against.',
+  ]},
+  { when: { vineMode: 'bind', hasSuggestion: true }, weight: 4, text: [
+    'Bound in place and already compelled — the suggestion resolves with the vines still tightening. Two systems reaching the same conclusion simultaneously.',
+    'The vines finish their work and the enchantment takes its moment. Bound and compelled: a thorough combination.',
+  ]},
+  { when: { vineMode: 'bind', isQuicksandTrapped: true }, weight: 3, text: [
+    'Pinned from below and now from above — the vines add their grip to what the quicksand was already doing. An abundance of certainty.',
+    'Quicksand held the legs; vines take the wrists and waist. They have run out of directions to be free in.',
+  ]},
+  { when: { vineMode: 'bind' }, weight: 2, text: [
+    'The vines do their work with a craftsman\'s thoroughness — each limb in its place, the waist cinched last, nothing left to chance.',
+    'Bound at the wrists, bound at the ankles, bound at the waist. The spell is efficient and the result is total.',
+    'Everything is accounted for: movement, escape, resistance. The vines have considered each and addressed them in order.',
+  ]},
+]);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// spell.state.vine.feed — feeding a vine-restrained target
+// Context keys: isVineSuspended, isVineBound
+// ─────────────────────────────────────────────────────────────────────────────
+registerPool('spell.state.vine.feed', [
+  { when: { isVineSuspended: true }, weight: 3, text: [
+    'Gravity does half the work — suspended and face-down, each bite they take falls slightly toward the waiting belly. You are assisting a process that has become largely self-sustaining.',
+    'The position makes access trivially easy and refusal mechanically awkward. You reach up without effort; they have no good direction to turn away.',
+    'Face-down and hanging, they receive what you offer without the complication of a direction to retreat in.',
+  ]},
+  { when: { isVineBound: true }, weight: 3, text: [
+    'Bound at every joint that matters, they accept the feeding with the particular resignation of something that has considered its options and found them limited.',
+    'The wrists are fixed, the ankles are fixed, the waist is fixed. Their appetite is the one thing still their own, and you have made it very easy to satisfy.',
+    'Restrained and accessible: you feed them at the pace that suits you, and they take what is brought without ceremony.',
+  ]},
+  { when: {}, text: [
+    'The vines hold everything steady — limbs, position, cooperation.',
+    'Bound in place, they accept each bite with the specific quality of someone who has stopped looking for alternatives.',
+  ]},
+]);
+
+// ─────────────────────────────────────────────────────────────────────────────
+// spell.state.vine.transport — carrying a vine-bound target
+// Context keys: isVineSuspended, targetLbsBand
+// ─────────────────────────────────────────────────────────────────────────────
+registerPool('spell.state.vine.transport', [
+  { when: { isVineSuspended: true }, weight: 3, text: [
+    'The vines are already carrying them. Redirecting the vines is a matter of intent.',
+    'Suspended and weightless relative to the floor, they travel where the vines go — which is, at the moment, where you go.',
+    'Transport is not the word for this. The word is delivery.',
+  ]},
+  { when: {}, text: [
+    'Bound securely, they can be moved with the vines doing most of the structural work.',
+    'The vines make them portable in the way that a wrapped parcel is portable — thoroughly secured and going exactly where you intend.',
+  ]},
+]);
+
 /**
- * Render spell cast prose for a Phase 1 utility spell.
+ * Render spell cast prose for a utility spell.
  * Falls back to generic text if no pool exists for the spellId.
  */
 export function renderIndulgeStateCast(spellId, caster, target, opts = {}) {

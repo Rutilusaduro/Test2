@@ -25,6 +25,7 @@ export default function SpellbookPanel({ game, npcs, features = [], onCastResult
   const [targetFeature, setTargetFeature] = useState(null);
   const [targetOpenEnv, setTargetOpenEnv] = useState(false);
   const [openEnvForm, setOpenEnvForm] = useState('basin');
+  const [vineMode, setVineMode] = useState('bind');
   const [targetMode, setTargetMode] = useState('npc');
   const [overflow, setOverflow] = useState(false);
   const [result, setResult] = useState('');
@@ -52,7 +53,7 @@ export default function SpellbookPanel({ game, npcs, features = [], onCastResult
     const spell = spells.find((s) => s.id === selectedSpell);
     if (!spell || !canCast(spell)) return;
 
-    const res = castSpellOnNpc(game, targetNpc, selectedSpell, { overflow, ritual: mode === 'ritual' });
+    const res = castSpellOnNpc(game, targetNpc, selectedSpell, { overflow, ritual: mode === 'ritual', vineMode });
     if (!res.ok) {
       setResult(res.text);
       return;
@@ -319,6 +320,27 @@ export default function SpellbookPanel({ game, npcs, features = [], onCastResult
                   </button>
                 ))}
               </div>
+              {targetMode === 'npc' && selectedSpell === 'conjure_vines' && (
+                <div style={{ marginTop: 8, marginBottom: 4 }}>
+                  <p style={{ fontSize: '0.8rem', color: 'var(--text-dim)', marginBottom: 4 }}>Vine mode:</p>
+                  <div style={{ display: 'flex', gap: 6 }}>
+                    {[
+                      { id: 'bind',    label: 'Bind',    hint: 'wrists · ankles · waist' },
+                      { id: 'suspend', label: 'Suspend', hint: 'face-down, airborne' },
+                    ].map((m) => (
+                      <button
+                        key={m.id}
+                        className={vineMode === m.id ? 'primary' : ''}
+                        style={{ flex: 1, fontSize: '0.8rem' }}
+                        onClick={() => setVineMode(m.id)}
+                      >
+                        {m.label}
+                        <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)' }}>{m.hint}</div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
               <button
                 className="primary"
                 style={{ marginTop: '0.75rem' }}
@@ -332,6 +354,7 @@ export default function SpellbookPanel({ game, npcs, features = [], onCastResult
                       ? `Open Ground${selectedSpell === 'stone_shape' ? ` — ${openEnvForm}` : ''}`
                       : (targetFeature?.name || '…'))
                   : (targetNpc?.name || '…')}
+                {targetMode === 'npc' && selectedSpell === 'conjure_vines' && ` — ${vineMode}`}
               </button>
             </>
           )}
