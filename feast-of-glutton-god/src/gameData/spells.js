@@ -523,6 +523,11 @@ export function isRitualSpell(spell) {
   return Boolean(spell.ritual || spell.environment?.ritual);
 }
 
+/** Return every spell id in the catalog — used by debug unlock mode. */
+export function getAllSpellIds() {
+  return [...SPELL_INDEX.keys()];
+}
+
 export function getRitualApCost(spell) {
   if (!spell) return 0;
   return spell.apCost ?? Math.max(8, (spell.slotLevel || 1) * 6);

@@ -3,7 +3,7 @@
  * Cantrips are always castable; leveled spells must be prepared after rest.
  */
 import { getCreationGiftSpellIds } from './creationGift.js';
-import { getSpell } from './spells.js';
+import { getSpell, getAllSpellIds } from './spells.js';
 import { getPreparedCap } from './spellLearning.js';
 import { isGrowthThemedSpell, ensureSpellState, getKnownSpellIds } from './spellLearning.js';
 
@@ -20,6 +20,7 @@ export function getSpellbookLeveledIds(character) {
 }
 
 export function getPreparedSpellIds(character) {
+  if (character?.debugAllSpellsUnlocked) return getAllSpellIds();
   ensureSpellState(character);
   if (!usesSpellPreparation(character.classId)) {
     const ids = getKnownSpellIds(character);
@@ -47,6 +48,7 @@ export function getPreparedSpells(character) {
 }
 
 export function isSpellPrepared(character, spellId) {
+  if (character?.debugAllSpellsUnlocked) return true;
   const spell = getSpell(spellId);
   if (!spell) return false;
   if (getCreationGiftSpellIds(character).includes(spellId)) return true;

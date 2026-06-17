@@ -52,12 +52,15 @@ import {
 export function getOverworldCastableSpells(player) {
   return getPreparedSpells(player).filter((spell) => {
     if (!isSpellPrepared(player, spell.id)) return false;
-    if (spell.minSizeStage != null) {
+    // Debug unlock bypasses size-stage gate
+    if (!player.debugAllSpellsUnlocked && spell.minSizeStage != null) {
       const stageId = getStage(player.lbs).id;
       if (stageId < spell.minSizeStage) return false;
     }
-    return spell.effect?.growth || spell.effect?.feed || spell.effect?.charm
-      || spell.effect?.corruption || spell.effect?.heal || spellHasEnvironmentUse(spell);
+    return player.debugAllSpellsUnlocked
+      || spell.effect?.growth || spell.effect?.feed || spell.effect?.charm
+      || spell.effect?.corruption || spell.effect?.heal || spellHasEnvironmentUse(spell)
+      || spell.createsStates?.length > 0;
   });
 }
 
@@ -157,14 +160,14 @@ export function castSpellOnNpc(game, npc, spellId, opts = {}) {
   const spell = getSpell(spellId);
   if (!spell) return { ok: false, text: 'Unknown spell.' };
 
-  if (spell.minSizeStage != null && getStage(player.lbs).id < spell.minSizeStage) {
+  if (!player.debugAllSpellsUnlocked && spell.minSizeStage != null && getStage(player.lbs).id < spell.minSizeStage) {
     return { ok: false, text: `You must reach size stage ${spell.minSizeStage} to wield ${spell.name}.` };
   }
 
   const cost = resolveOverworldCost(player, spell, opts.overflow, { ...opts, game });
   if (!cost.ok) return { ok: false, text: cost.reason };
 
-  if (player.classId === 'wizard' && !isSpellPrepared(player, spellId)) {
+  if (!player.debugAllSpellsUnlocked && player.classId === 'wizard' && !isSpellPrepared(player, spellId)) {
     return { ok: false, text: `${spell.name} is not prepared. Prepare it after your next rest.` };
   }
 
@@ -266,14 +269,14 @@ export function castSpellOnFeature(game, featureId, spellId, opts = {}) {
   const spell = getSpell(spellId);
   if (!spell) return { ok: false, text: 'Unknown spell.' };
 
-  if (spell.minSizeStage != null && getStage(player.lbs).id < spell.minSizeStage) {
+  if (!player.debugAllSpellsUnlocked && spell.minSizeStage != null && getStage(player.lbs).id < spell.minSizeStage) {
     return { ok: false, text: `You must reach size stage ${spell.minSizeStage} to wield ${spell.name}.` };
   }
 
   const cost = resolveOverworldCost(player, spell, opts.overflow, { ...opts, game });
   if (!cost.ok) return { ok: false, text: cost.reason };
 
-  if (player.classId === 'wizard' && !isSpellPrepared(player, spellId)) {
+  if (!player.debugAllSpellsUnlocked && player.classId === 'wizard' && !isSpellPrepared(player, spellId)) {
     return { ok: false, text: `${spell.name} is not prepared. Prepare it after your next rest.` };
   }
 

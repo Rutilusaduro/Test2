@@ -146,6 +146,25 @@ export default function DebugPanel({
                   </button>
                 ))}
               </div>
+              <div style={{ fontSize: 10, color: "#888", marginBottom: 6 }}>SPELLS</div>
+              <label style={{ fontSize: 11, color: "#aaa", display: "flex", gap: 8, alignItems: "center", marginBottom: 8 }}>
+                <input
+                  type="checkbox"
+                  checked={player.debugAllSpellsUnlocked ?? false}
+                  onChange={(e) => onUpdateGame?.((g) => ({
+                    ...g,
+                    player: { ...g.player, debugAllSpellsUnlocked: e.target.checked },
+                  }))}
+                />
+                <span>
+                  Unlock all spells
+                  {player.debugAllSpellsUnlocked && (
+                    <span style={{ marginLeft: 6, color: "#60b060", fontSize: 10 }}>
+                      — all spells prepared, size/prep gates bypassed
+                    </span>
+                  )}
+                </span>
+              </label>
               <div style={{ fontSize: 10, color: "#888", marginBottom: 6 }}>COMBAT SCENES</div>
               <label style={{ fontSize: 11, color: "#aaa", display: "flex", gap: 8, alignItems: "center" }}>
                 <input
