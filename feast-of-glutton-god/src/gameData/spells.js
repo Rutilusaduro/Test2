@@ -1,5 +1,12 @@
 /**
  * Extended spell catalog — growth-focused, modular by class and subclass.
+ *
+ * Phase 1 schema additions (new optional fields):
+ *   targetTypes     — string[]  'creature' | 'object' | 'feature' | 'area' | 'background'
+ *   mechanicalTags  — string[]  'control' | 'setup' | 'combo' | 'utility' | 'terrain' | ...
+ *   createsStates   — string[]  arcaneStates.js state IDs this spell applies
+ *   interactsWith   — string[]  state IDs this spell gets bonuses against
+ *   persistentUntil — string    'long_rest' | 'until_triggered' | 'consumed' | 'permanent'
  */
 import { getSubclass } from './subclasses.js';
 import { getMaxSpellLevelForCharacter } from './spellSlots.js';
@@ -69,7 +76,70 @@ export const CANTRIPS = [
       },
     },
   },
+  // ── Phase 1 Foundation Cantrip ──────────────────────────────────────────────
+  {
+    id: 'mage_hand', name: 'Mage Hand', slotLevel: 0, school: 'conjuration',
+    desc: 'Conjure a spectral hand to manipulate objects at range, feed willing or restrained targets, or trigger a bound Calorie Bond from a distance. Creates a mage_hand_active state that persists until used.',
+    effect: { feed: 1 },
+    targetTypes: ['creature', 'object', 'feature'],
+    mechanicalTags: ['utility', 'setup', 'remote_feed'],
+    createsStates: ['mage_hand_active'],
+    interactsWith: ['bound_calorie_transfer', 'quicksand_restrained'],
+    persistentUntil: 'consumed',
+  },
 ];
+
+/**
+ * Phase 1 utility spells — class-agnostic, grantable by any build or granted by the
+ * DM / story unlock. Listed in the SPELL_INDEX and castable via overworldSpells.js
+ * special-case paths.
+ */
+export const UTILITY_SPELLS = {
+  magic_mouth: {
+    id: 'magic_mouth', name: 'Magic Mouth', slotLevel: 2, school: 'illusion',
+    desc: 'Bind an object (food container, shrine, chest) to a creature. Any calories fed to that object are magically transferred to the linked person — a perfect long-range feeding scheme.',
+    effect: {},   // growth happens via bound_calorie_transfer state resolution
+    targetTypes: ['object', 'feature', 'creature'],
+    mechanicalTags: ['setup', 'persistent', 'remote_feed', 'weight_scheme'],
+    createsStates: ['bound_calorie_transfer'],
+    interactsWith: ['mage_hand_active'],
+    persistentUntil: 'until_long_rest',
+    environment: { ritual: true },
+  },
+  stone_shape: {
+    id: 'stone_shape', name: 'Stone Shape', slotLevel: 4, school: 'transmutation',
+    desc: 'Shape stone, earth, or similar material into useful forms — a sturdy table, a large basin (holds liquids), simple stone cuffs that restrain a creature, or small structures. Shaped items persist until destroyed.',
+    effect: {},   // creates physical shaped_stone state with chosen form
+    targetTypes: ['object', 'feature', 'area', 'creature'],
+    mechanicalTags: ['utility', 'setup', 'control', 'terrain'],
+    createsStates: ['shaped_stone'],
+    interactsWith: ['quicksand_restrained'],
+    persistentUntil: 'permanent',
+    environment: { soften: true },
+  },
+  suggestion: {
+    id: 'suggestion', name: 'Suggestion', slotLevel: 2, school: 'enchantment',
+    desc: 'Plant a subtle magical compulsion in a target — "You feel incredibly hungry, go eat the nearest rich food" or "Indulge yourself freely." Resolves immediately with bonus growth if the target is already restrained.',
+    effect: { charm: 1, corruption: 4 },
+    targetTypes: ['creature', 'background'],
+    mechanicalTags: ['control', 'combo', 'setup', 'social'],
+    createsStates: ['suggestion_active'],
+    interactsWith: ['quicksand_restrained', 'restrained'],
+    persistentUntil: 'until_triggered',
+    environment: { charm: true },
+  },
+  quicksand: {
+    id: 'quicksand', name: 'Quicksand', slotLevel: 3, school: 'transmutation',
+    desc: 'Transform a patch of terrain into magical quicksand. Named targets or background crowd members sink to waist depth (quicksand_restrained). Excellent setup — restrained targets are far more susceptible to Suggestion and feeding magic.',
+    effect: {},   // applies quicksand_restrained to targets
+    targetTypes: ['area', 'creature', 'background'],
+    mechanicalTags: ['control', 'terrain', 'setup', 'aoe'],
+    createsStates: ['quicksand_restrained'],
+    interactsWith: ['suggestion_active'],
+    persistentUntil: 'until_long_rest',
+    environment: { slick: true, soften: true },
+  },
+};
 
 /** Spells granted by specific subclasses or shared across classes. */
 export const BONUS_SPELLS = {
@@ -380,6 +450,7 @@ const SPELL_INDEX = new Map([
   ...CANTRIPS.map((s) => [s.id, normalizeSpell(s)]),
   ...Object.values(BONUS_SPELLS).map((s) => [s.id, normalizeSpell(s)]),
   ...Object.values(CLASS_SPELLS).flat().map((s) => [s.id, normalizeSpell(s)]),
+  ...Object.values(UTILITY_SPELLS).map((s) => [s.id, normalizeSpell(s)]),
 ]);
 
 export function getSpell(id) {
@@ -395,7 +466,7 @@ export function getSpellsForClass(classId) {
   return getSpellsForBuild(classId, null);
 }
 
-export function getSpellsForBuild(classId, subclassId) {
+export function getSpellsForBuild(classId, subclassId, opts = {}) {
   const seen = new Set();
   const list = [];
 
@@ -415,7 +486,17 @@ export function getSpellsForBuild(classId, subclassId) {
     }
   }
 
+  // Utility spells are available to all classes when unlocked
+  if (opts.includeUtility) {
+    for (const s of Object.values(UTILITY_SPELLS)) add(s);
+  }
+
   return list;
+}
+
+/** Get all utility/foundation spells (grantable by story or DM unlock). */
+export function getUtilitySpells() {
+  return Object.values(UTILITY_SPELLS).map(normalizeSpell);
 }
 
 export function getSpellForCast(spell, overflow = false) {

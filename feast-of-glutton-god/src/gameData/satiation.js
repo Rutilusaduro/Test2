@@ -4,6 +4,7 @@
  */
 import { getTier } from './relationships.js';
 import { reduceRelationship } from './relationships.js';
+import { processIndulgenceStates } from './arcaneStates.js';
 
 export const SATIATION_MAX = 100;
 
@@ -116,6 +117,10 @@ export function decaySatiationForGame(game, { longRest = false } = {}) {
     for (const id of Object.keys(game.npcStates)) {
       decaySatiation(game.npcStates[id], { longRest });
     }
+  }
+  // Expire and tick indulgence states on the same schedule as satiation decay
+  if (longRest) {
+    processIndulgenceStates(game, 'long_rest');
   }
   return game;
 }

@@ -33,6 +33,7 @@ import './dm/directorsCut.js';
 import './leveling/tiers.js';
 import './leveling/milestones.js';
 import './spells/namedSpellFlavor.js';
+import './spells/indulgeStateFlavor.js';
 import './npc/companionSofteningTiers.js';
 import './growthEvent/epicCrossingsExtension.js';
 import './dm/index.js';
