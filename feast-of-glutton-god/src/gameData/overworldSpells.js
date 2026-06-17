@@ -647,7 +647,7 @@ export function castStoneShape(game, form = 'table', targetNpc = null) {
     const comboHint = hasIndulgenceState(targetNpc, 'suggestion_active')
       ? `\n\n✦ Suggestion will now trigger with bonus growth — ${targetNpc.name} is restrained and compelled.`
       : `\n\n✦ ${targetNpc.name} is now Restrained. Suggestion and feeding magic gain a bonus against them.`;
-    text = `Stone cuffs rise from the earth around ${targetNpc.name}'s wrists — smooth, unyielding, and unapologetically heavy. Struggle only tightens them.${comboHint}`;
+    text = `The earth answers. Stone rises in rings around ${targetNpc.name}'s ankles first — heavy bands closing over their feet with a grinding finality that leaves no doubt — then matching cuffs climb their wrists, locking their hands at waist height. Each piece fits like something purpose-built. Smooth on the outside, snug on the in. Struggle only settles them tighter.${comboHint}`;
   } else {
     // Apply shaped_stone state to the area
     applyAreaState(game, regionId, 'shaped_stone', { properties: props });
@@ -671,4 +671,116 @@ export function castStoneShape(game, form = 'table', targetNpc = null) {
     stateApplied,
     targetNpc,
   };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Open-environment casting — spells aimed at the terrain, not a specific target.
+// Returns { ok, text, feature } where feature is a dynamic feature descriptor
+// the caller should add to game state via withDynamicFeature().
+// ─────────────────────────────────────────────────────────────────────────────
+
+const OPEN_ENV_FORMS = {
+  stone_shape: {
+    basin:     { name: 'Stone Basin',          icon: '⬛', shortDesc: 'A deep stone basin shaped by magic — can hold liquid, food, or other spells.' },
+    table:     { name: 'Stone Feasting Table', icon: '⬜', shortDesc: 'A broad flat stone table, stable enough to host a proper feast.' },
+    structure: { name: 'Stone Alcove',         icon: '🪨', shortDesc: 'A low arched hollow — enclosed, permanent, and just cozy enough.' },
+  },
+};
+
+const OPEN_ENV_TEXT = {
+  stone_shape: {
+    basin:     'A basin scoops itself from the stone floor — wide-lipped, smooth-walled, and already patient. It will hold whatever you choose to fill it with.\n\n✦ The basin persists here and can be targeted by other spells.',
+    table:     'A feasting table rises from the earth — broad, flat, and unyielding. It will hold whatever weight you intend to put on it, or at it.\n\n✦ The table persists here and can be targeted by other spells.',
+    structure: 'The nearest wall obliges — an arch opens, a bench rises, a private hollow forms. Cozy enough to feel intentional. Too enclosed for easy escape.\n\n✦ The structure persists here and can be targeted by other spells.',
+  },
+  quicksand: 'A section of ground softens without ceremony — one wrong step and the earth thickens underfoot, gripping, pulling, patient. It will wait.\n\n✦ The quicksand pit persists here. Creatures can be lured, pushed, or dragged into it.',
+};
+
+/** @param {{ form?: string, regionId?: string, overflow?: boolean }} opts */
+export function castSpellOnOpenEnvironment(game, spellId, opts = {}) {
+  const player = game.player;
+  const spell = getSpell(spellId);
+  if (!spell) return { ok: false, text: 'Unknown spell.' };
+
+  const cost = resolveOverworldCost(player, spell, opts.overflow ?? false, { game });
+  if (!cost.ok) return { ok: false, text: cost.reason };
+
+  if (cost.method === 'slot') spendSpellSlot(player, cost.slotLevel);
+  else if (cost.method === 'ap' || cost.method === 'ritual') spendAP(game, cost.ap);
+
+  const regionId = opts.regionId ?? game.region;
+  const uid = `dyn_${spellId}_${regionId}_${Date.now()}`;
+  let feature = null;
+  let text = '';
+
+  if (spellId === 'stone_shape') {
+    const form = opts.form ?? 'basin';
+    const fd = OPEN_ENV_FORMS.stone_shape[form] ?? { name: `Stone ${form}`, icon: '⬛', shortDesc: `A ${form} shaped in stone.` };
+    feature = { id: uid, regionId, isDynamic: true, createdBy: 'stone_shape', form, ...fd };
+    text = OPEN_ENV_TEXT.stone_shape[form] ?? `A stone ${form} rises at your command.`;
+    applyAreaState(game, regionId, 'shaped_stone', { properties: { form, featureId: uid } });
+  } else if (spellId === 'quicksand') {
+    feature = {
+      id: uid, regionId, isDynamic: true, createdBy: 'quicksand', form: 'pit',
+      name: 'Quicksand Pit', icon: '🌀',
+      shortDesc: 'A patch of treacherous earth — thick, deep, and patient.',
+    };
+    text = OPEN_ENV_TEXT.quicksand;
+    applyAreaState(game, regionId, 'shaped_stone', { properties: { form: 'quicksand_pit', isQuicksandArea: true, featureId: uid } });
+  } else {
+    return { ok: false, text: `${spell.name} requires a specific target.` };
+  }
+
+  const spread = awardAbundanceSpreadWithEvents(game, 'overworld_spell_growth');
+  const spreadNote = spread.gained ? `\n\n✦ Abundance spreads (+${spread.gained} world influence)` : '';
+
+  return { ok: true, text: `${text}${spreadNote}`, feature, spellId };
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Casting on a previously-created dynamic feature.
+// ─────────────────────────────────────────────────────────────────────────────
+
+const DYNAMIC_FEATURE_INTERACTIONS = {
+  magic_mouth: {
+    basin:     'Arcane lips trace the rim of the basin — the Calorie Bond is set. Whatever is poured or placed here now reaches your chosen recipient instead.',
+    table:     'The covenant is written across the stone surface. Every morsel set on this table will be felt elsewhere.',
+    structure: 'The hollow now carries a whispered promise — anything consumed inside feeds your intended target.',
+    pit:       'Magic Mouth on a quicksand pit: a voice rises from the mud, beckoning. Hunger made audible.',
+  },
+  mage_hand: {
+    basin:     'The spectral hand descends into the basin and stirs — efficient, unhurried, exactly as directed.',
+    table:     'The hand moves along the table surface, arranging, adjusting, preparing. No waiting required.',
+    structure: 'The translucent fingers feel along the alcove walls — methodical and thorough. Exactly what you needed found.',
+    pit:       'The hand hovers over the quicksand, pressing gently. The surface ripples with the contact.',
+  },
+  suggestion: {
+    basin:     'You whisper a suggestion near the basin — whoever approaches it next will feel an irresistible need to eat from it.',
+    table:     'A suggestion bound to the table: any creature that sits at it will find their appetite sharpened beyond reason.',
+    structure: 'The enchantment settles into the alcove like a warm invitation. Those who enter will want to stay.',
+    pit:       'You murmur a compulsion toward the quicksand pit. Something about it now seems safe — even inviting.',
+  },
+};
+
+/** Cast any overworld spell on a dynamic feature already in the scene. */
+export function castSpellOnDynamicFeature(game, feature, spellId, opts = {}) {
+  const player = game.player;
+  const spell = getSpell(spellId);
+  if (!spell) return { ok: false, text: 'Unknown spell.' };
+
+  const cost = resolveOverworldCost(player, spell, opts.overflow ?? false, { game });
+  if (!cost.ok) return { ok: false, text: cost.reason };
+
+  if (cost.method === 'slot') spendSpellSlot(player, cost.slotLevel);
+  else if (cost.method === 'ap' || cost.method === 'ritual') spendAP(game, cost.ap);
+
+  const form = feature.form ?? 'basin';
+  const specific = DYNAMIC_FEATURE_INTERACTIONS[spellId]?.[form];
+  const text = specific
+    ?? `Your ${spell.name} suffuses the ${feature.name}. The magic lingers, readied for whatever comes next.`;
+
+  const spread = awardAbundanceSpreadWithEvents(game, 'overworld_spell_growth');
+  const spreadNote = spread.gained ? `\n\n✦ Abundance spreads (+${spread.gained} world influence)` : '';
+
+  return { ok: true, text: `${text}${spreadNote}`, feature, spellId };
 }

@@ -1,5 +1,6 @@
 import { useState } from 'react';
-import { getOverworldCastableSpells, castSpellOnNpc, castSpellOnFeature, getRitualCastableSpells } from '../gameData/overworldSpells.js';
+import { getOverworldCastableSpells, castSpellOnNpc, castSpellOnFeature, getRitualCastableSpells, castSpellOnOpenEnvironment, castSpellOnDynamicFeature } from '../gameData/overworldSpells.js';
+import { withDynamicFeature } from '../gameData/dynamicFeatures.js';
 import { previewCastCost } from '../gameData/spellSlots.js';
 import { canUseCreationGift } from '../gameData/creationGift.js';
 import { getStage } from '../gameData/stages.js';
@@ -22,10 +23,14 @@ export default function SpellbookPanel({ game, npcs, features = [], onCastResult
   const [selectedSpell, setSelectedSpell] = useState(null);
   const [targetNpc, setTargetNpc] = useState(null);
   const [targetFeature, setTargetFeature] = useState(null);
+  const [targetOpenEnv, setTargetOpenEnv] = useState(false);
+  const [openEnvForm, setOpenEnvForm] = useState('basin');
   const [targetMode, setTargetMode] = useState('npc');
   const [overflow, setOverflow] = useState(false);
   const [result, setResult] = useState('');
   const [mode, setMode] = useState('cast');
+
+  const OPEN_ENV_SPELLS = new Set(['stone_shape', 'quicksand']);
 
   const player = game.player;
   const spells = mode === 'ritual' ? getRitualCastableSpells(player) : getOverworldCastableSpells(player);
@@ -112,14 +117,53 @@ export default function SpellbookPanel({ game, npcs, features = [], onCastResult
     resetCast();
   };
 
+  const handleCastOnOpenEnv = () => {
+    if (!selectedSpell) return;
+    const spell = spells.find((s) => s.id === selectedSpell);
+    if (!spell || !canCast(spell)) return;
+
+    const res = castSpellOnOpenEnvironment(game, selectedSpell, {
+      overflow,
+      form: openEnvForm,
+      regionId: game.region,
+    });
+    if (!res.ok) { setResult(res.text); return; }
+
+    onGameUpdate?.((g) => {
+      const next = { ...g, player: { ...g.player, ...player } };
+      if (res.feature) return withDynamicFeature(next, game.region, res.feature);
+      return next;
+    });
+    setResult(res.text);
+    resetCast();
+  };
+
+  const handleCastOnDynamicFeature = () => {
+    if (!selectedSpell || !targetFeature) return;
+    const spell = spells.find((s) => s.id === selectedSpell);
+    if (!spell || !canCast(spell)) return;
+
+    const res = castSpellOnDynamicFeature(game, targetFeature, selectedSpell, { overflow });
+    if (!res.ok) { setResult(res.text); return; }
+
+    onGameUpdate?.((g) => ({ ...g, player: { ...g.player, ...player } }));
+    setResult(res.text);
+    resetCast();
+  };
+
   const resetCast = () => {
     setSelectedSpell(null);
     setTargetNpc(null);
     setTargetFeature(null);
+    setTargetOpenEnv(false);
   };
 
   const handleCast = () => {
-    if (targetMode === 'environment') return handleCastOnFeature();
+    if (targetMode === 'environment') {
+      if (targetOpenEnv) return handleCastOnOpenEnv();
+      if (targetFeature?.isDynamic) return handleCastOnDynamicFeature();
+      return handleCastOnFeature();
+    }
     return handleCastOnNpc();
   };
 
@@ -195,10 +239,8 @@ export default function SpellbookPanel({ game, npcs, features = [], onCastResult
               : 'Cast abundance magic on people or places nearby. Clever spell use can solve mysteries without combat.'}
           </p>
           <div className="btn-grid" style={{ marginBottom: '0.5rem' }}>
-            <button className={targetMode === 'npc' ? 'primary' : ''} onClick={() => { setTargetMode('npc'); setTargetFeature(null); }}>Target: People</button>
-            {features.length > 0 && (
-              <button className={targetMode === 'environment' ? 'primary' : ''} onClick={() => { setTargetMode('environment'); setTargetNpc(null); }}>Target: Environment</button>
-            )}
+            <button className={targetMode === 'npc' ? 'primary' : ''} onClick={() => { setTargetMode('npc'); setTargetFeature(null); setTargetOpenEnv(false); }}>Target: People</button>
+            <button className={targetMode === 'environment' ? 'primary' : ''} onClick={() => { setTargetMode('environment'); setTargetNpc(null); }}>Target: Environment</button>
           </div>
           <label style={{ fontSize: '0.85rem', display: 'block', marginBottom: '0.5rem' }}>
             <input type="checkbox" checked={overflow} onChange={(e) => setOverflow(e.target.checked)} />
@@ -226,16 +268,48 @@ export default function SpellbookPanel({ game, npcs, features = [], onCastResult
                 {targetMode === 'environment' ? 'Which place receives your magic?' : 'Who receives your magic?'}
               </p>
               <div className="btn-grid" style={{ gridTemplateColumns: '1fr' }}>
-                {targetMode === 'environment' ? features.map((f) => (
-                  <button
-                    key={f.id}
-                    className={targetFeature?.id === f.id ? 'primary' : ''}
-                    onClick={() => setTargetFeature(f)}
-                  >
-                    {f.icon} {f.name}
-                    {f.solved ? ' (solved)' : ''}
-                  </button>
-                )) : npcs.map((n) => (
+                {targetMode === 'environment' ? (
+                  <>
+                    {features.map((f) => (
+                      <button
+                        key={f.id}
+                        className={targetFeature?.id === f.id ? 'primary' : ''}
+                        onClick={() => { setTargetFeature(f); setTargetOpenEnv(false); }}
+                      >
+                        {f.icon} {f.name}
+                        {f.solved ? ' (solved)' : f.isDynamic ? ' — conjured' : ''}
+                      </button>
+                    ))}
+                    {OPEN_ENV_SPELLS.has(selectedSpell) && (
+                      <button
+                        className={targetOpenEnv ? 'primary' : ''}
+                        style={{ borderStyle: targetOpenEnv ? undefined : 'dashed', opacity: 0.85 }}
+                        onClick={() => { setTargetOpenEnv(true); setTargetFeature(null); }}
+                      >
+                        ✦ Open Ground — shape the terrain itself
+                      </button>
+                    )}
+                    {selectedSpell === 'stone_shape' && targetOpenEnv && (
+                      <div style={{ display: 'flex', gap: 6, marginTop: 4 }}>
+                        {[
+                          { id: 'basin',     label: 'Basin',  hint: 'holds liquid' },
+                          { id: 'table',     label: 'Table',  hint: 'feast surface' },
+                          { id: 'structure', label: 'Alcove', hint: 'enclosed space' },
+                        ].map((f) => (
+                          <button
+                            key={f.id}
+                            className={openEnvForm === f.id ? 'primary' : ''}
+                            style={{ flex: 1, fontSize: '0.8rem' }}
+                            onClick={() => setOpenEnvForm(f.id)}
+                          >
+                            {f.label}
+                            <div style={{ fontSize: '0.72rem', color: 'var(--text-dim)' }}>{f.hint}</div>
+                          </button>
+                        ))}
+                      </div>
+                    )}
+                  </>
+                ) : npcs.map((n) => (
                   <button
                     key={n.id}
                     className={targetNpc?.id === n.id ? 'primary' : ''}
@@ -248,10 +322,16 @@ export default function SpellbookPanel({ game, npcs, features = [], onCastResult
               <button
                 className="primary"
                 style={{ marginTop: '0.75rem' }}
-                disabled={targetMode === 'environment' ? !targetFeature : !targetNpc}
+                disabled={targetMode === 'environment'
+                  ? (!targetOpenEnv && !targetFeature)
+                  : !targetNpc}
                 onClick={handleCast}
               >
-                Cast on {targetMode === 'environment' ? (targetFeature?.name || '…') : (targetNpc?.name || '…')}
+                Cast on {targetMode === 'environment'
+                  ? (targetOpenEnv
+                      ? `Open Ground${selectedSpell === 'stone_shape' ? ` — ${openEnvForm}` : ''}`
+                      : (targetFeature?.name || '…'))
+                  : (targetNpc?.name || '…')}
               </button>
             </>
           )}

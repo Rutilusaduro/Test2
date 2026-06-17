@@ -22,6 +22,7 @@ import { getPuzzleCapabilities } from './stagePerks.js';
 import { getTightSpacePenalty } from './stageMechanics.js';
 import { renderPuzzleText } from '../textEngine/scenes/puzzles/index.js';
 import { awardAbundanceSpreadWithEvents } from './worldEvents.js';
+import { getDynamicFeatures } from './dynamicFeatures.js';
 import { getSpell, getSpellEnvironmentTags } from './spells.js';
 import { getLandmarksInRegion } from './worldReactivity.js';
 import { getRegionTransformation } from './worldTransformation.js';
@@ -84,7 +85,7 @@ export function getRegionPuzzleStates(game, regionId) {
 }
 
 export function getVisibleFeatures(game, regionId) {
-  return getFeaturesInRegion(regionId).map((feature) => {
+  const staticFeatures = getFeaturesInRegion(regionId).map((feature) => {
     const puzzle = getPuzzleByFeature(feature.id);
     return {
       ...feature,
@@ -93,6 +94,13 @@ export function getVisibleFeatures(game, regionId) {
       examined: isFeatureExamined(game, feature.id),
     };
   });
+  const dynamic = getDynamicFeatures(game, regionId).map((f) => ({
+    ...f,
+    puzzle: null,
+    solved: false,
+    examined: false,
+  }));
+  return [...staticFeatures, ...dynamic];
 }
 
 function evaluateSolutionKind(game, solution, puzzle, context = {}) {
