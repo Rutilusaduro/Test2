@@ -286,6 +286,7 @@ export function resolveCastCost(character, spell, opts = {}) {
  * Returns { ok, method: 'cantrip'|'slot'|'ap', apSpent? }
  */
 export function previewCastCost(character, spell, opts = {}) {
+  if (character.debugAllSpellsUnlocked) return { ok: true, method: "free" };
   const slotLevel = spell.slotLevel ?? spell.level ?? 0;
   if (slotLevel === 0) return { ok: true, method: "cantrip" };
 

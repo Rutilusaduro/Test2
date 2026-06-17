@@ -79,6 +79,7 @@ export function getRitualCastableSpells(player) {
 
 function resolveOverworldCost(player, spell, overflow, opts = {}) {
   const castData = getSpellForCast(spell, overflow);
+  if (player.debugAllSpellsUnlocked) return { ok: true, method: 'free', spell: castData };
   if (castData.slotLevel === 0) return { ok: true, method: 'cantrip', spell: castData };
   if (!overflow && canUseCreationGift(player, castData.id, { overflow })) {
     return { ok: true, method: 'gift', spell: castData };

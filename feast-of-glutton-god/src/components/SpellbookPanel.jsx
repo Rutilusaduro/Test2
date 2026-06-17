@@ -34,6 +34,7 @@ export default function SpellbookPanel({ game, npcs, features = [], onCastResult
   const spellbookIds = isWizard ? getSpellbookLeveledIds(player) : [];
 
   const canCast = (spell) => {
+    if (player.debugAllSpellsUnlocked) return true;
     if (mode === 'ritual' && isRitualSpell(spell)) {
       if (canUseCreationGift(player, spell.id)) return true;
       return (player.ap || 0) >= getRitualApCost(spell);

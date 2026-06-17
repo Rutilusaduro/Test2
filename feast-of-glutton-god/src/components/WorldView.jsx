@@ -152,7 +152,7 @@ export default function WorldView({ game, onUpdate, onEncounter, onHostilityEnco
     });
   };
 
-  const handleNpcUpdate = (npc) => {
+  const persistNpcState = (npc) => {
     onUpdate((g) => {
       applyNpcState(g, npc.id, npc);
       if (npc.isCompanion) {
@@ -164,6 +164,10 @@ export default function WorldView({ game, onUpdate, onEncounter, onHostilityEnco
       }
       return { ...g, npcStates: { ...g.npcStates, [npc.id]: npc } };
     });
+  };
+
+  const handleNpcUpdate = (npc) => {
+    persistNpcState(npc);
     setNpcModal(npc);
   };
 
@@ -366,7 +370,7 @@ export default function WorldView({ game, onUpdate, onEncounter, onHostilityEnco
         npcs={npcs}
         features={features}
         onGameUpdate={onUpdate}
-        onCastResult={(npc) => handleNpcUpdate(npc)}
+        onCastResult={(npc) => persistNpcState(npc)}
         onFeatureCast={(result) => {
           if (result.puzzleSolve?.solved) {
             onUpdate((g) => {
